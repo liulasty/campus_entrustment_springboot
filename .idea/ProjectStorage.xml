@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectStorage">
+    <option name="path" value="狄拉墨涅的私有团队-&gt;campus_entrustment" />
+    <option name="prefixUrlList">
+      <list>
+        <PrefixUrl>
+          <option name="moduleName" value="campus_entrustment" />
+          <option name="prefixUrl" value="http://localhost:80/campus_entrustment" />
+          <option name="rowIndex" value="0" />
+        </PrefixUrl>
+      </list>
+    </option>
+    <option name="profile" value="dev" />
+    <option name="projectId" value="c9fe1f18-3bbf-4afd-a407-7271e7edb65c" />
+    <option name="uploadType" value="2" />
+  </component>
+</project>
