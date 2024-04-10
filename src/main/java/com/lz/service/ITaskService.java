@@ -13,4 +13,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface ITaskService extends IService<Task> {
 
+    void addTask();
+    void updateTask();
+    void deleteTask();
+    void searchTask(Long id);
 }

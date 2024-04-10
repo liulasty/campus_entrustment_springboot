@@ -1,9 +1,12 @@
 package com.lz.service.impl;
 
+import com.lz.mapper.ReviewsMapper;
+import com.lz.mapper.UsersMapper;
 import com.lz.pojo.entity.Task;
 import com.lz.mapper.TaskMapper;
 import com.lz.service.ITaskService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -16,5 +19,32 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements ITaskService {
+    
+    @Autowired
+    private UsersMapper usersMapper;
+    
+    @Autowired
+    private TaskMapper taskMapper;
+    @Override
+    public void addTask() {
+        
+    }
 
+    @Override
+    public void updateTask() {
+
+    }
+
+    @Override
+    public void deleteTask() {
+
+    }
+    
+    @Override
+    public void searchTask(Long id) {
+        Task task = taskMapper.selectById(id);
+        
+        
+        System.out.println(task);
+    }
 }
