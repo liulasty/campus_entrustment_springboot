@@ -1,2 +1,16 @@
 # 项目排除路径
 /target/
+
+# Exclusion rules for unmanaged files
+
+# Directories
+src/main/resources/application-dev.yml
+src/main/resources/application-devDB.yml
+src/main/resources/application-devMVC.yml
+
+
+
+
+
+# IDE-specific file
+.idea/vcs.xml
