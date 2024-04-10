@@ -3,6 +3,9 @@ package com.lz.controller;
 
 import com.lz.constants.MessageConstants;
 import com.lz.pojo.dto.TaskDTO;
+import com.lz.pojo.dto.TaskPageDTO;
+import com.lz.pojo.entity.Task;
+import com.lz.pojo.result.PageResult;
 import com.lz.pojo.result.Result;
 import com.lz.service.ITaskService;
 import com.lz.service.INotificationsService;
@@ -110,5 +113,13 @@ public class TaskController {
         //即将到期委托
         // taskService.getExpireTask();
         return null;
+    }
+    
+    //分页查询
+    @PostMapping("/searchPage")
+    @ApiOperation("分页查询")
+    public Result<PageResult<Task>> searchPage(TaskPageDTO taskPageDTO) {
+        PageResult<Task> taskPageResult = taskService.searchPage(taskPageDTO);
+        return Result.success(taskPageResult);
     }
 }
