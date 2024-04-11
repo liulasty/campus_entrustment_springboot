@@ -1,4 +1,4 @@
-package com.lz.constants;
+package com.lz.pojo.constants;
 
 /*
  * Created with IntelliJ IDEA.
@@ -8,7 +8,10 @@ package com.lz.constants;
  */
 
 /**
+ * 消息常量
+ *
  * @author lz
+ * @date 2024/04/10
  */
 public class MessageConstants {
     

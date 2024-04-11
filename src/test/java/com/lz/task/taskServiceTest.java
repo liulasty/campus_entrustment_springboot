@@ -11,8 +11,10 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lz.pojo.Enum.TaskStatus;
 import com.lz.pojo.dto.TaskPageDTO;
+import com.lz.pojo.entity.DelegationCategories;
 import com.lz.pojo.entity.Task;
 import com.lz.pojo.result.PageResult;
+import com.lz.service.IDelegationCategoriesService;
 import com.lz.service.ITaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -20,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author lz
@@ -29,75 +32,85 @@ import java.util.Date;
 public class taskServiceTest {
     @Autowired
     private ITaskService taskService;
+
+    @Autowired
+    private IDelegationCategoriesService delegationCategoriesService;
     @Test
     public void test01() {
         Task task = Task.builder()
                 .receiverId(null)
-                .endTime(new Date(System.currentTimeMillis()))
-                .startTime(new Date(System.currentTimeMillis()))
-                .status(TaskStatus.PENDING)
-                .type("测试")
+                .description("测试")
+                .createdAt(new Date(System.currentTimeMillis()))
+                .endTime(new Date(System.currentTimeMillis() + 20 * 60 * 60 * 24 * 1000))
+                .startTime(new Date(System.currentTimeMillis() + 10 * 60 * 60 * 24 * 1000))
+                .status(TaskStatus.DRAFT)
+                
                 .location("测试")
                 .build();
-        for (int i = 0; i < 100; i++){
-            task.setOwnerId(i+1);
-            task.setDescription("测试"+i);
+        for (int i = 0; i < 100; i++) {
+            task.setOwnerId(i + 1);
+            task.setType(i/10+1);
+            task.setDescription("测试" + i);
+            task.setCreatedAt(new Date(System.currentTimeMillis() + (long) i * 60 * 60 * 24 * 1000));
+            task.setType(i/10+1);
             taskService.save(task);
         }
-        
-        
-        
+
+
     }
-    
+
     @Test
     public void test06() {
         Task task = Task.builder()
                 .receiverId(null)
                 .description("测试")
-                .endTime(new Date(System.currentTimeMillis()+20*60*60*24*1000))
-                .startTime(new Date(System.currentTimeMillis()))
-                .status(TaskStatus.COMPLETED)
-                .type("测试")
+                .createdAt(new Date(System.currentTimeMillis()))
+                .endTime(new Date(System.currentTimeMillis() + 20 * 60 * 60 * 24 * 1000))
+                .startTime(new Date(System.currentTimeMillis() + 10 * 60 * 60 * 24 * 1000))
+                .status(TaskStatus.DRAFT)
+                .type(1)
                 .location("测试")
                 .build();
-        
+
         taskService.save(task);
-            }
-    
+    }
+
     @Test
     public void test02() {
         Task task = Task.builder()
                 .receiverId(null)
-                .endTime(new Date(System.currentTimeMillis()+20*60*60*24*1000))
-                .startTime(new Date(System.currentTimeMillis()))
-                .status(TaskStatus.PENDING)
-                .type("修改测试")
+                .createdAt(new Date(System.currentTimeMillis()))
+                .endTime(new Date(System.currentTimeMillis() + 20 * 60 * 60 * 24 * 1000))
+                .startTime(new Date(System.currentTimeMillis() + 10 * 60 * 60 * 24 * 1000))
                 .location("修改测试")
                 .build();
-        for (int i = 304; i < 350; i++){
-            task.setTaskId(i+1);
-            task.setOwnerId(i+1);
-            task.setDescription("修改测试"+i);
-            log.info("修改开始时间：{}",task.getStartTime());
-            log.info("修改结束时间：{}",task.getEndTime());
-            taskService.updateById(task);
+        int count  = 1;
+        for (int i = 7; i < 23; i++) {
+            
+            task.setOwnerId(i + 1);
+            task.setCreatedAt(new Date(System.currentTimeMillis() + (long) i * 60 * 60 * 24 * 1000));
+            task.setStatus(TaskStatus.ONGOING);
+            
+            
+            
+            
         }
     }
     
+
     @Test
     public void test03() {
-        for (int i = 49; i < 100; i++){
-            taskService.removeById(i+1);
+        for (int i = 49; i < 100; i++) {
+            taskService.removeById(i + 1);
         }
     }
-    
-    
-    
+
+
     @Test
     public void test04() {
         TaskPageDTO taskPageDTO = new TaskPageDTO();
         taskPageDTO.setPageNum(1);
-        
+
         taskPageDTO.setPageSize(10);
         taskPageDTO.setDescription("测试1");
         taskPageDTO.setLocation("");
@@ -105,14 +118,37 @@ public class taskServiceTest {
 
         PageResult<Task> taskPageResult = taskService.searchPage(taskPageDTO);
 
-        log.info("查询结果：{}",taskPageResult);
+        log.info("查询结果：{}", taskPageResult);
+    }
+
+    @Test
+    public void test05() {
+
+        log.info("查询结果：{}", taskService.getById(398L));
+    }
+
+    @Test
+    public void AddSystemAnnouncement() {
+
+        log.info("查询结果：{}", taskService.getById(398L));
     }
     
     @Test
-    public void test05() {
-        
-        log.info("查询结果：{}",taskService.getById(398L));
+    void addTaskType(){
+        DelegationCategories delegationCategories = DelegationCategories.builder()
+                .categoryName("测试")
+                .categoryDescription("测试")
+                .build();
+        delegationCategoriesService.save(delegationCategories);
     }
     
+    @Test
+    void deleteTaskType(){
+        List<DelegationCategories> list = delegationCategoriesService.list();
+        log.info("查询结果：{}", list);
+        delegationCategoriesService.removeById(11);
+    }
     
+
+
 }

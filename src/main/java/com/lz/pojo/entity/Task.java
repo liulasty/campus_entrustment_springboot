@@ -45,6 +45,11 @@ public class Task implements Serializable {
     @ApiModelProperty(value = "任务接收者的用户ID")
     @TableField("ReceiverID")
     private Integer receiverId;
+    
+    
+    @ApiModelProperty(value = "创建时间")
+    @TableField("CreatedAt")
+    private Date createdAt;
 
     @ApiModelProperty(value = "任务描述")
     @TableField("Description")
@@ -52,17 +57,17 @@ public class Task implements Serializable {
     
     @ApiModelProperty(value = "委托类型")
     @TableField("TaskType")
-    private String type;
+    private Integer type;
     
     @ApiModelProperty(value = "任务地点")
     @TableField("Location")
     private String location;
 
-    @ApiModelProperty(value = "任务开始时间")
+    @ApiModelProperty(value = "委托发布时间")
     @TableField("StartTime")
     private Date startTime;
 
-    @ApiModelProperty(value = "任务结束时间")
+    @ApiModelProperty(value = "任务截止时间")
     @TableField("EndTime")
     private Date endTime;
 

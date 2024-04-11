@@ -1,5 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.lz.mapper.TaskMapper">
+<mapper namespace = "com.lz.mapper.TaskMapper">
+	<select id = "selectTaskTypeCountTop5" resultType = "com.lz.pojo.dto.TaskCountDTO">
+		SELECT TaskType as taskTypeId, COUNT(*) AS typeCount
+		FROM campus_entrustment.task
+		GROUP BY TaskType
+		ORDER BY typeCount DESC
+		LIMIT 5;
+	</select>
+	<select id = "selectTasksStats">
+	</select>
+	
+	<!-- 定义查询语句 -->
+	<select id = "getTasksTodayCount" resultType = "java.lang.Integer">
+		SELECT COUNT(*)
+		FROM Task
+		WHERE
+		<if test = "key != null and key != ''">
+			STATUS = #{key} AND
+		</if>
+		DATE(StartTime) = CURDATE()
+	</select>
+	<select id = "getTasksWeeklyCount" resultType = "java.lang.Integer">
+		SELECT COUNT(*)
+		FROM Task
+		WHERE
+		<if test = "key != null and key != ''">
+			STATUS = #{key} AND
+		</if>
+		YEARWEEK(StartTime, 1) = YEARWEEK(CURDATE(), 1);
+	
+	</select>
+	<select id = "getTasksMonthlyCount" resultType = "java.lang.Integer">
+		SELECT COUNT(*)
+		FROM Task
+		WHERE
+		<if test = "key != null and key != ''">
+			STATUS = #{key} AND
+		</if>
+		DATE_FORMAT(StartTime, '%Y-%m') = DATE_FORMAT(CURDATE(), '%Y-%m');
+	
+	</select>
 
 </mapper>

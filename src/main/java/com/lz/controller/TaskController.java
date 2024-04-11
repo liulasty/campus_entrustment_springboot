@@ -1,7 +1,7 @@
 package com.lz.controller;
 
 
-import com.lz.constants.MessageConstants;
+import com.lz.pojo.constants.MessageConstants;
 import com.lz.pojo.dto.TaskDTO;
 import com.lz.pojo.dto.TaskPageDTO;
 import com.lz.pojo.entity.Task;
@@ -100,12 +100,10 @@ public class TaskController {
     @GetMapping("/getNewTask")
     @ApiOperation("快速信息展示")
     public Result<String> getNewTask() {
-        //系统公告与通知
-        // notificationService.getNotifications();
+        // 系统公告与通知
+        notificationService.getNewestNotifications();
         //最新委托
         // taskService.getNewTask();
-        //热门委托
-        // taskService.getHotTask();
         //委托成交统计
         // taskService.getTaskStatistics();
         //热门服务类别

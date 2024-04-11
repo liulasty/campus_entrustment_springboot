@@ -1,11 +1,14 @@
 package com.lz.pojo.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.time.LocalDateTime;
 import java.io.Serializable;
+import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.lz.pojo.Enum.NotificationsType;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -37,20 +40,29 @@ public class Notifications implements Serializable {
     @TableId(value = "NotificationID", type = IdType.AUTO)
     private Integer notificationId;
 
-    @ApiModelProperty(value = "接收通知的用户ID")
+    @ApiModelProperty(value = "接收通知的用户ID，0为全体用户")
+    @TableField("UserID")
     private Integer userId;
 
     @ApiModelProperty(value = "通知类型")
-    private String notificationType;
-
+    @TableField("NotificationType")
+    private NotificationsType notificationType;
+    
+    @ApiModelProperty(value = "通知标题")
+    @TableField("Title")
+    private String title;
+    /**
+     * 消息
+     * VARCHAR(255)字段通常能够存储大约85个汉字
+     */
     @ApiModelProperty(value = "通知消息")
+    @TableField("Message")
     private String message;
-
-    @ApiModelProperty(value = "是否已读")
-    private Boolean isRead;
+    
 
     @ApiModelProperty(value = "通知时间")
-    private LocalDateTime notificationTime;
+    @TableField("NotificationTime")
+    private Date notificationTime;
 
 
 }

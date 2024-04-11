@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lz.Exception.MyException;
-import com.lz.constants.MessageConstants;
+import com.lz.pojo.constants.MessageConstants;
 import com.lz.mapper.UsersMapper;
 import com.lz.pojo.dto.UserDTO;
 import com.lz.pojo.dto.UserLoginDTO;
@@ -161,14 +161,11 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
 
                 Page<Users> usersPage = usersMapper.selectPage(page, queryWrapper);
 
-                usersPage.getRecords().forEach(users -> {
-                    users.setPassword(null);
-                });
+                usersPage.getRecords().forEach(users -> users.setPassword(null));
 
 
-                PageResult<Users> pageResult = new PageResult(usersPage.getTotal(),
-                                                              usersPage.getRecords());
-                return pageResult;
+                return (PageResult<Users>) new PageResult(usersPage.getTotal(),
+                                                          usersPage.getRecords());
             }
         }
         return null;
