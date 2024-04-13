@@ -8,12 +8,15 @@ package com.lz.pojo.vo;
  */
 
 import com.lz.Annotation.HaveNoBlank;
+import com.lz.pojo.dto.TaskCountDTO;
 import com.lz.pojo.dto.TaskDTO;
 import com.lz.pojo.entity.SystemAnnouncements;
+import com.lz.pojo.entity.Task;
 import io.swagger.annotations.ApiModel;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 最新资讯 DTO
@@ -31,20 +34,20 @@ public class NewestInfoVO {
     /**
      * 最新委托
      */
-    List<TaskVO> newestTask;
+    List<Task> newestTask;
     /**
      * 热门类别
      */
-    List<String> hotTaskCategory;
+    Map<String, TaskCountDTO> hotTaskCategory;
     
     /**
      * 委托统计
      */
-    List<Integer> transactionStats;
+    Map<String, Integer> transactionStats;
     
     /**
      * 与我相关的委托
      */
-    List<TaskVO> tasksWithUser;
+    List<Task> tasksWithUser;
     
 }

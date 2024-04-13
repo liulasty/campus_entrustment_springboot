@@ -113,11 +113,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
                 return false;
             }
 
-            if (!role.equals(ROLE_ADMIN) && !role.equals(ROLE_USER)) {
-                // 如果是非法角色
-                log.error("非法角色: {}", role); // 使用参数化日志记录
-                return false;
-            }
+            
 
 
             List<GrantedAuthority> authorities = new ArrayList<>();

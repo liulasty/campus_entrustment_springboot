@@ -67,4 +67,10 @@ public class MessageConstants {
     public static final String USER_ABLE_SUCCESS = "取消用户禁用";
     public static final String USER_LOGOUT_FAILURE = "退出登录失败";
     public static final String SEND_EMAIL_FAIL = "发送邮件失败";
+    public static final String TASK_UPDATE_SUCCESS =  "更新委托成功";
+    public static final String TASK_PUBLISH_SUCCESS = "发布委托成功";
+    public static final String TASK_PUBLISH_FAIL = "发布委托失败";
+    public static final String TASK_AUDIT_REASON = "审核不通过，原因";
+    public static final String DATA_AUDIT_SUCCESS =  "委托审核成功";
+    public static final String DATA_AUDIT_FAIL = "委托审核失败";
 }

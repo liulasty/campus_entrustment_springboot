@@ -10,6 +10,7 @@ import com.lz.pojo.dto.UsersPageDTO;
 import com.lz.pojo.entity.Users;
 import com.lz.pojo.result.PageResult;
 import com.lz.pojo.result.Result;
+import com.lz.pojo.vo.UserLoginVO;
 import com.lz.service.IUsersService;
 import com.lz.utils.JwtUtil;
 import com.lz.utils.ValidateUtil;
@@ -73,7 +74,7 @@ public class UsersController {
      */
     @PostMapping(value = "/login")
     @ApiOperation("登录")
-    public Result<String> login(@Validated @RequestBody UserLoginDTO userLoginDTO, BindingResult result) throws MyException {
+    public Result<UserLoginVO> login(@Validated @RequestBody UserLoginDTO userLoginDTO, BindingResult result) throws MyException {
         log.info("用户登录:{}", userLoginDTO.getUsername());
         //校验结果
         if (ValidateUtil.validate(result) != null) {
@@ -95,26 +96,25 @@ public class UsersController {
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             // 获取当前用户的角色信息
-            String role = "user";
-            Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-            for (GrantedAuthority authority : authorities) {
-                String roleName = authority.getAuthority();
-                log.info("当前用户角色: {}", roleName);
-                role = roleName;
-            }
+            
+            Users user = usersService.getByUsername(userLoginDTO.getUsername());
 
             HashMap<String, Object> claims = new HashMap<>();
-            claims.put("username", userLoginDTO.getUsername());
-            claims.put("role", Objects.equals(role, ROLE_ADMIN) ? ROLE_ADMIN
-                    : ROLE_USER);
+            claims.put("username", user.getUsername());
+            claims.put("role",user.getRole());
             String token = JwtUtil.genToken(claims, appConfig.getJwtKey());
+            UserLoginVO loginVO = UserLoginVO.builder()
+                    .userId(user.getUserId())
+                    .userType(user.getRole())
+                    .token(token)
+                    .build();
             // boolean login = usersService.login(userLoginDTO);
             // if (!login) {
             //     return Result.error(MessageConstants.USER_LOGIN_FAIL);
             // }
             // 登录成功，生成JWT并添加到响应中
             // Spring Security验证成功，无需再执行usersService.login()
-            return Result.success(token, MessageConstants.USER_LOGIN_SUCCESS);
+            return Result.success(loginVO, MessageConstants.USER_LOGIN_SUCCESS);
         }
     }
 
@@ -162,7 +162,7 @@ public class UsersController {
     @PostMapping(value = "/logout")
     @ApiOperation("登出")
     // @Secured("user")
-    @PreAuthorize(value = "hasRole('ROLE_USER')")
+    // @PreAuthorize(value = "hasRole('ROLE_USER')")
     public Result<String> logout(HttpServletRequest request) {
         log.info("用户登出请求");
 
@@ -332,6 +332,13 @@ public class UsersController {
         log.info("重置密码:{}", users);
         usersService.resetPassword(users);
         return Result.success(MessageConstants.USER_UPDATE_SUCCESS);
+    }
+    
+    @GetMapping("/check")
+    @ApiOperation("检查用户是否登录")
+    public Result<String> check() {
+        log.info("检查用户是否登录");
+        return Result.success("用户已登录");
     }
 
 

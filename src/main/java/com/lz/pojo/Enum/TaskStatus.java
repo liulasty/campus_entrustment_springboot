@@ -13,7 +13,9 @@ import lombok.Getter;
 @Getter
 @ApiModel(value = "任务状态类型枚举")
 public enum TaskStatus {
-    //草稿
+    /**
+     * 草稿
+     */
     @ApiModelProperty(value = "草稿")
     DRAFT("DRAFT","草稿"),
     /**
@@ -21,10 +23,14 @@ public enum TaskStatus {
      */
     @ApiModelProperty(value = "审核中")
     AUDITING("AUDITING","审核中"),
-    //未通过
+    /**
+     * 审核未通过
+     */
     @ApiModelProperty(value = "未通过")
     AUDIT_FAILED("AUDIT_FAILED","审核未通过"),
-    //等待发布
+    /**
+     * 待发布
+     */
     @ApiModelProperty(value = "等待发布")
     PENDING_RELEASE("PENDING_RELEASE","等待发布"),
     

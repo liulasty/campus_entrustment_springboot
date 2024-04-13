@@ -40,7 +40,7 @@ public class Users implements Serializable {
 
     @ApiModelProperty(value = "用户ID")
     @TableId(value = "UserID", type = IdType.AUTO)
-    private Integer userId;
+    private Long userId;
 
     @ApiModelProperty(value = "用户名")
     private String username;

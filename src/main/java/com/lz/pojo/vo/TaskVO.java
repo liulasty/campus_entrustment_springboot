@@ -7,12 +7,15 @@ package com.lz.pojo.vo;
  * @Description:
  */
 
+import com.lz.pojo.Enum.TaskStatus;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.Date;
 
 /**
  * 委托信息前端展示
@@ -35,11 +38,12 @@ public class TaskVO {
      */
     @ApiModelProperty("委托位置")
     private String location;
-    /**
-     * 委托标题
-     */
-    @ApiModelProperty("委托标题")
-    private String title;
+    
+    @ApiModelProperty("委托发起人")
+    private Long ownerId;
+    
+    @ApiModelProperty("委托创建时间")
+    private Date createdAt;
     /**
      * 委托描述
      */
@@ -49,16 +53,16 @@ public class TaskVO {
      * 类型
      */
     @ApiModelProperty("委托类型")
-    private String type;
+    private TaskStatus type;
     /**
      * 开始时间
      */
     @ApiModelProperty("委托开始时间")
-    private String startTime;
+    private Date startTime;
     /**
      * 结束时间
      */
     @ApiModelProperty("委托结束时间")
-    private String endTime;
+    private Date endTime;
     
 }

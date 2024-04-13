@@ -2,6 +2,7 @@ package com.lz.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.lz.pojo.entity.DelegateAuditRecords;
+import com.lz.pojo.entity.Task;
 
 /**
  * <p>
@@ -13,4 +14,10 @@ import com.lz.pojo.entity.DelegateAuditRecords;
  */
 public interface IDelegateAuditRecordsService extends IService<DelegateAuditRecords> {
 
+    /**
+     * 按 ID 获取失败原因
+     *
+     * @param id 同上
+     */
+    DelegateAuditRecords getFailReasonById(Long id);
 }

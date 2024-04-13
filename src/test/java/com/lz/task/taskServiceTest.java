@@ -35,26 +35,11 @@ public class taskServiceTest {
 
     @Autowired
     private IDelegationCategoriesService delegationCategoriesService;
+    
+    
     @Test
     public void test01() {
-        Task task = Task.builder()
-                .receiverId(null)
-                .description("测试")
-                .createdAt(new Date(System.currentTimeMillis()))
-                .endTime(new Date(System.currentTimeMillis() + 20 * 60 * 60 * 24 * 1000))
-                .startTime(new Date(System.currentTimeMillis() + 10 * 60 * 60 * 24 * 1000))
-                .status(TaskStatus.DRAFT)
-                
-                .location("测试")
-                .build();
-        for (int i = 0; i < 100; i++) {
-            task.setOwnerId(i + 1);
-            task.setType(i/10+1);
-            task.setDescription("测试" + i);
-            task.setCreatedAt(new Date(System.currentTimeMillis() + (long) i * 60 * 60 * 24 * 1000));
-            task.setType(i/10+1);
-            taskService.save(task);
-        }
+        
 
 
     }
@@ -77,24 +62,24 @@ public class taskServiceTest {
 
     @Test
     public void test02() {
-        Task task = Task.builder()
-                .receiverId(null)
-                .createdAt(new Date(System.currentTimeMillis()))
-                .endTime(new Date(System.currentTimeMillis() + 20 * 60 * 60 * 24 * 1000))
-                .startTime(new Date(System.currentTimeMillis() + 10 * 60 * 60 * 24 * 1000))
-                .location("修改测试")
-                .build();
-        int count  = 1;
-        for (int i = 7; i < 23; i++) {
-            
-            task.setOwnerId(i + 1);
-            task.setCreatedAt(new Date(System.currentTimeMillis() + (long) i * 60 * 60 * 24 * 1000));
-            task.setStatus(TaskStatus.ONGOING);
-            
-            
-            
-            
-        }
+        // Task task = Task.builder()
+        //         .receiverId(null)
+        //         .createdAt(new Date(System.currentTimeMillis()))
+        //         .endTime(new Date(System.currentTimeMillis() + 20 * 60 * 60 * 24 * 1000))
+        //         .startTime(new Date(System.currentTimeMillis() + 10 * 60 * 60 * 24 * 1000))
+        //         .location("修改测试")
+        //         .build();
+        // int count  = 1;
+        // for (int i = 7; i < 23; i++) {
+        //    
+        //     task.setOwnerId(i + 1);
+        //     task.setCreatedAt(new Date(System.currentTimeMillis() + (long) i * 60 * 60 * 24 * 1000));
+        //     task.setStatus(TaskStatus.ONGOING);
+        //    
+        //    
+        //    
+        //    
+        // }
     }
     
 
@@ -147,6 +132,11 @@ public class taskServiceTest {
         List<DelegationCategories> list = delegationCategoriesService.list();
         log.info("查询结果：{}", list);
         delegationCategoriesService.removeById(11);
+    }
+    
+    @Test
+    void  getUserDelegateDraft(){
+        
     }
     
 

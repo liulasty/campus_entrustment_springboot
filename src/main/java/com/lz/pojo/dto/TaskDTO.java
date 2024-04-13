@@ -9,6 +9,8 @@ package com.lz.pojo.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.models.auth.In;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
@@ -19,9 +21,13 @@ import javax.validation.constraints.NotBlank;
 @Data
 @ApiModel(value="委托信息对象",description = "用户创建时传递的数据模型")
 public class TaskDTO {
-    @ApiModelProperty(value = "委托标题",required = true)
-    @NotBlank(message = "委托标题 不能为空")
-    String title;
+    @ApiModelProperty(value = "委托ID",required = true)
+    Long taskId;
+    /**
+     *委托人
+     */
+    @ApiModelProperty(value = "委托人id",required = true)
+    Long ownerId;
     
     @ApiModelProperty(value = "委托地点",required = true)
     @NotBlank(message = "委托地点 不能为空")
@@ -36,31 +42,7 @@ public class TaskDTO {
     String type;
     
     
-    @ApiModelProperty(value = "委托开始时间",required = true)
-    @NotBlank(message = "委托开始时间 不能为空")
-    String startTime;
     
-    @ApiModelProperty(value = "委托结束时间",required = true)
-    @NotBlank(message = "委托结束时间 不能为空")
-    String endTime;
-    
-    public String validate() {
-        if (title == null || "".equals(title)) {
-            return "title 不能为空";
-        }
-        if (location == null || "".equals(location)) {
-            return "location 不能为空";
-        }
-        if (content == null || "".equals(content)) {
-            return "content 不能为空";
-        }
-        if (type == null || "".equals(type)) {
-            return "type 不能为空";
-        }
-        
-        
-        return null;
-    }
     
     
 }

@@ -4,6 +4,7 @@
 	<select id = "selectTaskTypeCountTop5" resultType = "com.lz.pojo.dto.TaskCountDTO">
 		SELECT TaskType as taskTypeId, COUNT(*) AS typeCount
 		FROM campus_entrustment.task
+		WHERE STATUS = 'ONGOING' or STATUS = 'ACCEPTED'
 		GROUP BY TaskType
 		ORDER BY typeCount DESC
 		LIMIT 5;

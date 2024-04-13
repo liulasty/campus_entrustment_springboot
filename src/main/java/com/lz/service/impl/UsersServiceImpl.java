@@ -106,7 +106,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         return false;
     }
 
-    public void sendActivationEmail(Integer id, String email, String baseUrl,
+    public void sendActivationEmail(Long id, String email, String baseUrl,
                                     String msg) throws MyException {
         try {
             // 构建激活链接

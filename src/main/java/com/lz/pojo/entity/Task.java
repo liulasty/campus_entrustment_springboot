@@ -36,15 +36,15 @@ public class Task implements Serializable {
 
     @ApiModelProperty(value = "任务ID")
     @TableId(value = "TaskID", type = IdType.AUTO)
-    private Integer taskId;
+    private Long taskId;
 
     @ApiModelProperty(value = "任务所有者的用户ID")
     @TableField("OwnerID")
-    private Integer ownerId;
+    private Long ownerId;
 
     @ApiModelProperty(value = "任务接收者的用户ID")
     @TableField("ReceiverID")
-    private Integer receiverId;
+    private Long receiverId;
     
     
     @ApiModelProperty(value = "创建时间")
