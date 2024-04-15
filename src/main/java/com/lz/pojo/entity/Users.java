@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import io.swagger.annotations.ApiModel;
@@ -51,9 +52,7 @@ public class Users implements Serializable {
     @ApiModelProperty(value = "电子邮件地址")
     private String email;
 
-    @ApiModelProperty(value = "电话号码")
-    @TableField("PhoneNumber")
-    private String phoneNumber;
+
 
     @ApiModelProperty(value = "用户是否激活")
     @TableField("IsActive")
@@ -61,6 +60,10 @@ public class Users implements Serializable {
 
     @ApiModelProperty(value = "用户角色")
     private String role;
+    @TableField(value = "CreateTime")
+    private Date createTime;
+    @TableField(value = "ActiveTime")
+    private Date activeTime;
 
 
     

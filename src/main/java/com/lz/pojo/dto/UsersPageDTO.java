@@ -24,9 +24,8 @@ public class UsersPageDTO implements Serializable {
     @ApiModelProperty(value = "用户名")
     private String username;
     
-    
-    @ApiModelProperty(value = "角色")
-    private String role;
+    @ApiModelProperty(value = "验证邮箱")
+    private String email;
     
     @ApiModelProperty(value = "用户是否激活")
     private Boolean isActive;

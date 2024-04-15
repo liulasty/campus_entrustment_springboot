@@ -1,6 +1,7 @@
 package com.lz.service;
 
 import com.lz.Exception.MyException;
+import com.lz.pojo.Page.UsersConfig;
 import com.lz.pojo.dto.UserDTO;
 import com.lz.pojo.dto.UserLoginDTO;
 import com.lz.pojo.dto.UsersPageDTO;
@@ -52,7 +53,7 @@ public interface IUsersService extends IService<Users>  {
      *
      * @return {@code List<Users>}
      */
-    PageResult<?> getUserByPage(UsersPageDTO usersPageDTO);
+    PageResult getUserByPage(UsersConfig config);
 
     /**
      * 重置密码

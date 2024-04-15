@@ -2,6 +2,8 @@ package com.lz.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.lz.Exception.MyException;
+import com.lz.pojo.dto.UserInfoDTO;
 import com.lz.pojo.entity.UsersInfo;
 
 /**
@@ -14,4 +16,10 @@ import com.lz.pojo.entity.UsersInfo;
  */
 public interface IUsersInfoService extends IService<UsersInfo> {
 
+    /**
+     * 提交认证信息
+     *
+     * @param dto DTO
+     */
+    void submitCertificationInformation(UserInfoDTO dto) throws MyException;
 }

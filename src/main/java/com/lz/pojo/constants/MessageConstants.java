@@ -73,4 +73,5 @@ public class MessageConstants {
     public static final String TASK_AUDIT_REASON = "审核不通过，原因";
     public static final String DATA_AUDIT_SUCCESS =  "委托审核成功";
     public static final String DATA_AUDIT_FAIL = "委托审核失败";
+    public static final String TASK_CANCEL_SUCCESS = "委托取消发布成功";
 }

@@ -4,20 +4,29 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lz.Exception.MyException;
+import com.lz.pojo.Page.UsersConfig;
 import com.lz.pojo.constants.MessageConstants;
 import com.lz.mapper.UsersMapper;
 import com.lz.pojo.dto.UserDTO;
 import com.lz.pojo.dto.UserLoginDTO;
 import com.lz.pojo.dto.UsersPageDTO;
 import com.lz.pojo.entity.Users;
+import com.lz.pojo.entity.UsersInfo;
 import com.lz.pojo.result.PageResult;
+import com.lz.pojo.vo.UserPageVO;
+import com.lz.service.IUsersInfoService;
 import com.lz.service.IUsersService;
 import com.lz.utils.MailUtils;
 import com.lz.utils.PasswordUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Objects;
 
 /**
  * <p>
@@ -29,11 +38,14 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Slf4j
-@Transactional(rollbackFor = MyException.class )
-public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements IUsersService{
+@Transactional(rollbackFor = MyException.class)
+public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements IUsersService {
 
     public static final String BASEURL = "http://localhost:80";
 
+
+    @Autowired
+    private IUsersInfoService usersInfoService;
     @Autowired
     private UsersMapper usersMapper;
 
@@ -66,7 +78,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         if (PasswordUtils.check(inputPassword, users.getPassword())) {
             return true;
         } else if (!users.getIsActive()) {
-            sendActivationEmail(users.getUserId(), users.getEmail(), BASEURL, 
+            sendActivationEmail(users.getUserId(), users.getEmail(), BASEURL,
                                 "需激活后才能登录");
             throw new MyException(MessageConstants.USER_NOT_ACTIVE);
         }
@@ -89,12 +101,12 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
                         .password(PasswordUtils.hashPassword(userDTO.getPassword()))
                         .role("user")
                         .isActive(false)
+                        .createTime(new Date(System.currentTimeMillis()))
                         .email(userDTO.getEmail())
-                        .phoneNumber(userDTO.getPhoneNumber())
                         .build();
 
                 usersMapper.insert(user);
-                // TODO: 2024/4/4
+
                 sendActivationEmail(user.getUserId(), user.getEmail(),
                                     BASEURL, null);
 
@@ -110,7 +122,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
                                     String msg) throws MyException {
         try {
             // 构建激活链接
-            String activeUrl = baseUrl + "/user/user/active/" + id;
+            String activeUrl = baseUrl + "/campus_entrustment/user/active/" + id;
 
             MailUtils.sendMail(email,
                                "你好，这是一封激活邮件，无需回复，点击此链接激活" + activeUrl
@@ -131,6 +143,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
                 throw new MyException(MessageConstants.USER_ACTIVE_SUCCESS);
             }
             users.setIsActive(true);
+            users.setActiveTime(new Date(System.currentTimeMillis()));
             usersMapper.updateById(users);
             return true;
         }
@@ -138,37 +151,34 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
     }
 
     @Override
-    public PageResult<?> getUserByPage(UsersPageDTO usersPageDTO) {
-        if (usersPageDTO.validate() == null) {
-            QueryWrapper<Users> queryWrapper = new QueryWrapper<>();
-            if (usersPageDTO.getUsername() != null&& !usersPageDTO.getUsername().trim().isEmpty()) {
-                queryWrapper.like("Username", usersPageDTO.getUsername());
-            }
-            if (usersPageDTO.getRole() != null && !usersPageDTO.getRole().trim().isEmpty()) {
-                queryWrapper.eq("Role", usersPageDTO.getRole());
-            }
-            if (usersPageDTO.getIsActive() != null ) {
-                // 0 未激活 1 已激活
-                if(usersPageDTO.getIsActive()){
-                    queryWrapper.eq("IsActive", true);
-                }else if(!usersPageDTO.getIsActive()){
-                    queryWrapper.eq("IsActive", false);
-                }
-                
-            }
-            if (usersPageDTO.getPage() != null && usersPageDTO.getSize() != null) {
-                Page<Users> page = new Page<>(usersPageDTO.getPage(), usersPageDTO.getSize());
-
-                Page<Users> usersPage = usersMapper.selectPage(page, queryWrapper);
-
-                usersPage.getRecords().forEach(users -> users.setPassword(null));
-
-
-                return (PageResult<Users>) new PageResult(usersPage.getTotal(),
-                                                          usersPage.getRecords());
-            }
+    public PageResult getUserByPage(UsersConfig config) {
+        QueryWrapper<Users> queryWrapper = new QueryWrapper<>();
+        if (config.getUsername() != null && !config.getUsername().trim().isEmpty()) {
+            queryWrapper.like("Username", config.getUsername());
         }
-        return null;
+        if (config.getEmail() != null && !config.getEmail().trim().isEmpty()) {
+            queryWrapper.like("Email", config.getEmail());
+        }
+        if (config.getIsActive() != null) {
+            queryWrapper.eq("IsActive", config.getIsActive());
+        }
+
+        Page<Users> page = new Page<>(config.getPage(), config.getSize());
+
+        Page<Users> usersPage = usersMapper.selectPage(page, queryWrapper);
+        ArrayList<UserPageVO> userPageVOS = new ArrayList<>();
+        for (Users users : usersPage.getRecords()) {
+            UserPageVO userPageVO = new UserPageVO();
+            BeanUtils.copyProperties(users, userPageVO);
+
+            userPageVOS.add(userPageVO);
+        }
+
+
+        PageResult pageResult = new PageResult(usersPage.getTotal(),
+                                               userPageVOS);
+        return pageResult;
+
     }
 
     /**
@@ -178,7 +188,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
      */
     @Override
     public void resetPassword(Users users) {
-        
+
     }
 
     /**
@@ -188,7 +198,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
      */
     @Override
     public void cancelDisableUser(Long id) {
-        
+
     }
 
     /**
@@ -203,7 +213,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
 
     @Override
     public Users getByUsername(String username) {
-        
+
         return getOne(new QueryWrapper<Users>().eq("Username", username));
     }
 

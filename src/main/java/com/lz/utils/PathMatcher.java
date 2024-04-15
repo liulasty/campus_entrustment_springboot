@@ -33,7 +33,8 @@ public class PathMatcher {
             Pattern.compile(PATH_SEPARATOR+"/v2/api-docs"),
             Pattern.compile(PATH_SEPARATOR+"/druid/.*"), // Convert "**" to ".*" for regex matching
             Pattern.compile(PATH_SEPARATOR+"/doc.html"),
-            Pattern.compile(PATH_SEPARATOR+"/favicon.ico")
+            Pattern.compile(PATH_SEPARATOR+"/favicon.ico"),
+            Pattern.compile(PATH_SEPARATOR +"/img/upload")
     );
 
     public static boolean isUrlWhitelisted(String url) {

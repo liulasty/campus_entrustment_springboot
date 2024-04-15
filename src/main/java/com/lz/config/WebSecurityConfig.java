@@ -45,7 +45,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/swagger-resources",
             "/v2/api-docs",
             "/druid/**",
-            "/doc.html"
+            "/doc.html",
+            "/img/upload"
     };
 
     @Autowired

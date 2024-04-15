@@ -3,6 +3,7 @@ package com.lz.controller;
 
 import com.lz.Exception.MyException;
 import com.lz.config.AppConfig;
+import com.lz.pojo.Page.UsersConfig;
 import com.lz.pojo.constants.MessageConstants;
 import com.lz.pojo.dto.UserDTO;
 import com.lz.pojo.dto.UserLoginDTO;
@@ -148,7 +149,6 @@ public class UsersController {
 
     @GetMapping(value = "/active/{id}")
     @ApiOperation("激活")
-
     public Result<String> active(@PathVariable Long id) throws MyException {
         log.info("激活用户id:{}", id);
         boolean active = usersService.active(id);
@@ -161,8 +161,6 @@ public class UsersController {
 
     @PostMapping(value = "/logout")
     @ApiOperation("登出")
-    // @Secured("user")
-    // @PreAuthorize(value = "hasRole('ROLE_USER')")
     public Result<String> logout(HttpServletRequest request) {
         log.info("用户登出请求");
 
@@ -212,15 +210,31 @@ public class UsersController {
     /**
      * 按页面获取用户信息
      *
-     * @param usersPageDTO 用户页面 DTO
+     * @param username 用户名
+     * @param email    电子邮件
+     * @param isActive 处于活动状态
+     * @param page     页
+     * @param size     大小
      *
      * @return {@code Result<PageResult>}
      */
-    @PostMapping(value = "/getUserPage")
+    @GetMapping(value = "/page")
     @ApiOperation("分页查询用户信息")
-    public Result<PageResult> getUserInfoByPage(@RequestBody UsersPageDTO usersPageDTO) {
-        log.info("分页查询用户信息:{}", usersPageDTO);
-        return Result.success(usersService.getUserByPage(usersPageDTO));
+    public Result<PageResult> getUserInfoByPage(
+            @RequestParam(required = false) String username,                 
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) Boolean isActive,
+            @RequestParam(defaultValue ="1") long page,
+            @RequestParam(defaultValue ="5") long size) {
+        log.info("分页查询用户信息:{}", username);
+        UsersConfig config = UsersConfig.builder()
+                .username(username)
+                .email(email)
+                .isActive(isActive)
+                .page(page)
+                .size(size)
+                .build();
+        return Result.success(usersService.getUserByPage(config));
     }
 
     /**

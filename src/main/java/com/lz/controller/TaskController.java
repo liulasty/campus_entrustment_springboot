@@ -11,16 +11,15 @@ import com.lz.pojo.dto.TaskDraftDTO;
 import com.lz.pojo.dto.TaskPageDTO;
 import com.lz.pojo.entity.DelegateAuditRecords;
 import com.lz.pojo.entity.Task;
+import com.lz.pojo.entity.UsersInfo;
 import com.lz.pojo.result.NameAndDescription;
 import com.lz.pojo.result.PageResult;
 import com.lz.pojo.result.Result;
+import com.lz.pojo.vo.AuditResultVO;
 import com.lz.pojo.vo.NewestInfoVO;
 import com.lz.pojo.vo.TaskDraftVO;
 import com.lz.pojo.vo.UserDelegateDraft;
-import com.lz.service.IDelegateAuditRecordsService;
-import com.lz.service.IDelegationCategoriesService;
-import com.lz.service.ITaskService;
-import com.lz.service.INotificationsService;
+import com.lz.service.*;
 import com.lz.utils.ValidateUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -51,6 +50,12 @@ public class TaskController {
     
     @Autowired
     private ITaskService taskService;
+    
+    @Autowired
+    private IUsersService usersService;
+    
+    @Autowired
+    private IUsersInfoService usersInfoService;
     
     @Autowired
     private INotificationsService notificationService;
@@ -196,6 +201,27 @@ public class TaskController {
         }
 
     }
+    
+    /**
+     * 用户取消发布
+     */
+    @PutMapping(value = "/cancelTaskByUser/{id}")
+    @ApiOperation("用户取消发布")
+    public Result<String> cancelTask(@PathVariable("id") Long id) throws MyException {
+        try {
+            Task byId = taskService.getById(id);
+            if (byId == null) {
+                return Result.error(MessageConstants.DATABASE_ERROR);
+            }
+            if (byId.getStatus() != TaskStatus.ONGOING) {
+                return Result.error(MessageConstants.UNEXPECTED_EXCEPTION);
+            }
+            taskService.updateById(Task.builder().taskId(id).status(TaskStatus.DRAFT).build());
+            return Result.success(MessageConstants.TASK_CANCEL_SUCCESS);
+        }catch (Exception e){
+            throw new MyException(e.getMessage());
+        }
+    }
     /**
      * 提交审核结果
      */
@@ -231,7 +257,7 @@ public class TaskController {
      */
     @GetMapping("/getReason/{id}")
     @ApiOperation("获取审核未通过原因")
-    public Result<DelegateAuditRecords> getReason(@PathVariable("id") Long id) throws MyException {
+    public Result<AuditResultVO> getReason(@PathVariable("id") Long id) throws MyException {
         try {
             Task byId = taskService.getById(id);
             if (byId == null) {
@@ -241,7 +267,15 @@ public class TaskController {
                 return Result.error(MessageConstants.UNEXPECTED_EXCEPTION);
             }
             DelegateAuditRecords failReason = delegateAuditRecordsService.getFailReasonById(byId.getTaskId());
-            return Result.success(failReason);
+            UsersInfo usersInfo = usersInfoService.getById(byId.getOwnerId());
+            AuditResultVO auditResultVO = AuditResultVO.builder()
+                    .reviewStatus(AuditResult.REJECTED)
+                    .reviewComment(failReason.getReviewComment())
+                    .reviewTime(failReason.getReviewTime())
+                    .name(usersInfo.getName())
+
+                    .build();
+            return Result.success(auditResultVO);
         }catch (Exception e){
             throw new MyException(MessageConstants.UNEXPECTED_EXCEPTION);
         }
