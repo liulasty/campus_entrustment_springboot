@@ -29,7 +29,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/img")
 @Slf4j
-@Api(tags = "上传图片", description ="")
+@Api(tags = "上传图片")
 @CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
 public class ImgController {
     @Value("${aliyun.oss.accessKeyId}")
@@ -69,11 +69,11 @@ public class ImgController {
 
             // 关闭OSSClient
             ossClient.shutdown();
-
+            log.info("Image uploaded successfully");
             // 返回上传成功的消息
             return Result.success(fileName, "Image_uploaded_successfully");
         } catch (IOException e) {
-           
+            log.error("Failed to upload image", e);
             return Result.error("Failed_to_upload_image");
         }
     }

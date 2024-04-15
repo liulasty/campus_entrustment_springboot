@@ -7,9 +7,7 @@ package com.lz.common.security;
  * @Description:
  */
 
-/**
- * @author lz
- */
+
 
 import com.lz.Exception.InvalidTokenException;
 import com.lz.Exception.MyException;
@@ -69,7 +67,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
         try {
             log.info("请求路径: {}", request.getRequestURI());
             if (PathMatcher.isUrlWhitelisted(request.getRequestURI())) {
-                log.info("请求路径在白名单中，无需验证");
+                // log.info("请求路径在白名单中，无需验证");
                 filterChain.doFilter(request, response);
             } else {
                 String token = request.getHeader("JWT");

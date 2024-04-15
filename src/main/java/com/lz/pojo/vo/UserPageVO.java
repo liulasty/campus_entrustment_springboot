@@ -7,6 +7,7 @@ package com.lz.pojo.vo;
  * @Description:
  */
 
+import com.lz.pojo.Enum.AuthenticationStatus;
 import lombok.Data;
 
 import java.util.Date;
@@ -26,5 +27,6 @@ public class UserPageVO {
     private Boolean isActive;
     private Date createTime;
     private Date activeTime;
+    private AuthenticationStatus authStatus;
     
 }

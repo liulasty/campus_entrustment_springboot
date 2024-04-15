@@ -13,4 +13,4 @@ src/main/resources/application-devMVC.yml
 
 
 # IDE-specific file
-.idea/vcs.xml
+.idea

@@ -2,10 +2,12 @@ package com.lz.controller;
 
 
 import com.lz.Exception.MyException;
+import com.lz.pojo.constants.MessageConstants;
 import com.lz.pojo.dto.UserInfoDTO;
 import com.lz.pojo.entity.UsersInfo;
 import com.lz.pojo.result.Result;
 import com.lz.service.IUsersInfoService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping("/userInfo")
+@Slf4j
 @CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
 public class UsersinfoController {
     @Autowired
@@ -27,7 +30,11 @@ public class UsersinfoController {
     @GetMapping("/{id}")
     public Result<UsersInfo> userInfo(@PathVariable Long id) {
         UsersInfo usersInfo = usersInfoService.getById(id);
-
+        if (usersInfo == null){
+            log.error("用户信息不存在");
+            return Result.error("用户信息不存在");
+        }
+        
         return Result.success(usersInfo);
     }
 
@@ -42,8 +49,15 @@ public class UsersinfoController {
      */
     @PostMapping
     public Result<String> save(@RequestBody UserInfoDTO dto) throws MyException {
+        log.info("用户认证信息提交");
+        UsersInfo usersInfo = usersInfoService.getById(dto.getId());
+        if (usersInfo != null){
+            log.error("用户认证信息已存在");
+            return Result.error("用户认证信息已存在");
+        }
         usersInfoService.submitCertificationInformation(dto);
-        return Result.success();
+        log.info("用户认证信息提交成功");
+        return Result.success(MessageConstants.USER_UPDATE_SUCCESS);
     }
     
 

@@ -22,6 +22,6 @@ public class UsersConfig {
     private String username;
     private String email;
     private Boolean isActive;
-    private Long size;
-    private Long page;
+    private int size;
+    private int page;
 }

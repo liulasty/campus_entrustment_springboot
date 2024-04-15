@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lz.Exception.MyException;
+import com.lz.pojo.Enum.AuthenticationStatus;
 import com.lz.pojo.Page.UsersConfig;
 import com.lz.pojo.constants.MessageConstants;
 import com.lz.mapper.UsersMapper;
@@ -170,14 +171,21 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         for (Users users : usersPage.getRecords()) {
             UserPageVO userPageVO = new UserPageVO();
             BeanUtils.copyProperties(users, userPageVO);
+            UsersInfo byId = usersInfoService.getById(users.getUserId());
 
+            // 检查byId是否为null，若为null可提前处理，这里选择抛出一个异常
+            // 设置认证状态
+            if (byId == null) {
+               userPageVO.setAuthStatus(AuthenticationStatus.UNAUTHORIZED);
+            }else {
+                userPageVO.setAuthStatus(byId.getAuthStatus());
+            }
             userPageVOS.add(userPageVO);
         }
 
 
-        PageResult pageResult = new PageResult(usersPage.getTotal(),
-                                               userPageVOS);
-        return pageResult;
+        return new PageResult(usersPage.getTotal(),
+                              userPageVOS);
 
     }
 

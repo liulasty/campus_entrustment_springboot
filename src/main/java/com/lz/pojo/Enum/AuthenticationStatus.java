@@ -38,7 +38,7 @@ public enum AuthenticationStatus implements IEnum<Integer> {
 
     @EnumValue
     private final int code;
-    
+    @JsonValue
     private final String description;
 
     AuthenticationStatus(int code, String description) {
