@@ -18,6 +18,7 @@ public class MessageConstants {
     
     public static final String USER_NOT_EXIST = "用户名不存在";
     public static final String USER_EXIST = "用户名已存在";
+    public static final String DELETE_USER_FAIL =  "删除用户失败";
     //用户名或密码错误
     public static final String USER_PASSWORD_ERROR = "用户名或密码错误";
     public static final String USER_REGISTER_SUCCESS = "注册成功,请在你的邮箱点击激活链接";
@@ -28,6 +29,8 @@ public class MessageConstants {
     
     public static final String USER_NOT_ACTIVE = "用户未激活,请前往邮箱激活";
     public static final String USER_ACTIVE_SUCCESS = "您的账户已成功激活！现在您可以登录并开始使用我们的服务了。";
+
+    public static final String ADMIN_ACTIVE_USER_SUCCESS = "管理员激活用户成功";
     public static final String USER_ACTIVE_FAIL = "激活失败";
     public static final String USER_ACTIVE_CODE_ERROR = "激活码错误";
     public static final String USER_UPDATE_SUCCESS = "更新用户信息成功";
@@ -74,4 +77,14 @@ public class MessageConstants {
     public static final String DATA_AUDIT_SUCCESS =  "委托审核成功";
     public static final String DATA_AUDIT_FAIL = "委托审核失败";
     public static final String TASK_CANCEL_SUCCESS = "委托取消发布成功";
+
+    
+    public static final String USER_STATUS_ERROR = "用户状态异常,无法认证请重新查看";
+
+    public static final String USER_AUTHENTICATION_INFO_NOT_EXIST = "用户认证信息不存在";
+
+    public static final String USER_CANCEL_SUCCESS =  "取消认证成功";
+    public static final String USER_CANCEL_FAIL =  "取消认证失败";
+    public static final String USER_INFO_DELETE_SUCCESS =  "删除用户认证信息成功";
+    
 }

@@ -7,6 +7,7 @@ package com.lz.common.security;
  * @Description:
  */
 
+import com.lz.mapper.UsersMapper;
 import com.lz.pojo.entity.Users;
 import com.lz.service.IUsersService;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +33,7 @@ import java.util.List;
 public class MyUserDetailServiceImpl implements UserDetailsService {
     
     @Autowired
-    private IUsersService usersService;
+    private UsersMapper usersMapper;
     
 
     /**
@@ -44,7 +45,7 @@ public class MyUserDetailServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         
-        Users user = usersService.getByUsername(username);
+        Users user = usersMapper.getByUsername(username);
         
         if (user == null) {
             throw new UsernameNotFoundException("用户不存在");

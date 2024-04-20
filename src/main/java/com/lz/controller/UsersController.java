@@ -9,6 +9,7 @@ import com.lz.pojo.dto.UserDTO;
 import com.lz.pojo.dto.UserLoginDTO;
 import com.lz.pojo.dto.UsersPageDTO;
 import com.lz.pojo.entity.Users;
+import com.lz.pojo.entity.UsersInfo;
 import com.lz.pojo.result.PageResult;
 import com.lz.pojo.result.Result;
 import com.lz.pojo.vo.UserLoginVO;
@@ -32,10 +33,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * <p>
@@ -147,6 +145,15 @@ public class UsersController {
 
     }
 
+    /**
+     * 激活
+     *
+     * @param id 同上
+     *
+     * @return {@code Result<String>}
+     *
+     * @throws MyException 我的异常
+     */
     @GetMapping(value = "/active/{id}")
     @ApiOperation("激活")
     public Result<String> active(@PathVariable Long id) throws MyException {
@@ -159,7 +166,7 @@ public class UsersController {
         return Result.success(MessageConstants.USER_ACTIVE_SUCCESS);
     }
 
-    @PostMapping(value = "/logout")
+    @DeleteMapping(value = "/logout")
     @ApiOperation("登出")
     public Result<String> logout(HttpServletRequest request) {
         log.info("用户登出请求");
@@ -172,6 +179,13 @@ public class UsersController {
                 : Result.error(MessageConstants.USER_LOGOUT_FAILURE);
     }
 
+    /**
+     * 尝试注销
+     *
+     * @param request 请求
+     *
+     * @return boolean
+     */
     private boolean tryLogout(HttpServletRequest request) {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -226,10 +240,10 @@ public class UsersController {
             @RequestParam(required = false) String isActive,
             @RequestParam(defaultValue ="1") int page,
             @RequestParam(defaultValue ="5") int size) {
-        log.info("分页查询用户信息:{}", username);
+        log.info("分页查询用户信息:{}", isActive);
         Boolean is = null;
         if (isActive != null && !"".equals(isActive)){
-            is = !"TRUE".equals(isActive);
+            is = "TRUE".equals(isActive);
         }
         UsersConfig config = UsersConfig.builder()
                 .username(username)
@@ -238,6 +252,7 @@ public class UsersController {
                 .page(page)
                 .size(size)
                 .build();
+        log.info("分页查询用户信息:{}", config);
         return Result.success(usersService.getUserByPage(config));
     }
 
@@ -296,13 +311,20 @@ public class UsersController {
     }
 
 
-    //管理员激活用户
-    @GetMapping(value = "/activeUserByAdmin/{id}")
-    @ApiOperation("管理员激活用户")
-    public Result<String> activeUserByAdmin(@PathVariable Long id) throws MyException {
-        log.info("管理员激活用户:{}", id);
-        usersService.active(id);
-        return Result.success(MessageConstants.USER_ACTIVE_SUCCESS);
+    @PutMapping("/adminActivation/{id}")
+    public Result<String> adminActivation(@PathVariable Long id) throws MyException {
+        log.info("管理员激活用户");
+        Users user = usersService.getById(id);
+        if (user == null){
+            log.error("用户认证信息不存在");
+            return Result.error(MessageConstants.USER_AUTHENTICATION_INFO_NOT_EXIST);
+        }
+
+        if (!usersService.adminActivation(id)){
+            throw new MyException(MessageConstants.USER_ACTIVE_FAIL);
+        }
+        log.info("管理员激活用户成功");
+        return Result.success(MessageConstants.ADMIN_ACTIVE_USER_SUCCESS);
     }
 
     /**
@@ -359,5 +381,13 @@ public class UsersController {
         return Result.success("用户已登录");
     }
 
+    @PostMapping("/deleteUser")
+    public Result<String> deleteAccounts(@RequestBody int[] deleteUsers) throws MyException {
+        log.info("删除用户:{}", deleteUsers);
+
+        // 其他业务逻辑
+        usersService.deleteUsers(deleteUsers);
+        return Result.success(MessageConstants.USER_DELETE_SUCCESS);
+    }
 
 }

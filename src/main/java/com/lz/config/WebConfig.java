@@ -118,7 +118,9 @@ public class WebConfig extends WebMvcConfigurationSupport {
                 MappingJackson2HttpMessageConverter jsonConverter = (MappingJackson2HttpMessageConverter) converter;
                 ObjectMapper objectMapper = jsonConverter.getObjectMapper();
 
-                objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
+                objectMapper.setDateFormat(new SimpleDateFormat("yyyy年MM" +
+                                                                        "月dd" +
+                                                                        "日HH:mm:ss"));
                 // 或者使用 Java 8 DateTimeFormatter
                 // objectMapper.setDateFormat(new StdDateFormat().withTimeZone(TimeZone.getTimeZone("UTC")));
 

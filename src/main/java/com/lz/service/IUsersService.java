@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.lz.pojo.result.PageResult;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * <p>
@@ -49,9 +50,9 @@ public interface IUsersService extends IService<Users>  {
     /**
      * 按页面获取用户
      *
-     * @param usersPageDTO 用户页面 DTO
+     * @param config 查询数据
      *
-     * @return {@code List<Users>}
+     * @return {@code PageResult}
      */
     PageResult getUserByPage(UsersConfig config);
 
@@ -84,4 +85,20 @@ public interface IUsersService extends IService<Users>  {
      * @return {@code Users}
      */
     Users getByUsername(String username);
+
+    /**
+     * 管理员辅助激活
+     *
+     * @param id 同上
+     *
+     * @return boolean
+     */
+    boolean adminActivation(Long id);
+
+    /**
+     * 删除用户
+     *
+     * @param singleton 单身 人士
+     */
+    void deleteUsers(int[] singleton) throws MyException;
 }

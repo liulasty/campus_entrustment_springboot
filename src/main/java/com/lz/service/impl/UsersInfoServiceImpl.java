@@ -6,6 +6,7 @@ import com.lz.Exception.MyException;
 import com.lz.mapper.UsersInfoMapper;
 import com.lz.mapper.UsersMapper;
 import com.lz.pojo.Enum.AuthenticationStatus;
+import com.lz.pojo.constants.MessageConstants;
 import com.lz.pojo.dto.UserInfoDTO;
 import com.lz.pojo.entity.Users;
 import com.lz.pojo.entity.UsersInfo;
@@ -56,4 +57,71 @@ public class UsersInfoServiceImpl extends ServiceImpl<UsersInfoMapper,
                 .build();
         save(usersInfo);
     }
+
+    /**
+     * 确认通过审核
+     *
+     * @param id 同上
+     *
+     * @return {@code Boolean}
+     */
+    @Override
+    public Boolean confirmToPassTheReview(Long id) throws MyException {
+        UsersInfo usersInfo = getById(id);
+        if (usersInfo != null) {
+            if (usersInfo.getAuthStatus() != AuthenticationStatus.AUTHENTICATING){
+                throw new MyException(MessageConstants.USER_STATUS_ERROR);
+            }
+            usersInfo.setAuthStatus(AuthenticationStatus.AUTHENTICATED);
+            usersInfo.setCertifiedTime(new Date(System.currentTimeMillis()));
+            return updateById(usersInfo);
+        }else {
+            throw new MyException(MessageConstants.USER_NOT_EXIST);
+        }
+    }
+
+    /**
+     * 拒绝通过审核
+     *
+     * @param id 同上
+     *
+     * @return {@code Boolean}
+     */
+    @Override
+    public Boolean refuseToPassReview(Long id) throws MyException {
+        UsersInfo usersInfo = getById(id);
+        if (usersInfo != null) {
+            if (usersInfo.getAuthStatus() != AuthenticationStatus.AUTHENTICATING){
+                throw new MyException(MessageConstants.USER_STATUS_ERROR);
+            }
+            usersInfo.setAuthStatus(AuthenticationStatus.AUTHENTICATION_FAILED);
+            usersInfo.setCertifiedTime(new Date(System.currentTimeMillis()));
+            return updateById(usersInfo);
+        }else {
+            throw new MyException(MessageConstants.USER_NOT_EXIST);
+        }
+    }
+
+    /**
+     * 取消用户信息身份验证
+     *
+     * @param id 同上
+     *
+     * @return {@code Boolean}
+     */
+    @Override
+    public Boolean cancelUserInfoAuthentication(Long id) throws MyException {
+        UsersInfo usersInfo = getById(id);
+        if (usersInfo == null) {
+            throw new MyException(MessageConstants.USER_NOT_EXIST);
+        }
+        if (usersInfo.getAuthStatus() == AuthenticationStatus.AUTHENTICATED) {
+            usersInfo.setAuthStatus(AuthenticationStatus.AUTHENTICATION_FAILED);
+            usersInfo.setCertifiedTime(new Date(System.currentTimeMillis()));
+            return updateById(usersInfo);
+        }
+        return false;
+    }
+
+    
 }

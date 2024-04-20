@@ -32,10 +32,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -101,40 +98,38 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
             Map<String, Object> map = JwtUtil.parseToken(token, appConfig.getJwtKey());
 
             if (map == null) {
-                throw new IllegalArgumentException("Map cannot be null");
+                log.error("jwt携带信息为空");
+                throw new IllegalArgumentException("jwt携带信息为空");
             }
 
             String username = convertToString(map.get("username"));
             String role = convertToString(map.get("role"));
 
             if (username == null || role == null) {
+                log.error("jwt携带信息为空");
                 return false;
+            }else {
+                log.info("用户: {} 角色: {}", username, role);
             }
 
             
 
 
             List<GrantedAuthority> authorities = new ArrayList<>();
+            // 创建并添加用户角色授权
             authorities.add(new SimpleGrantedAuthority(role));
-
+            // 创建认证令牌
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(username, null, authorities);
+            // 将认证令牌设置到安全上下文中
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            Collection<? extends GrantedAuthority> authorities1 = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-            List<String> roles = authorities1.stream()
-                    .map(GrantedAuthority::getAuthority)
-                    .collect(Collectors.toList());
-            if (roles.contains(ROLE_ADMIN)) {
-                log.info("用户: {} 是管理员", username);
-            } else if (roles.contains(ROLE_USER)) {
-                log.info("用户: {} 是普通用户", username);
-            } else {
-                log.error("用户: {} 没有任何角色", username);
-
-            }
+            
+            
+            List<String> roles = extractUserRoles();
             log.info("用户: {} 角色: {}", username, role);
             return true;
         } catch (Exception ex) {
+            log.error("解析jwt失败: {}", ex.getMessage());
             return false;
 
         }
@@ -145,6 +140,32 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
             return (String) obj;
         } else {
             return null;
+        }
+    }
+
+    /**
+     * 提取当前用户的角色列表。
+     * @return 当前用户的角色列表，如果无法获取或角色列表为空，则返回空列表。
+     */
+    public static List<String> extractUserRoles() {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || authentication.getAuthorities() == null) {
+                // 安全上下文或权限列表为空，直接返回空列表
+                log.error("安全上下文或权限列表为空,无法获取当前用户的角色列表");
+                return Collections.emptyList();
+            }
+
+            // 使用Stream API转换权限列表为角色字符串列表
+            Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+            return authorities.stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            // 捕获在提取角色过程中可能发生的任何异常，避免程序因为安全相关的问题崩溃
+            // 根据实际情况可以记录日志或者进行其他异常处理
+            log.error("提取当前用户的角色列表时发生异常: {}", e.getMessage());
+            return Collections.emptyList();
         }
     }
 }

@@ -1,9 +1,11 @@
 package com.lz.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.injector.methods.SelectOne;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lz.Exception.MyException;
+import com.lz.mapper.UsersInfoMapper;
 import com.lz.pojo.Enum.AuthenticationStatus;
 import com.lz.pojo.Page.UsersConfig;
 import com.lz.pojo.constants.MessageConstants;
@@ -25,9 +27,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * <p>
@@ -45,10 +47,11 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
     public static final String BASEURL = "http://localhost:80";
 
 
-    @Autowired
-    private IUsersInfoService usersInfoService;
+
     @Autowired
     private UsersMapper usersMapper;
+    @Autowired
+    private UsersInfoMapper usersInfoMapper;
 
     /**
      * 登录
@@ -171,7 +174,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         for (Users users : usersPage.getRecords()) {
             UserPageVO userPageVO = new UserPageVO();
             BeanUtils.copyProperties(users, userPageVO);
-            UsersInfo byId = usersInfoService.getById(users.getUserId());
+            UsersInfo byId = usersInfoMapper.selectById(users.getUserId());
 
             // 检查byId是否为null，若为null可提前处理，这里选择抛出一个异常
             // 设置认证状态
@@ -224,5 +227,50 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
 
         return getOne(new QueryWrapper<Users>().eq("Username", username));
     }
+
+    /**
+     * 管理员辅助激活
+     *
+     * @param id 同上
+     *
+     * @return boolean
+     */
+    @Override
+    public boolean adminActivation(Long id) {
+        Users users = usersMapper.selectById(id);
+        if (users != null) {
+            
+            if (users.getIsActive()) {
+                return false;
+            }
+            users.setIsActive(true);
+            users.setActiveTime(new Date(System.currentTimeMillis()));
+            usersMapper.updateById(users);
+            return true;
+        }
+        //发送邮件通知用户已激活成功
+        return false;
+    }
+
+    /**
+     * 删除用户
+     *
+     * @param singleton 单身 人士
+     */
+    @Override
+    public void deleteUsers(int[] singleton) throws MyException {
+        
+            List<Integer> collect = Arrays.stream(singleton)
+                    .filter(id -> "user".equals(usersMapper.selectById(id).getRole()) && usersInfoMapper.selectById(id) == null )
+                    .boxed()
+                    .collect(Collectors.toList());
+            if (collect.size() == 0 || collect.size() != singleton.length){
+                throw new MyException(MessageConstants.DELETE_USER_FAIL);
+            }
+            usersMapper.deleteBatchIds(collect);
+            
+        
+    }
+    
 
 }

@@ -46,7 +46,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/v2/api-docs",
             "/druid/**",
             "/doc.html",
-            "/img/upload"
+            "/img/upload",
+            "/user/logout"
     };
 
     @Autowired
@@ -78,7 +79,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(WebSecurity web) throws Exception {
         // 配置忽略对AUTH_WHITELIST中指定路径的安全检查
-        web.ignoring().antMatchers(AUTH_WHITELIST);
+        // web.ignoring().antMatchers(AUTH_WHITELIST);
     }
 
     @Override
@@ -89,9 +90,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .formLogin()
-                .loginProcessingUrl(PATH_SEPARATOR + "/error")
                 .and()
                 .addFilterBefore(jwtAuthorizationFilter, BasicAuthenticationFilter.class)
                 .authorizeRequests()
