@@ -17,13 +17,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * 任务更新类型
+ * 委托更新类型
  *
  * @author lz
  * @date 2024/04/11
  */
 @Getter
-@ApiModel(value = "任务更新类型枚举")
+@ApiModel(value = "委托更新类型枚举")
 public enum TaskUpdateType {
     /**
      * 审核完成
@@ -38,10 +38,14 @@ public enum TaskUpdateType {
     CREATED("CREATED", "新委托创建"),
     
     // 委托结果
-    RESULT("RESULT", "委托结果");
+    RESULT("RESULT", "委托结果"),
+
+    /**
+     * 回退草稿
+     */
+    FALLBACK_DRAFT("FALLBACK_DRAFT", "回退草稿");
     
 
-    
 
     
     /**

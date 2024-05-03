@@ -143,6 +143,7 @@ public class TaskController {
     @PostMapping("/deleteTask")
     @ApiOperation("删除委托")
     public Result<String> deleteTask() {
+        
         return null;
     }
 
@@ -151,7 +152,7 @@ public class TaskController {
      *
      * @param id 同上
      *
-     * @return {@code Result<String>}
+     * @return 结果<字符串>
      *
      * @throws MyException 我的异常
      */
@@ -175,17 +176,17 @@ public class TaskController {
     }
 
     /**
-     * 确认发布
+     * 获取需要发布的委托
      *
      * @param id 同上
      *
-     * @return {@code Result<String>}
+     * @return 结果<字符串>
      *
      * @throws MyException 我的异常
      */
-    @PutMapping(value = "/confirmTask/{id}")
-    @ApiOperation("确认发布")
-    public Result<String> confirmTask(@PathVariable("id") Long id) throws MyException {
+    @GetMapping(value = "/confirmTask/{id}")
+    @ApiOperation("获取需要发布的委托")
+    public Result<Task> confirmTask(@PathVariable("id") Long id) throws MyException {
         try {
             Task byId = taskService.getById(id);
             if (byId == null) {
@@ -194,16 +195,22 @@ public class TaskController {
             if (byId.getStatus() != TaskStatus.PENDING_RELEASE) {
                 return Result.error(MessageConstants.UNEXPECTED_EXCEPTION);
             }
-            taskService.updateById(Task.builder().taskId(id).status(TaskStatus.ONGOING).build());
-            return Result.success(MessageConstants.TASK_PUBLISH_SUCCESS);
+            
+            return Result.success(byId,MessageConstants.TASK_INFO_SUCCESS);
         } catch (Exception e) {
             throw new MyException(MessageConstants.TASK_PUBLISH_FAIL);
         }
 
     }
-    
+
     /**
      * 用户取消发布
+     *
+     * @param id 同上
+     *
+     * @return 结果<字符串>
+     *
+     * @throws MyException 我的异常
      */
     @PutMapping(value = "/cancelTaskByUser/{id}")
     @ApiOperation("用户取消发布")
@@ -222,8 +229,15 @@ public class TaskController {
             throw new MyException(e.getMessage());
         }
     }
+
     /**
      * 提交审核结果
+     *
+     * @param auditResultDTO 审计结果 DTO
+     *
+     * @return 结果<字符串>
+     *
+     * @throws MyException 我的异常
      */
     @PostMapping(value = "/auditResult")
     @ApiOperation("提交审核结果")
@@ -251,7 +265,7 @@ public class TaskController {
      *
      * @param id 同上
      *
-     * @return {@code Result<String>}
+     * @return 结果<审计结果 vo>
      *
      * @throws MyException 我的异常
      */
@@ -277,6 +291,7 @@ public class TaskController {
                     .build();
             return Result.success(auditResultVO);
         }catch (Exception e){
+            log.error(e.getMessage());
             throw new MyException(MessageConstants.UNEXPECTED_EXCEPTION);
         }
     }

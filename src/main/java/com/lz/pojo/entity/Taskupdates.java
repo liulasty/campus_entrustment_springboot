@@ -1,5 +1,6 @@
 package com.lz.pojo.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -10,8 +11,7 @@ import java.util.Date;
 import com.lz.pojo.Enum.TaskUpdateType;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 import lombok.experimental.Accessors;
 
 /**
@@ -23,6 +23,9 @@ import lombok.experimental.Accessors;
  * @since 2024-04-04
  */
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @TableName("taskupdates")
@@ -33,21 +36,26 @@ public class Taskupdates implements Serializable {
 
     @ApiModelProperty(value = "更新记录的ID")
     @TableId(value = "UpdateID", type = IdType.AUTO)
-    private Integer updateId;
+    private Long updateId;
 
     @ApiModelProperty(value = "对应的任务ID")
-    private Integer taskId;
+    @TableField(value = "TaskID")
+    private Long taskId;
 
     @ApiModelProperty(value = "进行更新的用户ID")
-    private Integer userId;
+    @TableField(value = "UserID")
+    private Long userId;
     
     @ApiModelProperty(value = "更新类型")
+    @TableField(value = "UpdateType")
     private TaskUpdateType updateType;
 
     @ApiModelProperty(value = "更新时间")
+    @TableField(value = "UpdateTime")
     private Date updateTime;
 
     @ApiModelProperty(value = "更新内容")
+    @TableField(value = "UpdateDescription")
     private String updateDescription;
 
 

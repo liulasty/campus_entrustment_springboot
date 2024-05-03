@@ -12,8 +12,10 @@ import com.lz.pojo.entity.Users;
 import com.lz.service.IUsersService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -21,9 +23,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.temporal.ValueRange;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author lz
@@ -34,6 +34,8 @@ public class MyUserDetailServiceImpl implements UserDetailsService {
     
     @Autowired
     private UsersMapper usersMapper;
+    
+    
     
 
     /**
@@ -55,10 +57,12 @@ public class MyUserDetailServiceImpl implements UserDetailsService {
             log.info("用户信息：{}", user);
             throw new UsernameNotFoundException("用户未激活");
         }
-        List<GrantedAuthority> authorities = new ArrayList<>();
+        Set<GrantedAuthority> authorities = new HashSet<>();
         authorities.add(new SimpleGrantedAuthority(user.getRole()));
         return new User(username, user.getPassword(), authorities);
     }
+
+    
 
    
 }

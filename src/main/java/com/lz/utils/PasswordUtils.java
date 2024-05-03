@@ -25,7 +25,7 @@ public class PasswordUtils implements PasswordEncoder {
      * @return 哈希后的密码。
      */
     public static String hashPassword(String plainTextPassword) {
-        log.info("明文密码:{}然后加密",plainTextPassword);
+        
         return BCrypt.hashpw(plainTextPassword, BCrypt.gensalt());
     }
 
@@ -36,7 +36,7 @@ public class PasswordUtils implements PasswordEncoder {
      * @return 如果密码匹配，则返回true；否则返回false。
      */
     public static boolean check(String plainTextPassword, String hashedPassword) {
-        log.info("明文密码:{},哈希后的密码:{}",plainTextPassword,hashedPassword);
+        
         return BCrypt.checkpw(plainTextPassword, hashedPassword);
     }
 
@@ -49,6 +49,7 @@ public class PasswordUtils implements PasswordEncoder {
      */
     @Override
     public String encode(CharSequence rawPassword) {
+        log.info("原始密码:{}",rawPassword.length());
         return hashPassword(rawPassword.toString());
     }
 
@@ -62,7 +63,10 @@ public class PasswordUtils implements PasswordEncoder {
      */
     @Override
     public boolean matches(CharSequence rawPassword, String encodedPassword) {
-        return check(rawPassword.toString(), encodedPassword);
+        log.info("原始密码:{},哈希后的密码:{}",rawPassword,encodedPassword);
+        boolean check = check(rawPassword.toString(), encodedPassword);
+        log.info("密码校验结果 {}", check);
+        return check;
     }
     
 }

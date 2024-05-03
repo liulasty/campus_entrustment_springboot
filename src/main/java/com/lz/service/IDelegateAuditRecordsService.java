@@ -1,6 +1,7 @@
 package com.lz.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.lz.pojo.Enum.TaskStatus;
 import com.lz.pojo.entity.DelegateAuditRecords;
 import com.lz.pojo.entity.Task;
 
@@ -20,4 +21,8 @@ public interface IDelegateAuditRecordsService extends IService<DelegateAuditReco
      * @param id 同上
      */
     DelegateAuditRecords getFailReasonById(Long id);
+
+    void createNewRecord(Long taskId, String s);
+
+    void createNewRecord(Long taskId, String msg, TaskStatus status);    
 }

@@ -38,6 +38,7 @@ public class NotificationTest {
     @Autowired
     private ISystemAnnouncementsService systemAnnouncementsService;
 
+    @Test
     public void getNotificationsByIdANDDate() {
         notificationsService.getNotificationsByIdANDDate();
     }
@@ -129,6 +130,7 @@ public class NotificationTest {
     public void getNewestSystemAnnouncements() {
         systemAnnouncementsService.getNewestAnnouncement();
     }
+    
 
 
 }

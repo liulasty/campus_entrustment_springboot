@@ -115,18 +115,12 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
             
 
 
-            List<GrantedAuthority> authorities = new ArrayList<>();
-            // 创建并添加用户角色授权
-            authorities.add(new SimpleGrantedAuthority(role));
-            // 创建认证令牌
-            UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(username, null, authorities);
-            // 将认证令牌设置到安全上下文中
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            AuthenticationService authenticationService = new AuthenticationService();
+            authenticationService.setAuthentication(username, role);
             
             
             List<String> roles = extractUserRoles();
-            log.info("用户: {} 角色: {}", username, role);
+            log.info("用户: {} 角色: {}", username, roles);
             return true;
         } catch (Exception ex) {
             log.error("解析jwt失败: {}", ex.getMessage());

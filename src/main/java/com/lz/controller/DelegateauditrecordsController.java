@@ -1,6 +1,8 @@
 package com.lz.controller;
 
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.lz.pojo.result.Result;
 import com.lz.service.IDelegateAuditRecordsService;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,12 +30,19 @@ public class DelegateauditrecordsController {
     /**
      * 查询存储委托信息审核记录列表
      */
-
     // @GetMapping("/list")
-    // public TableDataInfo list(Delegateauditrecords delegateauditrecords)
+    // public Result list(Delegateauditrecords delegateauditrecords)
     // {
-    //     startPage();
-    //     List<Delegateauditrecords> list = delegateauditrecordsService.selectDelegateauditrecordsList(delegateauditrecords);
+    //     // 在查询方法中使用分页
+    //     Page<Delegateauditrecords> page = new Page<>(1, 10); // 查询第一页，每页10条记录
+    //     PageHelper.setPagination(page); // 设置分页对象，自动注入分页数据
+    //
+    //     List<Delegateauditrecords> list = delegateAuditRecordService.selectDelegateauditrecordsList(delegateauditrecords);
+    //     // 获取总记录数
+    //     long total = page.getTotal();
+    //     // 获取查询结果列表
+    //     List<Delegateauditrecords> records = page.getRecords(); 
+    //    
     //     return getDataTable(list);
     // }
 

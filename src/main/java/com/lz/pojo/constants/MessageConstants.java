@@ -80,11 +80,20 @@ public class MessageConstants {
 
     
     public static final String USER_STATUS_ERROR = "用户状态异常,无法认证请重新查看";
+    
+    public static final String USER_EXIST_TASK = "用户存在进行中的委托任务，无法删除认证信息";
 
     public static final String USER_AUTHENTICATION_INFO_NOT_EXIST = "用户认证信息不存在";
 
     public static final String USER_CANCEL_SUCCESS =  "取消认证成功";
     public static final String USER_CANCEL_FAIL =  "取消认证失败";
     public static final String USER_INFO_DELETE_SUCCESS =  "删除用户认证信息成功";
-    
+    //正在认证中，请耐心等待
+    public static final String USER_AUTHENTICATION_INFO_EXISTING = "正在认证中，请耐心等待";
+    public static final String USER_AUTHENTICATION_INFO_EXIST = "用户认证信息已存在";
+
+    public static final String TASK_DRAFT_DELETE_SUCCESS = "委托草稿删除成功";
+    public static final String TASK_NOT_EXIST = "当前委托信息异常，系统异常，请刷新后重试";
+    public static final String TASK_INFO_SUCCESS = "获取委托信息成功" ;
+    public static final String DATA_ACCEPT_SUCCESS = "接受委托信息已提交成功，等待处理";
 }

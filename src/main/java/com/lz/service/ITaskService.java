@@ -1,6 +1,8 @@
 package com.lz.service;
 
 import com.lz.Exception.MyException;
+import com.lz.pojo.Enum.TaskStatus;
+import com.lz.pojo.Page.DraftConfig;
 import com.lz.pojo.dto.AuditResultDTO;
 import com.lz.pojo.dto.TaskCountDTO;
 import com.lz.pojo.dto.TaskDTO;
@@ -9,6 +11,7 @@ import com.lz.pojo.entity.Task;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.lz.pojo.result.PageResult;
 import com.lz.pojo.vo.NewestInfoVO;
+import com.lz.pojo.vo.TaskAndUserInfoVO;
 import com.lz.pojo.vo.TaskDraftVO;
 import com.lz.pojo.vo.UserDelegateDraft;
 
@@ -37,12 +40,16 @@ public interface ITaskService extends IService<Task> {
     * 更新
      */
     void updateTask(AuditResultDTO auditResultDTO);
+
+
     /**
-    * 删除
-     */
-    void deleteTask();
-    /**
-    * 查询
+     * 查询
+     *
+     * @param id 同上
+     *
+     * @return {@code TaskDraftVO}
+     *
+     * @throws MyException 我的异常
      */
     TaskDraftVO searchTask(Long id) throws MyException;
 
@@ -107,4 +114,65 @@ public interface ITaskService extends IService<Task> {
      * @param taskDTO
      */
     void createTask(TaskDTO taskDTO) throws MyException;
-}
+
+    /**
+     * 管理员搜索委托
+     *
+     * @param draftConfig 草稿配置
+     *
+     * @return {@code PageResult<Task>}
+     */
+    PageResult<Task> searchPageByAdmin(DraftConfig draftConfig);
+
+
+    /**
+     * 回退草稿
+     *
+     * @param taskId 任务 ID
+     *
+     * @return 布尔
+     */
+    Boolean fallbackDraft(Long taskId) throws MyException;
+
+    /**
+     * 允许发布
+     *
+     * @param taskId 任务 ID
+     *
+     * @return 布尔
+     */
+    Boolean allowPublish(Long taskId) throws MyException;
+
+    /**
+     * 不允许
+     *
+     * @param taskId 任务 ID
+     *
+     * @return 布尔
+     */
+    Boolean notAllowed(Long taskId) throws MyException;
+
+    /**
+     * 搜索已发布和已接收委托页面
+     *
+     * @param pageNum     页码
+     * @param pageSize    页面大小
+     * @param location    位置
+     * @param description 描述
+     * @param taskTypeId  任务类型 ID
+     * @param queryRules  查询规则
+     *
+     * @return 页面结果<任务>
+     */
+    PageResult<Task> searchPage(int pageNum, int pageSize, String location,
+                                String description, Long taskTypeId,
+                                Integer queryRules, TaskStatus status);
+
+    /**
+     * 搜委托信息与委托人信息
+     * @param id 委托id
+     *
+     * @return <p>
+     */
+    TaskAndUserInfoVO getTaskAndPublisherInfo(Long id) throws MyException;
+}   

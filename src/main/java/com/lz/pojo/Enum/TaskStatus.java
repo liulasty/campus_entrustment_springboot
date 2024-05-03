@@ -5,6 +5,11 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 
 /**
  * 任务状态枚举，代表任务的不同状态。
@@ -43,15 +48,17 @@ public enum TaskStatus {
      * 已接收
      */
     @ApiModelProperty(value = "已接收")
-    ACCEPTED("ACCEPTED","已接收"),
+    ACCEPTED("ACCEPTED","已接受"),
     
     /**
      * 已过期
      */
+    @ApiModelProperty(value = "已过期")
     EXPIRED("EXPIRED","已过期"),
     /**
      * 取消发布
      */
+    @ApiModelProperty(value = "已取消")
     CANCELLED("CANCELLED","已取消");
 
     
@@ -93,5 +100,22 @@ public enum TaskStatus {
             }
         }
         throw new IllegalArgumentException("无效的任务状态值: " + dbValue);
+    }
+    public static List<TaskStatus> getStatusesForPhase(TaskPhase phase) {
+        
+        switch (phase) {
+            case EDITING_AND_AUDITING:
+                return Arrays.asList(DRAFT, AUDITING, AUDIT_FAILED, PENDING_RELEASE);
+            case PUBLISHING_AND_EXECUTION:
+                return Arrays.asList(ONGOING, ACCEPTED);
+            case LIFECYCLE_TERMINATION:
+                return Arrays.asList(EXPIRED, CANCELLED);
+            default:
+                throw new IllegalArgumentException("Unknown content lifecycle phase: " + phase);
+        }
+    }
+    
+    public static List<TaskStatus> getFallbackDraft(){
+        return Arrays.asList( AUDIT_FAILED, PENDING_RELEASE);
     }
 }

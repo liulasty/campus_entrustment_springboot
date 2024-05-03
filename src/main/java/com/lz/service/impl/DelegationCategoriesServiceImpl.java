@@ -28,7 +28,7 @@ import java.util.*;
  */
 @Service
 public class DelegationCategoriesServiceImpl extends ServiceImpl<DelegationCategoriesMapper, DelegationCategories> implements IDelegationCategoriesService {
-    
+
     /**
      * 获取委托类别
      *
@@ -43,11 +43,10 @@ public class DelegationCategoriesServiceImpl extends ServiceImpl<DelegationCateg
         }
 
 
-        
         List<NameAndDescription> nameAndDescriptions = new ArrayList<>();
         list.forEach(l -> {
             nameAndDescriptions.add(new NameAndDescription(l.getCategoryId(),
-                    l.getCategoryName(), l.getCategoryDescription()));
+                                                           l.getCategoryName(), l.getCategoryDescription()));
         });
 
         return nameAndDescriptions;
@@ -55,6 +54,7 @@ public class DelegationCategoriesServiceImpl extends ServiceImpl<DelegationCateg
 
     /**
      * 根据名字查询相关实体
+     *
      * @return {@code DelegationCategories}
      */
     @Override
@@ -66,7 +66,7 @@ public class DelegationCategoriesServiceImpl extends ServiceImpl<DelegationCateg
                 
                 // 设置查询条件
                 .eq("category_name", name)
-        
+
         ;
         return getOne(wrapper);
     }

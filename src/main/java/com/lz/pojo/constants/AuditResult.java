@@ -23,4 +23,9 @@ public class AuditResult {
      * 待定
      */
     public static final String PENDING = "待定";
+
+    /**
+     * 删除
+     */
+    public static final String DELETE = "已删除";
 }

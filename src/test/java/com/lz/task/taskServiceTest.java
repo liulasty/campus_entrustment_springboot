@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -50,8 +51,8 @@ public class taskServiceTest {
                 .receiverId(null)
                 .description("测试")
                 .createdAt(new Date(System.currentTimeMillis()))
-                .endTime(new Date(System.currentTimeMillis() + 20 * 60 * 60 * 24 * 1000))
-                .startTime(new Date(System.currentTimeMillis() + 10 * 60 * 60 * 24 * 1000))
+                // .endTime(LocalDateTime.now().plusHours(1))
+                // .startTime(LocalDateTime.now())
                 .status(TaskStatus.DRAFT)
                 .type(1)
                 .location("测试")
@@ -137,6 +138,11 @@ public class taskServiceTest {
     @Test
     void  getUserDelegateDraft(){
         
+    }
+
+    @Test
+    public void getTasksWithUser(){
+        taskService.getTasksWithUser(8L);
     }
     
 

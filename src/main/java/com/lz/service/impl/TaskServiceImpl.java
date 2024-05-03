@@ -4,27 +4,25 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lz.Exception.MyException;
-import com.lz.mapper.ReviewsMapper;
-import com.lz.mapper.UsersMapper;
-import com.lz.pojo.Enum.AnnouncementStatus;
-import com.lz.pojo.Enum.TaskStatus;
+import com.lz.mapper.*;
+import com.lz.pojo.Enum.*;
+import com.lz.pojo.Page.DraftConfig;
 import com.lz.pojo.constants.AuditResult;
+import com.lz.pojo.constants.MessageConstants;
 import com.lz.pojo.dto.AuditResultDTO;
 import com.lz.pojo.dto.TaskCountDTO;
 import com.lz.pojo.dto.TaskDTO;
 import com.lz.pojo.dto.TaskPageDTO;
 import com.lz.pojo.entity.*;
-import com.lz.mapper.TaskMapper;
 import com.lz.pojo.result.PageResult;
 import com.lz.pojo.vo.NewestInfoVO;
+import com.lz.pojo.vo.TaskAndUserInfoVO;
 import com.lz.pojo.vo.TaskDraftVO;
 import com.lz.pojo.vo.UserDelegateDraft;
-import com.lz.service.IDelegateAuditRecordsService;
-import com.lz.service.IDelegationCategoriesService;
-import com.lz.service.ISystemAnnouncementsService;
-import com.lz.service.ITaskService;
+import com.lz.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
+import net.sf.jsqlparser.statement.select.Select;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +50,9 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
 
     @Autowired
     private UsersMapper usersMapper;
+    
+    @Autowired
+    private UsersInfoMapper usersInfoMapper;
 
     @Autowired
     private TaskMapper taskMapper;
@@ -61,6 +62,15 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
 
     @Autowired
     private IDelegateAuditRecordsService delegateAuditRecordsService;
+    
+    @Autowired
+    private DelegationCategoriesMapper delegationCategoriesMapper;
+    
+    @Autowired
+    private ITaskUpdatesService taskUpdateService;
+    
+    @Autowired
+    private ITaskUpdatesService taskUpdatesService;
     
 
    
@@ -95,6 +105,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
             }else if (auditResultDTO.getReviewStatus().equals(AuditResult.REJECTED)){
                 updateById(Task.builder().taskId(auditResultDTO.getDelegateId()).status(TaskStatus.AUDIT_FAILED).build());
             }
+
             DelegateAuditRecords delegateAuditRecords = new DelegateAuditRecords();
             BeanUtils.copyProperties(auditResultDTO, delegateAuditRecords);
             delegateAuditRecords.setReviewTime(new Date(System.currentTimeMillis()));
@@ -104,10 +115,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
         }
     }
 
-    @Override
-    public void deleteTask() {
-
-    }
+    
 
     @Override
     public TaskDraftVO searchTask(Long id) throws MyException {
@@ -115,8 +123,10 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
         if (task == null) {
             throw new MyException("未找到该委托");
         }
+        log.info("查询结果：{}", task);
         TaskDraftVO taskDraftVO = new TaskDraftVO();
         BeanUtils.copyProperties(task, taskDraftVO);
+        taskDraftVO.setType(delegationCategoriesMapper.selectById(task.getType()).getCategoryName());
         return taskDraftVO;
 
     }
@@ -235,6 +245,8 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
                 // 设置排序规则
                 .orderByDesc("CreatedAt")
                 // 设置查询条件
+                .eq("ReceiverID", userId)
+                .or()
                 .eq("OwnerID", userId);
 
 
@@ -304,6 +316,182 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
                 .location(taskDTO.getLocation())
                 .build();
         taskMapper.insert(task);
+    }
+
+    /**
+     * 管理员搜索委托
+     *
+     * @param draftConfig 草稿配置
+     *
+     * @return {@code PageResult<Task>}
+     */
+    @Override
+    public PageResult<Task> searchPageByAdmin(DraftConfig draftConfig) {
+        Page<Task> page = new Page<>(draftConfig.getPageNum(),
+                                     draftConfig.getPageSize());
+        
+        QueryWrapper<Task> wrapper = new QueryWrapper<>();
+        if (draftConfig.getTaskType() != null){
+            wrapper.eq("TaskType",draftConfig.getTaskType());
+        }
+        if (draftConfig.getCreatedAt() != null){
+            wrapper.gt("CreatedAt",draftConfig.getCreatedAt());
+        }
+        if (draftConfig.getDescription() != null && !"".equals(draftConfig.getDescription())){
+            wrapper.like("Description",draftConfig.getDescription());
+        }
+        if (draftConfig.getLocation() != null && !"".equals(draftConfig.getLocation())){
+            wrapper.eq("Location",draftConfig.getLocation());
+        }
+        if (draftConfig.getTypePhase() != null){
+            wrapper.in("Status", TaskStatus.getStatusesForPhase(draftConfig.getTypePhase()));
+        }
+
+        page = taskMapper.selectPage(page, wrapper);
+        
+        log.info("page:{}",page.getRecords());
+        return new PageResult<>(page.getTotal(), page.getRecords());
+    }
+
+    /**
+     * 回退草稿
+     *
+     * @param taskId 任务 ID
+     *
+     * @return 布尔
+     */
+    @Override
+    public Boolean fallbackDraft(Long taskId) throws MyException {
+        Task task = taskMapper.selectById(taskId);
+        if (task == null){
+            throw new MyException(MessageConstants.TASK_NOT_EXIST);
+        }
+
+        List<TaskStatus> statusList = TaskStatus.getFallbackDraft();
+        boolean existsInList = statusList.stream()
+                .anyMatch(status -> status.equals(task.getStatus()));
+        if (existsInList){
+            task.setStatus(TaskStatus.DRAFT);
+            taskMapper.updateById(task);
+            taskUpdateService.fallbackDraft(taskId);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 允许发布
+     *
+     * @param taskId 任务 ID
+     *
+     * @return 布尔
+     */
+    @Override
+    public Boolean allowPublish(Long taskId) throws MyException {
+        Task task = taskMapper.selectById(taskId);
+        if (task == null){
+            throw new MyException(MessageConstants.TASK_NOT_EXIST);
+        }
+        if (task.getStatus() == TaskStatus.AUDITING){
+            task.setStatus(TaskStatus.PENDING_RELEASE);
+            taskMapper.updateById(task);
+            taskUpdateService.allowPublish(taskId);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 不允许
+     *
+     * @param taskId 任务 ID
+     *
+     * @return 布尔
+     */
+    @Override
+    public Boolean notAllowed(Long taskId) throws MyException {
+        Task task = taskMapper.selectById(taskId);
+        if (task == null){
+            throw new MyException(MessageConstants.TASK_NOT_EXIST);
+        }
+        if (task.getStatus() == TaskStatus.AUDITING){
+            task.setStatus(TaskStatus.AUDIT_FAILED);
+            taskMapper.updateById(task);
+            taskUpdateService.notAllowed(taskId);
+            delegateAuditRecordsService.createNewRecord(taskId, "审核不通过",
+                                                        TaskStatus.AUDIT_FAILED);
+            taskUpdatesService.createNewRecord(taskId, TaskUpdateType.AUDITING,
+                                               MessageConstants.DATA_AUDIT_FAIL);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 搜索已发布和已接收委托页面
+     *
+     * @param pageNum     页码
+     * @param pageSize    页面大小
+     * @param location    位置
+     * @param description 描述
+     * @param taskTypeId  任务类型 ID
+     * @param queryRules  查询规则
+     *
+     * @return 页面结果<任务>
+     */
+    @Override
+    public PageResult<Task> searchPage(int pageNum, int pageSize,
+                                       String location, String description,
+                                       Long taskTypeId, Integer queryRules,
+                                       TaskStatus status) {
+        Page<Task> page = new Page<>(pageNum, pageSize);
+        QueryWrapper<Task> wrapper = new QueryWrapper<>();
+        if (status != null){
+            wrapper.eq("Status", status);
+        }else {
+            wrapper.in("Status", TaskStatus.ACCEPTED, TaskStatus.ONGOING);
+        }
+        if (taskTypeId != null){
+            wrapper.eq("TaskType", taskTypeId);
+        }
+        if (location != null && !"".equals(location)){
+            wrapper.eq("Location", location);
+        }
+        if (description != null && !"".equals(description)){
+            wrapper.like("Description", description);
+        }
+        if (queryRules == 0){
+            wrapper.orderByDesc("StartTime");
+            
+        }else {
+            wrapper.orderByAsc("StartTime");
+        }
+        page = taskMapper.selectPage(page, wrapper);
+        return new PageResult<>(page.getTotal(), page.getRecords());
+    }
+
+    /**
+     * 搜委托信息与委托人信息
+     *
+     * @param id 委托id
+     *
+     * @return <p>
+     */
+    @Override
+    public TaskAndUserInfoVO getTaskAndPublisherInfo(Long id) throws MyException {
+        Task task = taskMapper.selectById(id);
+        if (task == null){
+            throw new MyException(MessageConstants.TASK_NOT_EXIST);
+        }
+        
+        UsersInfo usersInfo = usersInfoMapper.selectById(task.getOwnerId());
+        if (usersInfo == null|| usersInfo.getAuthStatus() != AuthenticationStatus.AUTHENTICATED){
+            throw new MyException(MessageConstants.USER_NOT_EXIST);
+        }
+        usersInfo.setRoleImgSrc("");
+        usersInfo.setCertifieTime(null);
+        usersInfo.setCertifiedTime(null);
+        return new TaskAndUserInfoVO(task,usersInfo);
     }
 
 

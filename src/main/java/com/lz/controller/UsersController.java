@@ -88,7 +88,7 @@ public class UsersController {
                             userLoginDTO.getPassword()
                     )
             );
-            log.info("用户登录成功:{}", userLoginDTO.getUsername());
+            log.info("用户登录成功:{}", authentication);
 
 
             // 设置认证上下文

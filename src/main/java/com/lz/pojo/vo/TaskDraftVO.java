@@ -23,6 +23,7 @@ public class TaskDraftVO {
     Long taskId;
     String location;
     String description;
-    Integer type;
+    String type;
     Date createdAt;
+    TaskStatus status;
 }
