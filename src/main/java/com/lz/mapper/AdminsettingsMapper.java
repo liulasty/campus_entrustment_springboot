@@ -1,6 +1,6 @@
 package com.lz.mapper;
 
-import com.lz.pojo.entity.Adminsettings;
+import com.lz.pojo.entity.AdminSettings;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -13,6 +13,6 @@ import org.apache.ibatis.annotations.Mapper;
  * @since 2024-04-04
  */
 @Mapper
-public interface AdminsettingsMapper extends BaseMapper<Adminsettings> {
+public interface AdminsettingsMapper extends BaseMapper<AdminSettings> {
 
 }

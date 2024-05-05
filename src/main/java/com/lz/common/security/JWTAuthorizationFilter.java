@@ -44,9 +44,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
-
-    private static final String ROLE_ADMIN = "ROLE_ADMIN";
-    private static final String ROLE_USER = "ROLE_USER";
+    
 
 
     @Autowired
@@ -62,15 +60,15 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         try {
-            log.info("请求路径: {}", request.getRequestURI());
+            // log.info("请求路径: {}", request.getRequestURI());
             if (PathMatcher.isUrlWhitelisted(request.getRequestURI())) {
                 // log.info("请求路径在白名单中，无需验证");
                 filterChain.doFilter(request, response);
             } else {
                 String token = request.getHeader("JWT");
-                log.info("请求令牌: {}", token);
+                // log.info("请求令牌: {}", token);
                 if (isValidToken(token)) {
-                    log.info("令牌有效");
+                    // log.info("令牌有效");
                     filterChain.doFilter(request, response);
                 } else {
                     throw new InvalidTokenException("令牌无效");
@@ -108,8 +106,6 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
             if (username == null || role == null) {
                 log.error("jwt携带信息为空");
                 return false;
-            }else {
-                log.info("用户: {} 角色: {}", username, role);
             }
 
             
@@ -120,7 +116,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
             
             
             List<String> roles = extractUserRoles();
-            log.info("用户: {} 角色: {}", username, roles);
+            // log.info("用户: {} 角色: {}", username, roles);
             return true;
         } catch (Exception ex) {
             log.error("解析jwt失败: {}", ex.getMessage());

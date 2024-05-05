@@ -21,9 +21,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 /**
- * <p>
- * 存储系统用户信息
- * </p>
+ * 用户
  *
  * @author lz
  * @date 2024/04/04

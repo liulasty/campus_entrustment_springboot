@@ -1,6 +1,6 @@
 package com.lz.service.impl;
 
-import com.lz.pojo.entity.Adminsettings;
+import com.lz.pojo.entity.AdminSettings;
 import com.lz.mapper.AdminsettingsMapper;
 import com.lz.service.IAdminsettingsService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
  * @since 2024-04-04
  */
 @Service
-public class AdminsettingsServiceImpl extends ServiceImpl<AdminsettingsMapper, Adminsettings> implements IAdminsettingsService {
+public class AdminSettingsServiceImpl extends ServiceImpl<AdminsettingsMapper
+        , AdminSettings> implements IAdminsettingsService {
 
 }

@@ -1,9 +1,10 @@
 package com.lz.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lz.Exception.MyException;
+import com.lz.common.security.AuthenticationService;
 import com.lz.mapper.*;
 import com.lz.pojo.Enum.*;
 import com.lz.pojo.Page.DraftConfig;
@@ -15,21 +16,18 @@ import com.lz.pojo.dto.TaskDTO;
 import com.lz.pojo.dto.TaskPageDTO;
 import com.lz.pojo.entity.*;
 import com.lz.pojo.result.PageResult;
-import com.lz.pojo.vo.NewestInfoVO;
-import com.lz.pojo.vo.TaskAndUserInfoVO;
-import com.lz.pojo.vo.TaskDraftVO;
-import com.lz.pojo.vo.UserDelegateDraft;
+import com.lz.pojo.vo.*;
 import com.lz.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
-import net.sf.jsqlparser.statement.select.Select;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -50,7 +48,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
 
     @Autowired
     private UsersMapper usersMapper;
-    
+
     @Autowired
     private UsersInfoMapper usersInfoMapper;
 
@@ -62,18 +60,16 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
 
     @Autowired
     private IDelegateAuditRecordsService delegateAuditRecordsService;
-    
+
     @Autowired
     private DelegationCategoriesMapper delegationCategoriesMapper;
-    
+
     @Autowired
     private ITaskUpdatesService taskUpdateService;
-    
-    @Autowired
-    private ITaskUpdatesService taskUpdatesService;
-    
 
-   
+    @Autowired
+    private TaskAcceptRecordsMapper taskAcceptRecordsMapper;
+
 
     /**
      * 获取最新信息
@@ -100,9 +96,9 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
     @Override
     public void updateTask(AuditResultDTO auditResultDTO) {
         try {
-            if (auditResultDTO.getReviewStatus().equals(AuditResult.APPROVED)){
-               updateById(Task.builder().taskId(auditResultDTO.getDelegateId()).status(TaskStatus.PENDING_RELEASE).build());
-            }else if (auditResultDTO.getReviewStatus().equals(AuditResult.REJECTED)){
+            if (auditResultDTO.getReviewStatus().equals(AuditResult.APPROVED)) {
+                updateById(Task.builder().taskId(auditResultDTO.getDelegateId()).status(TaskStatus.PENDING_RELEASE).build());
+            } else if (auditResultDTO.getReviewStatus().equals(AuditResult.REJECTED)) {
                 updateById(Task.builder().taskId(auditResultDTO.getDelegateId()).status(TaskStatus.AUDIT_FAILED).build());
             }
 
@@ -115,7 +111,6 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
         }
     }
 
-    
 
     @Override
     public TaskDraftVO searchTask(Long id) throws MyException {
@@ -166,7 +161,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
         wrapper
                 // 设置排序规则
                 .orderByDesc("StartTime")
-                .lt("StartTime",new Date(System.currentTimeMillis()) )
+                .lt("StartTime", new Date(System.currentTimeMillis()))
                 // 设置查询条件
                 .eq("status", TaskStatus.ONGOING);
         // 获取最新委托
@@ -207,37 +202,37 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
      * @return {@code Throwable}
      */
     @Override
-    public Map<String,Integer>  getTransactionStats() {
+    public Map<String, Integer> getTransactionStats() {
         //查询本月 本周 今天的 委托记录
-        Map<String,Integer> map = new LinkedHashMap<String, Integer>();
+        Map<String, Integer> map = new LinkedHashMap<String, Integer>();
 
         Integer tasksTodayCount1 =
                 taskMapper.getTasksTodayCount(TaskStatus.ACCEPTED.getDbValue());
-        map.put("今日已接受",tasksTodayCount1);
+        map.put("今日已接受", tasksTodayCount1);
         Integer tasksWeeklyCount1 =
                 taskMapper.getTasksWeeklyCount(TaskStatus.ACCEPTED.getDbValue());
-        map.put("本周已接受",tasksWeeklyCount1);
+        map.put("本周已接受", tasksWeeklyCount1);
         Integer tasksMonthlyCount1 =
                 taskMapper.getTasksMonthlyCount(TaskStatus.ACCEPTED.getDbValue());
-        map.put("本月已接受",tasksMonthlyCount1);
+        map.put("本月已接受", tasksMonthlyCount1);
 
         Integer tasksTodayCount =
                 taskMapper.getTasksTodayCount(TaskStatus.ONGOING.getDbValue());
-        map.put("今日已发布",tasksTodayCount+tasksTodayCount1);
+        map.put("今日已发布", tasksTodayCount + tasksTodayCount1);
         Integer tasksWeeklyCount =
                 taskMapper.getTasksWeeklyCount(TaskStatus.ONGOING.getDbValue());
-        map.put("本周已发布",tasksWeeklyCount+tasksWeeklyCount1);
+        map.put("本周已发布", tasksWeeklyCount + tasksWeeklyCount1);
         Integer tasksMonthlyCount =
                 taskMapper.getTasksMonthlyCount(TaskStatus.ONGOING.getDbValue());
-        map.put("本月已发布",tasksMonthlyCount+tasksMonthlyCount1);
-        
-        
+        map.put("本月已发布", tasksMonthlyCount + tasksMonthlyCount1);
+
+
         return map;
     }
 
     @Override
-    public  List<Task> getTasksWithUser(Long userId) {
-        Map<String,Task> map = new LinkedHashMap<String, Task>();
+    public List<Task> getTasksWithUser(Long userId) {
+        Map<String, Task> map = new LinkedHashMap<String, Task>();
         // 设置查询条件
         QueryWrapper<Task> wrapper = new QueryWrapper<>();
         // 设置查询条件
@@ -268,17 +263,17 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
         wrapper
                 // 设置排序规则
                 .orderByDesc("CreatedAt")
-                .lt("CreatedAt",new Date(System.currentTimeMillis()))
+                .lt("CreatedAt", new Date(System.currentTimeMillis()))
                 // 设置查询条件
                 .eq("OwnerID", userId)
                 .in("Status", Arrays.asList(TaskStatus.DRAFT,
                                             TaskStatus.AUDITING,
                                             TaskStatus.PENDING_RELEASE,
                                             TaskStatus.AUDIT_FAILED))
-                ;
+        ;
 
         List<Task> tasks = taskMapper.selectList(wrapper);
-        
+
         List<UserDelegateDraft> userDelegateDrafts = new ArrayList<>();
         for (Task task : tasks) {
             UserDelegateDraft userDelegateDraft = new UserDelegateDraft();
@@ -297,14 +292,15 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
     @Override
     public void createTask(TaskDTO taskDTO) throws MyException {
         Users users = usersMapper.selectById(taskDTO.getOwnerId());
-        if (users == null  || !Objects.equals(users.getRole(), "user")){
+        if (users == null || !Objects.equals(users.getRole(), "user")) {
             throw new MyException("用户不存在");
         }
 
         DelegationCategories delegationCategories = delegationCategoriesService.getTaskCategoryByCategoryName(taskDTO.getType());
-        if (delegationCategories == null){
+        if (delegationCategories == null) {
             throw new MyException("类别不存在");
-        };
+        }
+        ;
 
 
         Task task = Task.builder()
@@ -329,27 +325,27 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
     public PageResult<Task> searchPageByAdmin(DraftConfig draftConfig) {
         Page<Task> page = new Page<>(draftConfig.getPageNum(),
                                      draftConfig.getPageSize());
-        
+
         QueryWrapper<Task> wrapper = new QueryWrapper<>();
-        if (draftConfig.getTaskType() != null){
-            wrapper.eq("TaskType",draftConfig.getTaskType());
+        if (draftConfig.getTaskType() != null) {
+            wrapper.eq("TaskType", draftConfig.getTaskType());
         }
-        if (draftConfig.getCreatedAt() != null){
-            wrapper.gt("CreatedAt",draftConfig.getCreatedAt());
+        if (draftConfig.getCreatedAt() != null) {
+            wrapper.gt("CreatedAt", draftConfig.getCreatedAt());
         }
-        if (draftConfig.getDescription() != null && !"".equals(draftConfig.getDescription())){
-            wrapper.like("Description",draftConfig.getDescription());
+        if (draftConfig.getDescription() != null && !"".equals(draftConfig.getDescription())) {
+            wrapper.like("Description", draftConfig.getDescription());
         }
-        if (draftConfig.getLocation() != null && !"".equals(draftConfig.getLocation())){
-            wrapper.eq("Location",draftConfig.getLocation());
+        if (draftConfig.getLocation() != null && !"".equals(draftConfig.getLocation())) {
+            wrapper.eq("Location", draftConfig.getLocation());
         }
-        if (draftConfig.getTypePhase() != null){
+        if (draftConfig.getTypePhase() != null) {
             wrapper.in("Status", TaskStatus.getStatusesForPhase(draftConfig.getTypePhase()));
         }
 
         page = taskMapper.selectPage(page, wrapper);
-        
-        log.info("page:{}",page.getRecords());
+
+        log.info("page:{}", page.getRecords());
         return new PageResult<>(page.getTotal(), page.getRecords());
     }
 
@@ -363,14 +359,14 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
     @Override
     public Boolean fallbackDraft(Long taskId) throws MyException {
         Task task = taskMapper.selectById(taskId);
-        if (task == null){
+        if (task == null) {
             throw new MyException(MessageConstants.TASK_NOT_EXIST);
         }
 
         List<TaskStatus> statusList = TaskStatus.getFallbackDraft();
         boolean existsInList = statusList.stream()
                 .anyMatch(status -> status.equals(task.getStatus()));
-        if (existsInList){
+        if (existsInList) {
             task.setStatus(TaskStatus.DRAFT);
             taskMapper.updateById(task);
             taskUpdateService.fallbackDraft(taskId);
@@ -389,10 +385,10 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
     @Override
     public Boolean allowPublish(Long taskId) throws MyException {
         Task task = taskMapper.selectById(taskId);
-        if (task == null){
+        if (task == null) {
             throw new MyException(MessageConstants.TASK_NOT_EXIST);
         }
-        if (task.getStatus() == TaskStatus.AUDITING){
+        if (task.getStatus() == TaskStatus.AUDITING) {
             task.setStatus(TaskStatus.PENDING_RELEASE);
             taskMapper.updateById(task);
             taskUpdateService.allowPublish(taskId);
@@ -411,17 +407,17 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
     @Override
     public Boolean notAllowed(Long taskId) throws MyException {
         Task task = taskMapper.selectById(taskId);
-        if (task == null){
+        if (task == null) {
             throw new MyException(MessageConstants.TASK_NOT_EXIST);
         }
-        if (task.getStatus() == TaskStatus.AUDITING){
+        if (task.getStatus() == TaskStatus.AUDITING) {
             task.setStatus(TaskStatus.AUDIT_FAILED);
             taskMapper.updateById(task);
             taskUpdateService.notAllowed(taskId);
             delegateAuditRecordsService.createNewRecord(taskId, "审核不通过",
                                                         TaskStatus.AUDIT_FAILED);
-            taskUpdatesService.createNewRecord(taskId, TaskUpdateType.AUDITING,
-                                               MessageConstants.DATA_AUDIT_FAIL);
+            taskUpdateService.createNewRecord(taskId, TaskUpdateType.AUDITING,
+                                              MessageConstants.DATA_AUDIT_FAIL);
             return true;
         }
         return false;
@@ -446,24 +442,24 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
                                        TaskStatus status) {
         Page<Task> page = new Page<>(pageNum, pageSize);
         QueryWrapper<Task> wrapper = new QueryWrapper<>();
-        if (status != null){
+        if (status != null) {
             wrapper.eq("Status", status);
-        }else {
+        } else {
             wrapper.in("Status", TaskStatus.ACCEPTED, TaskStatus.ONGOING);
         }
-        if (taskTypeId != null){
+        if (taskTypeId != null) {
             wrapper.eq("TaskType", taskTypeId);
         }
-        if (location != null && !"".equals(location)){
+        if (location != null && !"".equals(location)) {
             wrapper.eq("Location", location);
         }
-        if (description != null && !"".equals(description)){
+        if (description != null && !"".equals(description)) {
             wrapper.like("Description", description);
         }
-        if (queryRules == 0){
+        if (queryRules == 0) {
             wrapper.orderByDesc("StartTime");
-            
-        }else {
+
+        } else {
             wrapper.orderByAsc("StartTime");
         }
         page = taskMapper.selectPage(page, wrapper);
@@ -480,18 +476,109 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
     @Override
     public TaskAndUserInfoVO getTaskAndPublisherInfo(Long id) throws MyException {
         Task task = taskMapper.selectById(id);
-        if (task == null){
+        if (task == null) {
             throw new MyException(MessageConstants.TASK_NOT_EXIST);
         }
-        
+
         UsersInfo usersInfo = usersInfoMapper.selectById(task.getOwnerId());
-        if (usersInfo == null|| usersInfo.getAuthStatus() != AuthenticationStatus.AUTHENTICATED){
+        if (usersInfo == null || usersInfo.getAuthStatus() != AuthenticationStatus.AUTHENTICATED) {
             throw new MyException(MessageConstants.USER_NOT_EXIST);
         }
         usersInfo.setRoleImgSrc("");
         usersInfo.setCertifieTime(null);
         usersInfo.setCertifiedTime(null);
-        return new TaskAndUserInfoVO(task,usersInfo);
+        return new TaskAndUserInfoVO(task, usersInfo);
+    }
+
+    /**
+     * 按发布者搜索页面
+     *
+     * @param pageNum     页码
+     * @param pageSize    页面大小
+     * @param location    位置
+     * @param description 描述
+     * @param taskType    任务类型
+     * @param queryRules  查询规则
+     * @param status      地位
+     *
+     * @return 页面结果<任务>
+     */
+    @Override
+    public PageResult<Task> searchPageByPublisher(int pageNum, int pageSize, String location, String description, Long taskType, Integer queryRules, TaskStatus status) throws MyException {
+        Page<Task> page = new Page<>(pageNum, pageSize);
+        QueryWrapper<Task> wrapper = new QueryWrapper<>();
+        if (status != null) {
+            wrapper.eq("Status", status);
+        } else {
+            wrapper.in("Status", TaskStatus.ACCEPTED, TaskStatus.ONGOING,
+                       TaskStatus.EXPIRED, TaskStatus.CANCELLED);
+        }
+        Users currentAdmin = getCurrentAdmin();
+        wrapper.eq("OwnerID", currentAdmin.getUserId());
+        if (taskType != null) {
+            wrapper.eq("TaskType", taskType);
+        }
+        if (location != null && !"".equals(location)) {
+            wrapper.eq("Location", location);
+        }
+        if (description != null && !"".equals(description)) {
+            wrapper.like("Description", description);
+        }
+        if (queryRules == 0) {
+            wrapper.orderByDesc("StartTime");
+
+        } else {
+            wrapper.orderByAsc("StartTime");
+        }
+        page = taskMapper.selectPage(page, wrapper);
+        return new PageResult<>(page.getTotal(), page.getRecords());
+    }
+
+    /**
+     * 按接受者搜索页面
+     *
+     * @param pageNum     页码
+     * @param pageSize    页面大小
+     * @param location    位置
+     * @param description 描述
+     * @param taskType    任务类型
+     * @param queryRules  查询规则
+     * @param status      地位
+     *
+     * @return 页面结果<任务>
+     */
+    @Override
+    public PageResult searchPageByAcceptor(int pageNum,
+                                           int pageSize, 
+                                           String location, 
+                                           String description, 
+                                           Long taskType, 
+                                           Integer queryRules, 
+                                           TaskStatus status) {
+        log.info("接受者搜索任务 {}",queryRules);
+        Page<TaskAcceptRecord> page = new Page<>(pageNum, pageSize);
+        Long userId = getCurrentAdmin().getUserId();
+        IPage<TaskAcceptRecord> taskAcceptRecord =
+                taskAcceptRecordsMapper.searchTaskAcceptRecord(page,
+                                                               userId,
+                                                               null,
+                                                               status,
+                                                               location,
+                                                               description,
+                                                               taskType,
+                                                               
+                                                               queryRules
+                );
+        
+        return new PageResult(taskAcceptRecord.getTotal(), taskAcceptRecord.getRecords());
+    }
+
+    public Users getCurrentAdmin() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String adminName = authentication.getName();
+        // log.info("管理员: {}", adminName);
+
+        return usersMapper.getByUsername(adminName);
     }
 
 

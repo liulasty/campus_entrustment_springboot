@@ -1,6 +1,6 @@
 package com.lz.Annotation;
 
-import com.lz.Annotation.Validator.emailValidator;
+import com.lz.Annotation.Validator.EmailValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -24,7 +24,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER})
 @Retention(RUNTIME)
 @Documented
-@Constraint(validatedBy = {emailValidator.class})// 标明由哪个类执行校验逻辑
+@Constraint(validatedBy = {EmailValidator.class})// 标明由哪个类执行校验逻辑
 public @interface emailVerification {
     // 校验出错时默认返回的消息
     String message() default "邮箱或用户名格式不正确";

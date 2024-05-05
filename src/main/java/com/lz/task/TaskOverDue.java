@@ -8,10 +8,10 @@ package com.lz.task;
  */
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.lz.mapper.TaskAcceptRecordsMapper;
 import com.lz.mapper.TaskMapper;
 import com.lz.pojo.Enum.TaskStatus;
 import com.lz.pojo.entity.Task;
-import com.lz.service.ITaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -28,6 +28,9 @@ import java.util.List;
 public class TaskOverDue {
     @Autowired
     private TaskMapper taskMapper;
+    
+    @Autowired
+    private TaskAcceptRecordsMapper taskAcceptRecordsMapper;
     //todo 委托过期处理
     @Scheduled(cron = "0/30 * * * * ?")
     public void delegateOverDue() {
@@ -39,6 +42,7 @@ public class TaskOverDue {
         tasks.forEach(task -> {
             task.setStatus(TaskStatus.EXPIRED);
             taskMapper.updateById(task);
+            taskAcceptRecordsMapper.expireProcess(task.getTaskId());
             //todo 通知用户
         });
         log.info("过期任务：" + tasks);

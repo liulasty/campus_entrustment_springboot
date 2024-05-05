@@ -11,7 +11,6 @@ import com.lz.pojo.dto.UserInfoDTO;
 import com.lz.pojo.entity.Users;
 import com.lz.pojo.entity.UsersInfo;
 import com.lz.service.IUsersInfoService;
-import com.lz.service.IUsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PostMapping;

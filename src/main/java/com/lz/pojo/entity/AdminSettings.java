@@ -23,8 +23,8 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @TableName("adminsettings")
-@ApiModel(value="Adminsettings对象", description="存储系统管理员相关设置")
-public class Adminsettings implements Serializable {
+@ApiModel(value="AdminSettings对象", description="存储系统管理员相关设置")
+public class AdminSettings implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

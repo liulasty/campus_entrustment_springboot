@@ -10,10 +10,7 @@ import com.lz.pojo.dto.TaskPageDTO;
 import com.lz.pojo.entity.Task;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.lz.pojo.result.PageResult;
-import com.lz.pojo.vo.NewestInfoVO;
-import com.lz.pojo.vo.TaskAndUserInfoVO;
-import com.lz.pojo.vo.TaskDraftVO;
-import com.lz.pojo.vo.UserDelegateDraft;
+import com.lz.pojo.vo.*;
 
 import java.util.List;
 import java.util.Map;
@@ -175,4 +172,34 @@ public interface ITaskService extends IService<Task> {
      * @return <p>
      */
     TaskAndUserInfoVO getTaskAndPublisherInfo(Long id) throws MyException;
+
+    /**
+     * 按发布者搜索页面
+     *
+     * @param pageNum     页码
+     * @param pageSize    页面大小
+     * @param location    位置
+     * @param description 描述
+     * @param taskType    任务类型
+     * @param queryRules  查询规则
+     * @param status      地位
+     *
+     * @return 页面结果<任务>
+     */
+    PageResult<Task> searchPageByPublisher(int pageNum, int pageSize, String location, String description, Long taskType, Integer queryRules, TaskStatus status) throws MyException;
+
+    /**
+     * 按接受者搜索页面
+     *
+     * @param pageNum     页码
+     * @param pageSize    页面大小
+     * @param location    位置
+     * @param description 描述
+     * @param taskType    任务类型
+     * @param queryRules  查询规则
+     * @param status      地位
+     *
+     * @return 页面结果<任务>
+     */
+    PageResult<TaskAcceptRecord> searchPageByAcceptor(int pageNum, int pageSize, String location, String description, Long taskType, Integer queryRules, TaskStatus status);    
 }   

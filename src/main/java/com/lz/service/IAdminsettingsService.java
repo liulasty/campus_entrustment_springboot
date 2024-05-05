@@ -1,6 +1,6 @@
 package com.lz.service;
 
-import com.lz.pojo.entity.Adminsettings;
+import com.lz.pojo.entity.AdminSettings;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -11,6 +11,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @author lz
  * @since 2024-04-04
  */
-public interface IAdminsettingsService extends IService<Adminsettings> {
+public interface IAdminsettingsService extends IService<AdminSettings> {
 
 }

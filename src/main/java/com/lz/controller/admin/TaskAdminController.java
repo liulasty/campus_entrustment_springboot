@@ -59,11 +59,11 @@ public class TaskAdminController {
     public TaskAdminController(ITaskService taskService,
                                IDelegateAuditRecordsService delegateAuditRecordsService,
                                IUsersService usersService,
-                               ITaskUpdatesService taskupdatesService) {
+                               ITaskUpdatesService taskUpdatesService) {
         this.taskService = taskService;
         this.delegateAuditRecordsService = delegateAuditRecordsService;
         this.usersService = usersService;
-        this.taskUpdatesService = taskupdatesService;
+        this.taskUpdatesService = taskUpdatesService;
     }
 
     /**

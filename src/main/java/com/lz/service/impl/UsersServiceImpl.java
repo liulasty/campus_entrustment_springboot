@@ -1,7 +1,6 @@
 package com.lz.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.injector.methods.SelectOne;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lz.Exception.MyException;
@@ -12,12 +11,10 @@ import com.lz.pojo.constants.MessageConstants;
 import com.lz.mapper.UsersMapper;
 import com.lz.pojo.dto.UserDTO;
 import com.lz.pojo.dto.UserLoginDTO;
-import com.lz.pojo.dto.UsersPageDTO;
 import com.lz.pojo.entity.Users;
 import com.lz.pojo.entity.UsersInfo;
 import com.lz.pojo.result.PageResult;
 import com.lz.pojo.vo.UserPageVO;
-import com.lz.service.IUsersInfoService;
 import com.lz.service.IUsersService;
 import com.lz.utils.MailUtils;
 import com.lz.utils.PasswordUtils;
@@ -29,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 /**
  * <p>

@@ -1,13 +1,9 @@
 package com.lz.mapper;
 
-import com.lz.pojo.Enum.TaskStatus;
 import com.lz.pojo.dto.TaskCountDTO;
-import com.lz.pojo.dto.TaskDTO;
 import com.lz.pojo.entity.Task;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 

@@ -20,8 +20,11 @@ import java.util.Date;
  * @date 2024/04/29
  */
 @Data
-public class publishDTO {
+public class PublishDTO {
     private Long id;
+    /**
+     * 
+     */
     private Date start;
     private Date end;
 }

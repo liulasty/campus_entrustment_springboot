@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
  * @date 2023/11/08
  */
 @Slf4j
-public class emailValidator implements ConstraintValidator<emailVerification, String> {
+public class EmailValidator implements ConstraintValidator<emailVerification, String> {
 
 
     /**

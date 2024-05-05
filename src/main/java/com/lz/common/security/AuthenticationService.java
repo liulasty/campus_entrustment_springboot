@@ -45,8 +45,8 @@ public class AuthenticationService {
 
         try {
             // 将认证令牌设置到安全上下文中
-            log.info("设置用户认证信息到安全上下文 {},{}",authentication.getPrincipal(),
-                     authentication.getAuthorities());
+            // log.info("设置用户认证信息到安全上下文 {},{}",authentication.getPrincipal(),
+            //          authentication.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);
             
         } catch (Exception e) {

@@ -1,7 +1,7 @@
 package com.lz.controller;
 
 
-import com.lz.pojo.entity.Adminsettings;
+import com.lz.pojo.entity.AdminSettings;
 import com.lz.pojo.result.Result;
 import com.lz.service.IAdminsettingsService;
 import io.swagger.annotations.Api;
@@ -36,13 +36,13 @@ public class AdminsettingsController {
     @GetMapping("")
     
     public Result getAdminsettingsList() {
-        List<Adminsettings> adminsettingsList = adminsettingsService.list();
-        return Result.success(adminsettingsList);
+        List<AdminSettings> adminSettingsList = adminsettingsService.list();
+        return Result.success(adminSettingsList);
     }
     @PostMapping
     @ApiOperation("新增分类")
     public Result<String> save(){
-        log.info("新增分类：{}","adminsettings");
+        log.info("新增分类：{}","adminSettings");
         
         return Result.success();
     }
