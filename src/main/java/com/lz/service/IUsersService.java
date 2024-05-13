@@ -68,14 +68,14 @@ public interface IUsersService extends IService<Users>  {
      *
      * @param id 同上
      */
-    void cancelDisableUser(Long id);
+    void cancelDisableUser(Long id) throws MyException;
 
     /**
      * 禁用用户
      *
      * @param id 同上
      */
-    void disableUser(Long id);
+    void disableUser(Long id) throws MyException;
 
     /**
      * 按用户名获取
@@ -101,4 +101,6 @@ public interface IUsersService extends IService<Users>  {
      * @param singleton 单身 人士
      */
     void deleteUsers(int[] singleton) throws MyException;
+
+   
 }

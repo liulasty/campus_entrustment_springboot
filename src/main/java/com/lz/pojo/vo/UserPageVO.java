@@ -28,5 +28,6 @@ public class UserPageVO {
     private Date createTime;
     private Date activeTime;
     private AuthenticationStatus authStatus;
+    private Boolean IsEnabled;
     
 }

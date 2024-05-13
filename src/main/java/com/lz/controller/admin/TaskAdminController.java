@@ -14,14 +14,11 @@ import com.lz.pojo.Enum.TaskUpdateType;
 import com.lz.pojo.Page.DraftConfig;
 import com.lz.pojo.constants.MessageConstants;
 import com.lz.pojo.entity.Task;
-import com.lz.pojo.entity.Taskupdates;
+import com.lz.pojo.entity.TaskUpdates;
 import com.lz.pojo.entity.Users;
 import com.lz.pojo.result.PageResult;
 import com.lz.pojo.result.Result;
-import com.lz.service.IDelegateAuditRecordsService;
-import com.lz.service.ITaskService;
-import com.lz.service.ITaskUpdatesService;
-import com.lz.service.IUsersService;
+import com.lz.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +43,8 @@ public class TaskAdminController {
     private final IDelegateAuditRecordsService delegateAuditRecordsService;
     private final IUsersService usersService;
     private final ITaskUpdatesService taskUpdatesService;
+    private final INotificationReadStatusService notificationReadStatusService;
+    private final INotificationsService notificationsService;
     
 
     /**
@@ -59,11 +58,15 @@ public class TaskAdminController {
     public TaskAdminController(ITaskService taskService,
                                IDelegateAuditRecordsService delegateAuditRecordsService,
                                IUsersService usersService,
-                               ITaskUpdatesService taskUpdatesService) {
+                               ITaskUpdatesService taskUpdatesService,
+                               INotificationReadStatusService notificationReadStatusService,
+                               INotificationsService notificationsService) {
         this.taskService = taskService;
         this.delegateAuditRecordsService = delegateAuditRecordsService;
         this.usersService = usersService;
         this.taskUpdatesService = taskUpdatesService;
+        this.notificationReadStatusService = notificationReadStatusService;
+        this.notificationsService = notificationsService;
     }
 
     /**
@@ -128,12 +131,19 @@ public class TaskAdminController {
         taskService.removeById(taskID);
         Users users = getCurrentAdmin();
 
-        Taskupdates taskupdates = Taskupdates.builder().taskId(taskID)
+        TaskUpdates taskupdates = TaskUpdates.builder().taskId(taskID)
                 .userId(users.getUserId())
                 .updateType(TaskUpdateType.RESULT)
                 .updateDescription(MessageConstants.TASK_DRAFT_DELETE_SUCCESS).build();
         taskUpdatesService.save(taskupdates);
         //todo 通知用户
+         Long id =
+                 notificationsService.addTaskDeleteNotification(users.getUserId(), 
+                                                       "您的委托已被删除");
+         // log.info("管理员删除委托成功{}", id);
+        notificationReadStatusService.addTaskNotification(id,
+                                                          task.getOwnerId(),
+                                                          users.getUserId());
         log.info("管理员删除委托成功{}", taskID);
         return Result.success(MessageConstants.TASK_DRAFT_DELETE_SUCCESS);
     }
@@ -220,6 +230,21 @@ public class TaskAdminController {
         return Result.success(MessageConstants.TASK_UPDATE_SUCCESS);
     }
     
+    
+    
+    @PutMapping("/handleEnableAdmin/{id}")
+    public Result handleEnableAdmin(@PathVariable("id") Long id) throws MyException {
+        log.info("管理员启用{}", id);
+        usersService.cancelDisableUser(id);
+        return Result.success(MessageConstants.USER_ABLE_SUCCESS);
+    }
+    
+    @PutMapping("/handleDisableAdmin/{id}")
+    public Result handleDisableAdmin(@PathVariable("id") Long id) throws MyException {
+        log.info("管理员禁用{}", id);
+        usersService.disableUser(id);
+        return Result.success(MessageConstants.USER_DISABLE_SUCCESS);
+    }
     
     
     

@@ -45,52 +45,50 @@ import java.util.List;
 @Api(tags = "委托相关接口")
 @Slf4j
 public class TaskController {
-    
+
     @Autowired
     private ITaskService taskService;
-    
+
     @Autowired
     private IUsersService usersService;
-    
+
     @Autowired
     private IUsersInfoService usersInfoService;
-    
+
     @Autowired
     private INotificationsService notificationService;
-    
+
     @Autowired
     private IDelegationCategoriesService delegationCategoriesService;
-    
+
     @Autowired
     private IDelegateAuditRecordsService delegateAuditRecordsService;
-    
 
-    
+
     //创建单个委托
     @PostMapping("/addTaskDraft")
     @ApiOperation("创建单个委托草稿")
     public Result<String> createTask(@RequestBody @Validated TaskDTO taskDTO,
                                      BindingResult result) throws MyException {
-        if(ValidateUtil.validate(result)!= null){
-            
+        if (ValidateUtil.validate(result) != null) {
+
             return Result.error(ValidateUtil.validate(result));
         }
-        
+
         taskService.createTask(taskDTO);
-        
-        
+
+
         return Result.success(MessageConstants.DATA_VALIDATION_SUCCESS);
     }
-    
-    
-    
+
+
     @PostMapping("/getTask")
     @ApiOperation("获取任务列表")
     public Result<String> getPendingAuditList() {
         return null;
     }
-    
-    
+
+
     //获取单个委托详细信息请
     @GetMapping("/getTask/{id}")
     @ApiOperation("获取单个委托详细信息")
@@ -99,7 +97,7 @@ public class TaskController {
         return Result.success(taskDraftVO);
     }
 
-    
+
     @PostMapping("/updateTaskDraft")
     @ApiOperation("更新委托草稿信息")
     public Result<String> updateTask(@RequestBody TaskDraftDTO taskDTO) throws MyException {
@@ -121,10 +119,10 @@ public class TaskController {
             throw new MyException(MessageConstants.UNEXPECTED_EXCEPTION);
         }
     }
-    
+
     @DeleteMapping(value = "/deleteTaskDraft/{id}")
     @ApiOperation("删除委托草稿")
-    public Result<String> deleteTaskDraft(@PathVariable("id") Long id) throws MyException{
+    public Result<String> deleteTaskDraft(@PathVariable("id") Long id) throws MyException {
         try {
             Task byId = taskService.getById(id);
             if (byId == null) {
@@ -136,12 +134,12 @@ public class TaskController {
             throw new MyException(MessageConstants.UNEXPECTED_EXCEPTION);
         }
     }
-    
-    
+
+
     @PostMapping("/deleteTask")
     @ApiOperation("删除委托")
     public Result<String> deleteTask() {
-        
+
         return null;
     }
 
@@ -193,8 +191,8 @@ public class TaskController {
             if (byId.getStatus() != TaskStatus.PENDING_RELEASE) {
                 return Result.error(MessageConstants.UNEXPECTED_EXCEPTION);
             }
-            
-            return Result.success(byId,MessageConstants.TASK_INFO_SUCCESS);
+
+            return Result.success(byId, MessageConstants.TASK_INFO_SUCCESS);
         } catch (Exception e) {
             throw new MyException(MessageConstants.TASK_PUBLISH_FAIL);
         }
@@ -223,7 +221,7 @@ public class TaskController {
             }
             taskService.updateById(Task.builder().taskId(id).status(TaskStatus.DRAFT).build());
             return Result.success(MessageConstants.TASK_CANCEL_SUCCESS);
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new MyException(e.getMessage());
         }
     }
@@ -249,13 +247,13 @@ public class TaskController {
                 return Result.error(MessageConstants.UNEXPECTED_EXCEPTION);
             }
             taskService.updateTask(auditResultDTO);
-            
-            
+
+
             return Result.success(MessageConstants.DATA_AUDIT_SUCCESS);
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new MyException(e.getMessage());
         }
-            
+
     }
 
     /**
@@ -270,45 +268,46 @@ public class TaskController {
     @GetMapping("/getReason/{id}")
     @ApiOperation("获取审核未通过原因")
     public Result<AuditResultVO> getReason(@PathVariable("id") Long id) throws MyException {
-        try {
-            Task byId = taskService.getById(id);
-            if (byId == null) {
-                return Result.error(MessageConstants.DATABASE_ERROR);
-            }
-            if (byId.getStatus() != TaskStatus.AUDIT_FAILED) {
-                return Result.error(MessageConstants.UNEXPECTED_EXCEPTION);
-            }
-            DelegateAuditRecords failReason = delegateAuditRecordsService.getFailReasonById(byId.getTaskId());
-            UsersInfo usersInfo = usersInfoService.getById(byId.getOwnerId());
-            AuditResultVO auditResultVO = AuditResultVO.builder()
-                    .reviewStatus(AuditResult.REJECTED)
-                    .reviewComment(failReason.getReviewComment())
-                    .reviewTime(failReason.getReviewTime())
-                    .name(usersInfo.getName())
-
-                    .build();
-            return Result.success(auditResultVO);
-        }catch (Exception e){
-            log.error(e.getMessage());
-            throw new MyException(MessageConstants.UNEXPECTED_EXCEPTION);
+        log.info("获取审核未通过原因 {}", id);
+        Task byId = taskService.getById(id);
+        if (byId == null) {
+            throw new MyException(MessageConstants.DATABASE_ERROR);
+            
         }
-    }
-    
+        if (byId.getStatus() != TaskStatus.AUDIT_FAILED) {
+            throw new MyException(MessageConstants.UNEXPECTED_EXCEPTION);
+            
+        }
+        DelegateAuditRecords failReason =
+                delegateAuditRecordsService.getFailReasonById(id);
+        log.info("failReason {} {}", failReason, byId.getOwnerId());
+        UsersInfo usersInfo = usersInfoService.getById(byId.getOwnerId());
+        log.info("userInfo {}", usersInfo);
+        AuditResultVO auditResultVO = AuditResultVO.builder()
+                .reviewStatus(AuditResult.REJECTED)
+                .reviewComment(failReason.getReviewComment())
+                .reviewTime(failReason.getReviewTime())
+                .name(usersInfo.getName())
+                .build();
 
-    
+        return Result.success(auditResultVO);
+
+    }
+
+
     @PostMapping("/searchTask")
     @ApiOperation("搜索待审核委托")
     public Result<String> searchTask() {
         return null;
     }
 
-    
+
     @PostMapping("/getHistory")
     @ApiOperation("获取审核历史记录")
     public Result<String> getHistory() {
         return null;
     }
-    
+
     //最新发布的委托列表（简要信息）
     @GetMapping("/getNewTask/{id}")
     @ApiOperation("快速信息展示")
@@ -318,7 +317,7 @@ public class TaskController {
 
         return Result.success(newestInfo);
     }
-    
+
     //分页查询
     @PostMapping("/searchPage")
     @ApiOperation("分页查询")
@@ -326,22 +325,22 @@ public class TaskController {
         PageResult<Task> taskPageResult = taskService.searchPage(taskPageDTO);
         return Result.success(taskPageResult);
     }
-    
+
     //获取委托分类
     @GetMapping("/getTaskCategory")
     @ApiOperation("获取委托分类")
     public Result<List<NameAndDescription>> getTaskCategory() throws MyException {
         List<NameAndDescription> map =
                 delegationCategoriesService.getTaskCategory();
-        log.info("list:{}",map);
+        log.info("list:{}", map);
         return Result.success(map);
     }
-    
+
     //获取用户委托草稿
     @GetMapping("/getUserDelegateDraft/{userId}")
     @ApiOperation("获取用户委托草稿")
-    public Result<List<UserDelegateDraft>>  getUserDelegateDraft(@PathVariable Long userId) {
-        List<UserDelegateDraft> tasksWithUser = taskService. getUserDelegateDraft(userId);
+    public Result<List<UserDelegateDraft>> getUserDelegateDraft(@PathVariable Long userId) {
+        List<UserDelegateDraft> tasksWithUser = taskService.getUserDelegateDraft(userId);
         return Result.success(tasksWithUser);
     }
 }

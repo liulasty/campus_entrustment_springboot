@@ -5,9 +5,7 @@ import com.baomidou.mybatisplus.annotation.*;
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 import lombok.experimental.Accessors;
 
 /**
@@ -20,6 +18,8 @@ import lombok.experimental.Accessors;
  */
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @TableName(value = "delegation_categories")
@@ -37,7 +37,12 @@ public class DelegationCategories implements Serializable {
     private String categoryName;
 
     @ApiModelProperty(value = "委托类别的详细描述，可为空")
+    @TableField(value = "category_description")
     private String categoryDescription;
+    
+    @ApiModelProperty(value = "是否启用，默认为启用")
+    @TableField(value = "isEnable")
+    private Boolean isEnabled;
 
 
 }

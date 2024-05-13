@@ -8,10 +8,12 @@ package com.lz.controller.user;
  */
 
 import com.lz.Exception.MyException;
+import com.lz.pojo.Enum.AcceptStatus;
 import com.lz.pojo.Enum.TaskStatus;
 import com.lz.pojo.constants.MessageConstants;
 import com.lz.pojo.dto.AcceptDTO;
 import com.lz.pojo.entity.Task;
+import com.lz.pojo.entity.TaskAcceptRecords;
 import com.lz.pojo.result.PageResult;
 import com.lz.pojo.result.Result;
 import com.lz.pojo.vo.TaskAcceptRecord;
@@ -37,6 +39,29 @@ public class AcceptController {
     @Autowired
     private ITaskService taskService;
 
+    /**
+     * 获取委托任务接收信息
+     *
+     * @param id 同上
+     *
+     * @return 结果<任务接受记录>
+     */
+    @GetMapping("/{id}")
+    public Result<TaskAcceptRecords> getTaskAcceptRecordByTaskId(@PathVariable Long id) throws MyException {
+        log.info("接收委托信息 {}", id);
+        TaskAcceptRecords taskAcceptRecord =
+                taskAcceptRecordsService.getTaskAcceptRecordByTaskId(id);
+        return Result.success(taskAcceptRecord);
+    }
+
+
+    /**
+     * 添加接收委托留言
+     *
+     * @param acceptDTO 接受 DTO
+     *
+     * @return 后端统一返回结果
+     */
     @PostMapping
     public Result accept(@RequestBody AcceptDTO acceptDTO) {
         log.info("接收委托留言 {}", acceptDTO);
@@ -45,7 +70,7 @@ public class AcceptController {
     }
 
     @GetMapping("/page")
-    public Result getTaskPage(
+    public Result<PageResult> getTaskPage(
             @RequestParam(defaultValue = "1") int pageNum, // 默认值为1，如果请求中未提供则使用此默认值
             @RequestParam(defaultValue = "10") int pageSize, // 默认每页大小为10
             @RequestParam(required = false) String location, // 类型阶段参数
@@ -65,5 +90,29 @@ public class AcceptController {
 
         // 返回响应数据，根据实际情况调整
         return Result.success(taskPageResult);
+    }
+
+    /**
+     * 取消接受记录
+     *
+     * @param id 同上
+     *
+     * @return 后端统一返回结果
+     *
+     * @throws MyException 我的异常
+     */
+    @PutMapping("/cancel/{id}")
+    public Result cancelAcceptRecords(@PathVariable("id") Long id) throws MyException {
+        TaskAcceptRecords taskAcceptRecord = taskAcceptRecordsService.getById(id);
+        if (taskAcceptRecord == null){
+            throw new MyException(MessageConstants.TASK_NOT_EXIST);
+        }
+        if (!taskAcceptRecord.getStatus().equals(AcceptStatus.PENDING)){
+            throw new MyException(MessageConstants.DATABASE_ERROR);
+        }
+        taskAcceptRecord.setStatus(AcceptStatus.CANCEL);
+
+        taskAcceptRecordsService.updateById(taskAcceptRecord);
+        return Result.success(MessageConstants.ACCEPT_CANCEL_SUCCESS);
     }
 }

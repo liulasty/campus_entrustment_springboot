@@ -1,6 +1,7 @@
 package com.lz.pojo.Enum;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.baomidou.mybatisplus.annotation.IEnum;
 import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -14,7 +15,7 @@ import lombok.Getter;
  */
 @ApiModel(value = "通知类型枚举")
 @Getter
-public enum NotificationsType {
+public enum NotificationsType{
     /**
      * 都
      */
@@ -44,4 +45,7 @@ public enum NotificationsType {
         }
         throw new IllegalArgumentException("无效的通知类型值: " + dbValue);
     }
+
+
+    
 }

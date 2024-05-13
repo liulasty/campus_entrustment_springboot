@@ -42,8 +42,9 @@
 			<if test = "isAsc == 0">
 				acceptTime ASC
 			</if>
-		
-	
-	
+	</select>
+	<select id = "getTaskAcceptRecordsByTaskId" resultType = "com.lz.pojo.entity.TaskAcceptRecords"
+			parameterType = "java.lang.Long">
+		select * from taskacceptrecords where taskId = #{taskId}
 	</select>
 </mapper>

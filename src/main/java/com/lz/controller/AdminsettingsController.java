@@ -24,6 +24,8 @@ import java.util.List;
 @RequestMapping("/adminsettings")
 @Api(tags = "存储系统管理员相关设置相关接口")
 @Slf4j
+@CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
+
 public class AdminsettingsController {
     
     @Autowired

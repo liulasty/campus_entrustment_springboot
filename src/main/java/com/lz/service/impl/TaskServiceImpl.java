@@ -1,10 +1,10 @@
 package com.lz.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lz.Exception.MyException;
-import com.lz.common.security.AuthenticationService;
 import com.lz.mapper.*;
 import com.lz.pojo.Enum.*;
 import com.lz.pojo.Page.DraftConfig;
@@ -40,7 +40,7 @@ import java.util.*;
  */
 @Service
 @Slf4j
-@Transactional(rollbackFor = Exception.class)
+
 public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements ITaskService {
 
     @Autowired
@@ -70,6 +70,9 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
     @Autowired
     private TaskAcceptRecordsMapper taskAcceptRecordsMapper;
 
+    @Autowired
+    private TaskUpdatesMapper taskUpdatesMapper;
+
 
     /**
      * 获取最新信息
@@ -94,20 +97,25 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
      * @param auditResultDTO 审计结果 DTO
      */
     @Override
-    public void updateTask(AuditResultDTO auditResultDTO) {
+    @Transactional
+    public void updateTask(AuditResultDTO auditResultDTO) throws MyException {
         try {
             if (auditResultDTO.getReviewStatus().equals(AuditResult.APPROVED)) {
                 updateById(Task.builder().taskId(auditResultDTO.getDelegateId()).status(TaskStatus.PENDING_RELEASE).build());
             } else if (auditResultDTO.getReviewStatus().equals(AuditResult.REJECTED)) {
                 updateById(Task.builder().taskId(auditResultDTO.getDelegateId()).status(TaskStatus.AUDIT_FAILED).build());
             }
-
+            //todo 保存审核记录
             DelegateAuditRecords delegateAuditRecords = new DelegateAuditRecords();
             BeanUtils.copyProperties(auditResultDTO, delegateAuditRecords);
             delegateAuditRecords.setReviewTime(new Date(System.currentTimeMillis()));
+            log.info("保存审核记录：{}", delegateAuditRecords);
+            
             delegateAuditRecordsService.save(delegateAuditRecords);
         } catch (BeansException e) {
             e.printStackTrace();
+            log.error("更新委托审核状态失败");
+            throw new MyException(MessageConstants.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -178,7 +186,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
         List<TaskCountDTO> tasks = taskMapper.selectTaskTypeCountTop5();
         log.info("热门类别：{}", tasks);
         // 获取热门委托类别
-        HashMap<String, TaskCountDTO> hashMap = new LinkedHashMap<String, TaskCountDTO>();
+        HashMap<String, TaskCountDTO> hashMap = new LinkedHashMap<>();
         tasks.forEach(taskCountDTO -> hashMap.put(
                 delegationCategoriesService.getById(taskCountDTO.getTaskTypeId()).getCategoryName(), taskCountDTO));
 
@@ -292,7 +300,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
     @Override
     public void createTask(TaskDTO taskDTO) throws MyException {
         Users users = usersMapper.selectById(taskDTO.getOwnerId());
-        if (users == null || !Objects.equals(users.getRole(), "user")) {
+        if (users == null || !Objects.equals(users.getRole(), "USER")) {
             throw new MyException("用户不存在");
         }
 
@@ -300,7 +308,6 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
         if (delegationCategories == null) {
             throw new MyException("类别不存在");
         }
-        ;
 
 
         Task task = Task.builder()
@@ -311,7 +318,17 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
                 .type(delegationCategories.getCategoryId())
                 .location(taskDTO.getLocation())
                 .build();
+
         taskMapper.insert(task);
+        //todo 添加更新记录
+        TaskUpdates taskUpdates =
+                TaskUpdates.builder()
+                        .taskId(task.getTaskId())
+                        .updateType(TaskUpdateType.CREATED)
+                        .updateDescription("创建委托草稿")
+                        .updateTime(new Date(System.currentTimeMillis()))
+                        .userId(taskDTO.getOwnerId()).build();
+        taskUpdatesMapper.insert(taskUpdates);
     }
 
     /**
@@ -391,6 +408,8 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
         if (task.getStatus() == TaskStatus.AUDITING) {
             task.setStatus(TaskStatus.PENDING_RELEASE);
             taskMapper.updateById(task);
+            delegateAuditRecordsService.createNewRecord(taskId, AuditResult.APPROVED,
+                                                        TaskStatus.PENDING_RELEASE);
             taskUpdateService.allowPublish(taskId);
             return true;
         }
@@ -414,7 +433,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
             task.setStatus(TaskStatus.AUDIT_FAILED);
             taskMapper.updateById(task);
             taskUpdateService.notAllowed(taskId);
-            delegateAuditRecordsService.createNewRecord(taskId, "审核不通过",
+            delegateAuditRecordsService.createNewRecord(taskId, AuditResult.REJECTED,
                                                         TaskStatus.AUDIT_FAILED);
             taskUpdateService.createNewRecord(taskId, TaskUpdateType.AUDITING,
                                               MessageConstants.DATA_AUDIT_FAIL);
@@ -487,7 +506,26 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
         usersInfo.setRoleImgSrc("");
         usersInfo.setCertifieTime(null);
         usersInfo.setCertifiedTime(null);
-        return new TaskAndUserInfoVO(task, usersInfo);
+        List<TaskAcceptRecords> records =
+                taskAcceptRecordsMapper.selectList(new QueryWrapper<TaskAcceptRecords>().eq("taskId", id));
+
+        if (records.size() == 0) {
+            return new TaskAndUserInfoVO(task, usersInfo);
+        }
+        ArrayList<TaskAcceptRecordVO> list = new ArrayList<>();
+        for (TaskAcceptRecords record : records) {
+            UsersInfo info = usersInfoMapper.selectById(record.getReceiverId());
+            log.info("发布者信息 {}", info);
+            if (info == null) {
+                throw new MyException(MessageConstants.USER_INFO_ERROR);
+            }
+            TaskAcceptRecordVO vo = new TaskAcceptRecordVO(record,
+                                                           info.getUserId(),
+                                                           info.getName(),
+                                                           info.getUserRole());
+            list.add(vo);
+        }
+        return new TaskAndUserInfoVO(task, usersInfo, list);
     }
 
     /**
@@ -504,7 +542,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
      * @return 页面结果<任务>
      */
     @Override
-    public PageResult<Task> searchPageByPublisher(int pageNum, int pageSize, String location, String description, Long taskType, Integer queryRules, TaskStatus status) throws MyException {
+    public PageResult<Task> searchPageByPublisher(int pageNum, int pageSize, String location, String description, Long taskType, Integer queryRules, TaskStatus status) {
         Page<Task> page = new Page<>(pageNum, pageSize);
         QueryWrapper<Task> wrapper = new QueryWrapper<>();
         if (status != null) {
@@ -548,14 +586,14 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
      * @return 页面结果<任务>
      */
     @Override
-    public PageResult searchPageByAcceptor(int pageNum,
-                                           int pageSize, 
-                                           String location, 
-                                           String description, 
-                                           Long taskType, 
-                                           Integer queryRules, 
-                                           TaskStatus status) {
-        log.info("接受者搜索任务 {}",queryRules);
+    public PageResult<TaskAcceptRecord> searchPageByAcceptor(int pageNum,
+                                                             int pageSize,
+                                                             String location,
+                                                             String description,
+                                                             Long taskType,
+                                                             Integer queryRules,
+                                                             TaskStatus status) {
+        log.info("接受者搜索任务 {}", queryRules);
         Page<TaskAcceptRecord> page = new Page<>(pageNum, pageSize);
         Long userId = getCurrentAdmin().getUserId();
         IPage<TaskAcceptRecord> taskAcceptRecord =
@@ -566,11 +604,62 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
                                                                location,
                                                                description,
                                                                taskType,
-                                                               
                                                                queryRules
                 );
-        
+
         return new PageResult(taskAcceptRecord.getTotal(), taskAcceptRecord.getRecords());
+    }
+
+    /**
+     * 确认委托接受者
+     *
+     * @param taskId        任务 ID
+     * @param acceptRecords 同上
+     */
+    @Override
+    @Transactional(rollbackFor = MyException.class)
+    public void confirmTheRecipient(Long taskId, TaskAcceptRecords acceptRecords) throws MyException {
+        if (acceptRecords == null) {
+            throw new MyException(MessageConstants.TASK_NOT_EXIST);
+        }
+        List<TaskAcceptRecords> list = taskAcceptRecordsMapper.selectList(new QueryWrapper<TaskAcceptRecords>().eq("taskId", taskId));
+
+        acceptRecords.setStatus(AcceptStatus.CHECKED);
+        acceptRecords.setAdoptTime(new Date(System.currentTimeMillis()));
+        int byId = taskAcceptRecordsMapper.updateById(acceptRecords);
+        if (byId == 0) {
+            throw new MyException(MessageConstants.TASK_NOT_EXIST);
+        }
+        UpdateWrapper<TaskAcceptRecords> updateWrapper = new UpdateWrapper<>();
+        TaskAcceptRecords taskAcceptRecords = TaskAcceptRecords.builder().status(AcceptStatus.UNCHECKED).build();
+        taskAcceptRecords.setAdoptTime(new Date(System.currentTimeMillis()));
+        updateWrapper.eq("taskId", taskId).eq("status", AcceptStatus.PENDING);
+        int update = taskAcceptRecordsMapper.update(taskAcceptRecords, updateWrapper);
+
+        TaskUpdates taskupdates = TaskUpdates.builder()
+                .taskId(taskId)
+                .updateDescription(MessageConstants.TASK_ACCEPT_SUCCESS)
+                .updateType(TaskUpdateType.RESULT)
+                .updateTime(new Date(System.currentTimeMillis()))
+                .build();
+
+        taskUpdateService.save(taskupdates);
+
+        if (update != list.size() - 1) {
+            log.info("更新失败 update {} list.size() {}", update, list.size());
+            throw new MyException(MessageConstants.DATABASE_ERROR);
+        }
+        Task task = Task.builder().taskId(taskId).status(TaskStatus.ACCEPTED).build();
+        updateById(task);
+        //todo 通知接受者
+
+    }
+
+    @Override
+    public List<Task> getTaskByCategoryId(Long id) {
+        List<Task> taskList = taskMapper.selectList(new QueryWrapper<Task>().eq("taskType", id));
+        
+        return taskList;
     }
 
     public Users getCurrentAdmin() {

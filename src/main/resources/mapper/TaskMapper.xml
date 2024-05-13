@@ -42,5 +42,7 @@
 		DATE_FORMAT(StartTime, '%Y-%m') = DATE_FORMAT(CURDATE(), '%Y-%m');
 	
 	</select>
+	
+	
 
 </mapper>

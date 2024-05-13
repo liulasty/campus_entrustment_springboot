@@ -32,14 +32,18 @@ public enum AcceptStatus {
      * 过期
      */
     EXPIRED("Expired", "已过期"),
-            
-    
+
 
     /**
      * 待定
      */
-    PENDING("Pending", "待处理");
-    
+    PENDING("Pending", "待处理"),
+
+    /**
+     * 取消接收
+     */
+    CANCEL("Cancel","已取消");
+
 
     @EnumValue
     private final String dbValue;
@@ -49,6 +53,6 @@ public enum AcceptStatus {
     AcceptStatus(String dbValue, String webValue) {
         this.dbValue = dbValue;
         this.webValue = webValue;
-        
+
     }
 }

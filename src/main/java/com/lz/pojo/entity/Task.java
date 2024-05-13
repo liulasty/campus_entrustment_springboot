@@ -74,6 +74,8 @@ public class Task implements Serializable {
     @ApiModelProperty(value = "任务状态")
     @TableField("STATUS")
     private TaskStatus status;
+    
+    
 
 
 }

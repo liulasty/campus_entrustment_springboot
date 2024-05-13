@@ -9,7 +9,7 @@ package com.lz.task;
 
 import com.lz.pojo.Enum.AnnouncementStatus;
 import com.lz.pojo.Enum.NotificationsType;
-import com.lz.pojo.entity.Notificationreadstatus;
+import com.lz.pojo.entity.NotificationReadStatus;
 import com.lz.pojo.entity.Notifications;
 import com.lz.pojo.entity.SystemAnnouncements;
 import com.lz.service.INotificationReadStatusService;
@@ -51,7 +51,7 @@ public class NotificationTest {
         notifications.setMessage("测试消息");
         notifications.setNotificationTime(new Date(System.currentTimeMillis()));
         for (int i = 0; i < 100; i++) {
-            notifications.setUserId(1 + i);
+            notifications.setUserId(1L + i);
             if (i % 2 == 0) {
 
                 if (i % 3 == 0) {
@@ -78,13 +78,13 @@ public class NotificationTest {
 
     @Test
     public void getNotificationsRead() {
-        Notificationreadstatus notificationreadstatus = new Notificationreadstatus();
+        NotificationReadStatus notificationreadstatus = new NotificationReadStatus();
 
 
         notificationreadstatus.setIsRead(false);
         for (int i = 1; i < 100; i++) {
-            notificationreadstatus.setNotificationId(i);
-            notificationreadstatus.setUserId(i);
+            notificationreadstatus.setNotificationId((long) i);
+            notificationreadstatus.setUserId((long) i);
             notificationreadstatus.setReadTime(new Date(System.currentTimeMillis() + 24 * 1000 * 60 * 60 * (long) i));
             notificationReadStatusService.save(notificationreadstatus);
         }
@@ -104,7 +104,7 @@ public class NotificationTest {
         SystemAnnouncements systemAnnouncements = SystemAnnouncements.builder()
                 .title("测试公告主题")
                 .content("测试公告内容")
-                .publisherId(9)
+                .publisherId(9L)
                 .publishTime(new Date(System.currentTimeMillis()))
                 .status(AnnouncementStatus.DRAFT)
                 .startEffectiveTime(new Date(System.currentTimeMillis()))
@@ -112,7 +112,7 @@ public class NotificationTest {
                 .isPinned(true)
                 .createdAt(new Date(System.currentTimeMillis()))
                 .updatedAt(new Date(System.currentTimeMillis() + (long) 24 * 1000 * 60 * 60 * 4))
-                .updatedBy(9)
+                .updatedBy(9L)
                 .build();
         for (int i = 0; i < 20; i++) {
             systemAnnouncements.setTitle("测试公告主题" + i);

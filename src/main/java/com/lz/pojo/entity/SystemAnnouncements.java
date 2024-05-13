@@ -8,12 +8,11 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.lz.pojo.Enum.AnnouncementStatus;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 import lombok.experimental.Accessors;
 
 /**
@@ -25,6 +24,8 @@ import lombok.experimental.Accessors;
  * @since 2024-04-10
  */
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
@@ -36,7 +37,7 @@ public class SystemAnnouncements implements Serializable {
 
     @ApiModelProperty(value = "公告ID，主键，自增")
     @TableId(value = "announcement_id", type = IdType.AUTO)
-    private Integer announcementId;
+    private Long announcementId;
 
     @ApiModelProperty(value = "公告标题")
     @TableField("title")
@@ -48,10 +49,11 @@ public class SystemAnnouncements implements Serializable {
 
     @ApiModelProperty(value = "发布者ID，外键关联用户表或其他相关表")
     @TableField("publisher_id")
-    private Integer publisherId;
+    private Long publisherId;
 
     @ApiModelProperty(value = "发布时间")
     @TableField("publish_time")
+    @JsonFormat(pattern = "yyyy年MM月dd日HH:mm:ss")
     private Date  publishTime;
 
     @ApiModelProperty(value = "公告状态（如：草稿、已发布、已撤回等）")
@@ -60,10 +62,12 @@ public class SystemAnnouncements implements Serializable {
 
     @ApiModelProperty(value = "公告开始生效时间（如有）")
     @TableField("start_effective_time")
+    @JsonFormat(pattern = "yyyy年MM月dd日HH:mm:ss")
     private Date startEffectiveTime;
 
     @ApiModelProperty(value = "公告结束生效时间（如有）")
     @TableField("end_effective_time")
+    @JsonFormat(pattern = "yyyy年MM月dd日HH:mm:ss")
     private Date endEffectiveTime;
 
     @ApiModelProperty(value = "是否置顶（0：否，1：是）")
@@ -81,7 +85,7 @@ public class SystemAnnouncements implements Serializable {
     
     @ApiModelProperty(value = "最后更新者编号")
     @TableField("updated_by")
-    private Integer updatedBy;
+    private Long updatedBy;
 
 
 }

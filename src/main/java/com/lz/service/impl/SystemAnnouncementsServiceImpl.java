@@ -1,6 +1,7 @@
 package com.lz.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lz.pojo.Enum.AnnouncementStatus;
 import com.lz.pojo.entity.SystemAnnouncements;
@@ -48,5 +49,17 @@ public class SystemAnnouncementsServiceImpl extends ServiceImpl<SystemAnnounceme
         
         log.info("getNewestAnnouncement: {}", announcements);
         return announcements;
+    }
+
+    @Override
+    public IPage<SystemAnnouncements> page(Page<SystemAnnouncements> page,
+                                           String status, String description,
+                                           Integer queryRules) {
+        log.info("page: {}", page);
+        
+        IPage<SystemAnnouncements> iPage =
+                systemAnnouncementsMapper.selectPageAdmin(page, status,
+                                                       description, queryRules);
+        return iPage;
     }
 }

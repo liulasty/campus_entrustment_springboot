@@ -30,7 +30,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @TableName("taskupdates")
 @ApiModel(value="Taskupdates对象", description="记录任务的更新情况")
-public class Taskupdates implements Serializable {
+public class TaskUpdates implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

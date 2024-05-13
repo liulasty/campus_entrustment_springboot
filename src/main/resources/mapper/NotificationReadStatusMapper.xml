@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lz.mapper.NotificationReadStatusMapper">
+	
+	
+	<select id = "selectPageAdmin" resultType = "com.lz.pojo.vo.NotificationReadStatusVO">
+		select id, n.NotificationID as notificationId,n2.NotificationTime as notificationTime,
+		       n2.NotificationType as type,n.UserID as userId,
+		        u.Username as username,n2.Title as title, n2.Message as message,
+		       n.IsRead as isRead, n.ReadTime as readTime
+		from NotificationReadStatus n, notifications n2,Users u
+		<where>
+			n.NotificationID = n2.NotificationID and n.UserID = u.UserID
+			<if test="createAt != null">
+				AND DATE(NotificationTime) = #{createAt}
+			</if>
+			<if test="messageType != null">
+				and n2.NotificationType = #{messageType}
+			</if>
+			<if test="description != null">
+				and Description like concat('%',#{description},'%')
+			</if>
+		</where>
+		order by SendTime desc
+	</select>
+</mapper>

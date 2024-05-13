@@ -204,8 +204,17 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
      * @param id 同上
      */
     @Override
-    public void cancelDisableUser(Long id) {
-
+    public void cancelDisableUser(Long id) throws MyException {
+        Users users = getOne(new QueryWrapper<Users>().eq("UserId", id));
+        if (users == null){
+            throw new MyException(MessageConstants.USER_NOT_EXIST);
+        }
+        if (!users.getIsEnabled()){
+            users.setIsEnabled(true);
+            usersMapper.updateById(users);
+        }else {
+            throw new MyException(MessageConstants.USER_INFO_ERROR);
+        }
     }
 
     /**
@@ -214,8 +223,17 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
      * @param id 同上
      */
     @Override
-    public void disableUser(Long id) {
-
+    public void disableUser(Long id) throws MyException {
+        Users users = getOne(new QueryWrapper<Users>().eq("UserId", id));
+        if (users == null){
+            throw new MyException(MessageConstants.USER_NOT_EXIST);
+        }
+        if (users.getIsEnabled()){
+            users.setIsEnabled(false);
+            usersMapper.updateById(users);
+        }else {
+            throw new MyException(MessageConstants.USER_INFO_ERROR);
+        }
     }
 
     @Override

@@ -22,7 +22,10 @@ import lombok.experimental.Accessors;
 import java.util.Date;
 
 /**
+ * 委托任务接受记录
+ *
  * @author lz
+ * @date 2024/05/07
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -34,9 +37,11 @@ public class TaskAcceptRecords {
     @ApiModelProperty(value = "接受记录ID")
     @TableId(value = "AcceptRecordId", type = IdType.AUTO)
     private Long id;
+    
     @ApiModelProperty(value = "接受状态")
     @TableField(value = "status")
     private AcceptStatus status;
+    
     @ApiModelProperty(value = "接受者ID")
     @TableField(value = "AccepterId")
     private Long receiverId;
@@ -52,5 +57,11 @@ public class TaskAcceptRecords {
     @ApiModelProperty(value = "接受时间")
     @TableField(value = "acceptTime")
     private Date acceptTime;
+
+    @ApiModelProperty(value = "处理时间")
+    @TableField(value = "adoptTime")
+    private Date adoptTime;
+    
+    
     
 }

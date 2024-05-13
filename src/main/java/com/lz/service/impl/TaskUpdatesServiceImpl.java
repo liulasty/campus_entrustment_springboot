@@ -1,11 +1,13 @@
 package com.lz.service.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lz.Exception.MyException;
 import com.lz.mapper.TaskMapper;
 import com.lz.mapper.UsersMapper;
 import com.lz.pojo.Enum.TaskUpdateType;
-import com.lz.pojo.entity.Taskupdates;
-import com.lz.mapper.TaskupdatesMapper;
+import com.lz.pojo.entity.TaskUpdates;
+import com.lz.mapper.TaskUpdatesMapper;
 import com.lz.pojo.entity.Users;
 import com.lz.service.ITaskUpdatesService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -14,6 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.Date;
 
 /**
  * <p>
@@ -25,7 +30,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @Slf4j
-public class TaskUpdatesServiceImpl extends ServiceImpl<TaskupdatesMapper, Taskupdates> implements ITaskUpdatesService {
+public class TaskUpdatesServiceImpl extends ServiceImpl<TaskUpdatesMapper, TaskUpdates> implements ITaskUpdatesService {
     
 
     @Autowired
@@ -33,6 +38,9 @@ public class TaskUpdatesServiceImpl extends ServiceImpl<TaskupdatesMapper, Tasku
     
     @Autowired
     private TaskMapper taskMapper;
+    
+    @Autowired
+    private TaskUpdatesMapper taskUpdatesMapper;
 
     /**
      * 获取当前登录用户信息
@@ -107,7 +115,7 @@ public class TaskUpdatesServiceImpl extends ServiceImpl<TaskupdatesMapper, Tasku
     public Boolean fallbackDraft(Long taskId) throws MyException {
         Users currentAdmin = getCurrentAdmin();
         if (currentAdmin != null) {
-            Taskupdates taskupdates = new Taskupdates();
+            TaskUpdates taskupdates = new TaskUpdates();
             taskupdates.setTaskId(taskId);
             taskupdates.setUserId(currentAdmin.getUserId());
             taskupdates.setUpdateType(TaskUpdateType.FALLBACK_DRAFT);
@@ -127,6 +135,7 @@ public class TaskUpdatesServiceImpl extends ServiceImpl<TaskupdatesMapper, Tasku
 
     @Override
     public void notAllowed(Long taskId) {
+        
 
     }
 
@@ -135,7 +144,7 @@ public class TaskUpdatesServiceImpl extends ServiceImpl<TaskupdatesMapper, Tasku
                              String dataAuditFail) {
         Users currentAdmin = getCurrentAdmin();
         if (currentAdmin != null) {
-            Taskupdates taskupdates = new Taskupdates();
+            TaskUpdates taskupdates = new TaskUpdates();
             taskupdates.setTaskId(taskId);
             taskupdates.setUserId(currentAdmin.getUserId());
             taskupdates.setUpdateType(auditing);
@@ -147,5 +156,13 @@ public class TaskUpdatesServiceImpl extends ServiceImpl<TaskupdatesMapper, Tasku
         log.error("权限异常，信息不存在");
         return false;
         
+    }
+
+    @Override
+    public IPage<TaskUpdates> page(Page<TaskUpdates> page, String delegateComment, String reviewStatus, Date reviewTime) {
+        log.info("delegateComment: {}, reviewStatus: {}, reviewTime: {}", delegateComment, reviewStatus, reviewTime);
+        IPage<TaskUpdates> list = taskUpdatesMapper.page(page, delegateComment,
+                                                     reviewStatus, reviewTime);
+        return list;
     }
 }

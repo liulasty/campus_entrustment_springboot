@@ -10,12 +10,17 @@ package com.lz.controller.user;
 import com.lz.Exception.MyException;
 import com.lz.pojo.Enum.TaskStatus;
 import com.lz.pojo.entity.Task;
+import com.lz.pojo.result.NameAndDescription;
 import com.lz.pojo.result.PageResult;
 import com.lz.pojo.result.Result;
 import com.lz.pojo.vo.TaskAndUserInfoVO;
+import com.lz.service.IDelegationCategoriesService;
 import com.lz.service.ITaskService;
+import io.swagger.annotations.ApiModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 任务控制器
@@ -26,9 +31,13 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
 @RequestMapping("/user/task")
+@ApiModel(value = "任务控制器")
 public class TaskUserController {
     @Autowired
     private ITaskService taskService;
+    
+    @Autowired
+    private IDelegationCategoriesService delegationCategoriesService;
     
     @GetMapping("/page")
     public Result getTaskPage(
@@ -64,4 +73,11 @@ public class TaskUserController {
         
         return Result.success(taskAndUserInfo);
     }
+
+    
+        @GetMapping("/categories")
+        public Result getTaskCategory() throws MyException {
+            List<NameAndDescription> taskCategory = delegationCategoriesService.getTaskCategoryUser();
+            return Result.success(taskCategory);
+        }
 }

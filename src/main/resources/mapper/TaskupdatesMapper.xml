@@ -1,5 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.lz.mapper.TaskupdatesMapper">
-
+<mapper namespace="com.lz.mapper.TaskUpdatesMapper">
+	
+	<insert id = "confirmTheRecipient">
+		INSERT INTO taskupdates(taskId,UpdateType,UpdateDescription)
+		VALUES(#{taskId},#{auditing},#{dataAuditFail})
+	</insert>
+	<select id="page" resultType="com.lz.pojo.entity.TaskUpdates">
+		select * from taskupdates
+		where 1=1
+			<if test="updateType != null and updateType != ''">
+				and updateType = #{updateType}
+			</if>
+			<if test="updateTime != null ">
+				AND DATE(UpdateTime) = #{updateTime}
+			</if>
+			<if test="updateDescription != null and updateDescription != ''">
+				and updateDescription like concat('%',#{updateDescription},'%')
+			</if>
+	</select>
 </mapper>

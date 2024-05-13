@@ -8,6 +8,7 @@ import com.lz.pojo.entity.TaskAcceptRecords;
 import com.lz.pojo.vo.TaskAcceptRecord;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -42,6 +43,17 @@ public interface TaskAcceptRecordsMapper extends BaseMapper<TaskAcceptRecords> {
      * @param taskId 任务 ID
      */
     void expireProcess(Long taskId);
+    
+    /**
+     * 通过委托任务编号获取所有委托接受记录
+     *
+     * @param taskId 任务 ID
+     *
+     * @return 接受者接受记录
+     */
+    ArrayList<TaskAcceptRecords> getTaskAcceptRecordsByTaskId(Long taskId);
+    
+    
     // IPage<User> selectUsersWithRoleAndPage( @Param("userId") Long userId, @Param("orderByColumn") String orderByColumn, @Param("isAsc") );
 
 }

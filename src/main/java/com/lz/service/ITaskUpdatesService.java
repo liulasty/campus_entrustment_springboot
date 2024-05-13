@@ -1,9 +1,14 @@
 package com.lz.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lz.Exception.MyException;
 import com.lz.pojo.Enum.TaskUpdateType;
-import com.lz.pojo.entity.Taskupdates;
+import com.lz.pojo.entity.TaskUpdates;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.time.LocalDate;
+import java.util.Date;
 
 /**
  * <p>
@@ -13,7 +18,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @author lz
  * @since 2024-04-04
  */
-public interface ITaskUpdatesService extends IService<Taskupdates> {
+public interface ITaskUpdatesService extends IService<TaskUpdates> {
     /**
      * 完成审核操作，并返回对应的状态结果。
      *
@@ -61,4 +66,7 @@ public interface ITaskUpdatesService extends IService<Taskupdates> {
 
     Boolean createNewRecord(Long taskId, TaskUpdateType auditing,
                       String dataAuditFail);
+
+
+    IPage<TaskUpdates> page(Page<TaskUpdates> page, String delegateComment, String reviewStatus, Date reviewTime);
 }

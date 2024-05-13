@@ -6,6 +6,7 @@ import com.lz.mapper.DelegateAuditRecordsMapper;
 import com.lz.mapper.UsersMapper;
 import com.lz.pojo.Enum.TaskStatus;
 import com.lz.pojo.constants.AuditResult;
+import com.lz.pojo.constants.MessageConstants;
 import com.lz.pojo.entity.DelegateAuditRecords;
 import com.lz.pojo.entity.Users;
 import com.lz.service.IDelegateAuditRecordsService;
@@ -53,6 +54,10 @@ public class DelegateAuditRecordsServiceImpl extends ServiceImpl<DelegateAuditRe
                 .eq("ReviewStatus", AuditResult.REJECTED)
                 .orderByDesc("ReviewTime");
         DelegateAuditRecords auditRecords = getOne(queryWrapper);
+        if (auditRecords == null) {
+            log.info("该委托没有审核记录");
+            throw new RuntimeException(MessageConstants.TASK_NOT_EXIST);
+        }
         return auditRecords;
     }
 

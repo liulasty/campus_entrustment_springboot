@@ -29,10 +29,7 @@ public enum TaskPhase {
      * 生命周期终止
      */
     LIFECYCLE_TERMINATION( "LIFECYCLE_TERMINATION",3);
-    /**
-     * 任务阶段
-     */
-    
+
     private final String taskPhase;
     
     private final int value;

@@ -8,6 +8,7 @@ package com.lz.service.impl;
  */
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.injector.methods.SelectList;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lz.Exception.MyException;
 import com.lz.common.security.AuthenticationService;
@@ -16,6 +17,7 @@ import com.lz.mapper.TaskMapper;
 import com.lz.mapper.UsersMapper;
 import com.lz.pojo.Enum.AcceptStatus;
 import com.lz.pojo.Enum.TaskStatus;
+import com.lz.pojo.constants.MessageConstants;
 import com.lz.pojo.dto.AcceptDTO;
 import com.lz.pojo.entity.Task;
 import com.lz.pojo.entity.Users;
@@ -29,6 +31,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author lz
@@ -42,18 +46,26 @@ public class ITaskAcceptRecordsServiceImpl extends ServiceImpl<TaskAcceptRecords
     
     @Autowired
     private TaskMapper taskMapper;
+    
+    @Autowired
+    private TaskAcceptRecordsMapper taskAcceptRecordsMapper;
 
     /**
      * 获取当前登录用户信息
      *
      * @return {@code Users}
      */
-    public Users getCurrentAdmin() {
+    public Users getCurrentAdmin() throws MyException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String adminName = authentication.getName();
-        log.info("管理员: {}", adminName);
+        // log.info("管理员: {}", adminName);
+        Users users = usersMapper.getByUsername(adminName);
+        if (users == null){
+            log.error("未登录，或者权限不足");
+            throw new MyException("未登录，或者权限不足");
+        }
 
-        return usersMapper.getByUsername(adminName);
+        return users;
     }
     
     @SneakyThrows
@@ -96,9 +108,11 @@ public class ITaskAcceptRecordsServiceImpl extends ServiceImpl<TaskAcceptRecords
     }
 
     @Override
-    public TaskAcceptRecords getTaskAcceptRecords(Long taskId) {
+    public TaskAcceptRecords getTaskAcceptRecordByTaskId(Long taskId) throws MyException {
         QueryWrapper<TaskAcceptRecords> queryWrapper = new QueryWrapper<>();
+        Users users = getCurrentAdmin();
         queryWrapper.eq("taskId",taskId);
+        queryWrapper.eq("AccepterId",users.getUserId());
         return getOne(queryWrapper);
     }
 
@@ -111,6 +125,18 @@ public class ITaskAcceptRecordsServiceImpl extends ServiceImpl<TaskAcceptRecords
 
 
         return getOne(queryWrapper);
+    }
+
+    @Override
+    public List<TaskAcceptRecords> getTaskAcceptRecordsByTaskId(Long taskId) throws MyException {
+        QueryWrapper<TaskAcceptRecords> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("taskId",taskId);
+        List<TaskAcceptRecords> taskAcceptRecords = taskAcceptRecordsMapper.selectList(queryWrapper);
+        if (taskAcceptRecords.size() == 0){
+            throw new MyException(MessageConstants.TASK_NOT_EXIST);
+        }
+        return taskAcceptRecords;
+        
     }
 
 

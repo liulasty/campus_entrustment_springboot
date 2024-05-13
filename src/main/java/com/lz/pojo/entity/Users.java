@@ -63,6 +63,12 @@ public class Users implements Serializable {
     @TableField(value = "ActiveTime")
     private Date activeTime;
 
+    /**
+     * 是否启用
+     */
+    @ApiModelProperty(value = "是否启用")
+    @TableField("IsEnabled")
+    private Boolean isEnabled;
 
     
 }

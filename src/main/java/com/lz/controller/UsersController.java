@@ -18,6 +18,7 @@ import com.lz.utils.JwtUtil;
 import com.lz.utils.ValidateUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -334,9 +335,10 @@ public class UsersController {
      *
      * @return {@code Result<String>}
      */
-    @GetMapping(value = "/disableUserByAdmin/{id}")
+    
+    @PutMapping(value = "/handleDisableByAdmin/{id}")
     @ApiOperation("管理员禁用用户")
-    public Result<String> disableUserByAdmin(@PathVariable Long id) {
+    public Result<String> disableUserByAdmin(@PathVariable Long id) throws MyException{
         log.info("管理员禁用用户:{}", id);
         usersService.disableUser(id);
         return Result.success(MessageConstants.USER_DISABLE_SUCCESS);
@@ -350,9 +352,10 @@ public class UsersController {
      *
      * @return {@code Result<String>}
      */
-    @GetMapping(value = "/cancelDisableUserByAdmin/{id}")
+    
+    @PutMapping(value = "/handleEnableByAdmin/{id}")
     @ApiOperation("管理员取消禁用用户")
-    public Result<String> cancelDisableUserByAdmin(@PathVariable Long id) {
+    public Result<String> cancelDisableUserByAdmin(@PathVariable Long id) throws MyException{
         log.info("管理员取消禁用用户:{}", id);
         usersService.cancelDisableUser(id);
         return Result.success(MessageConstants.USER_ABLE_SUCCESS);

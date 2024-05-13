@@ -67,7 +67,7 @@ public class MessageConstants {
 
     public static final String USER_DISABLE_SUCCESS = "管理员禁用用户成功";
     public static final String USER_DELETE_SUCCESS = "删除用户信息成功";
-    public static final String USER_ABLE_SUCCESS = "取消用户禁用";
+    public static final String USER_ABLE_SUCCESS = "取消禁用用户成功";
     public static final String USER_LOGOUT_FAILURE = "退出登录失败";
     public static final String SEND_EMAIL_FAIL = "发送邮件失败";
     public static final String TASK_UPDATE_SUCCESS =  "更新委托成功";
@@ -81,7 +81,7 @@ public class MessageConstants {
     
     public static final String USER_STATUS_ERROR = "用户状态异常,无法认证请重新查看";
     
-    public static final String USER_EXIST_TASK = "用户存在进行中的委托任务，无法删除认证信息";
+    public static final String USER_EXIST_TASK = "用户存在进行中的委托任务，无法删除认证信息";   
 
     public static final String USER_AUTHENTICATION_INFO_NOT_EXIST = "用户认证信息不存在";
 
@@ -96,4 +96,21 @@ public class MessageConstants {
     public static final String TASK_NOT_EXIST = "当前委托信息异常，系统异常，请刷新后重试";
     public static final String TASK_INFO_SUCCESS = "获取委托信息成功" ;
     public static final String DATA_ACCEPT_SUCCESS = "接受委托信息已提交成功，等待处理";
+    public static final String ACCEPT_CANCEL_SUCCESS = "取消委托接收成功";
+
+    public static final String USER_INFO_ERROR = "用户信息异常";
+    public static final String TASK_ACCEPT_SUCCESS = "委托接收成功";
+    public static final String ADD_MESSAGE_FAILURE = "添加通知消息失败";
+    public static final String ADD_MESSAGE_SUCCESS = "添加通知消息成功";
+    public static final String DELETE_MESSAGE_SUCCESS = "删除通知消息成功";
+    public static final String SYSTEM_ANNOUNCEMENTS_DELETE_SUCCESS = "删除系统公告成功";
+    
+    //委托类别更新成功
+    public static final String TASK_CATEGORY_UPDATE_SUCCESS = "委托类别更新成功";
+    public static final String TASK_CATEGORY_DELETE_SUCCESS = "委托类别删除成功";
+    public static final String TASK_CATEGORY_EXIST = "委托类别已存在";
+    public static final String TASK_CATEGORY_UPDATE_FAIL = "委托类别更新失败";
+    public static final String TASK_CATEGORY_DELETE_FAIL = "委托类别删除失败";
+    public static final String TASK_CATEGORY_NOT_EXIST_ERROR = "委托类别不存在";
+    public static final String TASK_CATEGORY_ADD_SUCCESS = "委托类别添加成功";
 }

@@ -11,11 +11,9 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.lz.pojo.Enum.NotificationsType;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.Accessors;
+import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  * <p>
@@ -31,6 +29,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @Accessors(chain = true)
 @TableName("notifications")
+@Builder
 @ApiModel(value="Notifications对象", description="存储系统通知信息")
 public class Notifications implements Serializable {
 
@@ -38,11 +37,11 @@ public class Notifications implements Serializable {
 
     @ApiModelProperty(value = "通知ID")
     @TableId(value = "NotificationID", type = IdType.AUTO)
-    private Integer notificationId;
+    private Long notificationId;
 
-    @ApiModelProperty(value = "接收通知的用户ID，0为全体用户")
+    @ApiModelProperty(value = "发送通知的用户ID")
     @TableField("UserID")
-    private Integer userId;
+    private Long userId;
 
     @ApiModelProperty(value = "通知类型")
     @TableField("NotificationType")
@@ -62,6 +61,7 @@ public class Notifications implements Serializable {
 
     @ApiModelProperty(value = "通知时间")
     @TableField("NotificationTime")
+    @DateTimeFormat(fallbackPatterns = "yyyy年MM月dd日HH:mm:ss")
     private Date notificationTime;
 
 

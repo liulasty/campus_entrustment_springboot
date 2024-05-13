@@ -9,6 +9,7 @@ import com.lz.pojo.dto.TaskDTO;
 import com.lz.pojo.dto.TaskPageDTO;
 import com.lz.pojo.entity.Task;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.lz.pojo.entity.TaskAcceptRecords;
 import com.lz.pojo.result.PageResult;
 import com.lz.pojo.vo.*;
 
@@ -36,7 +37,7 @@ public interface ITaskService extends IService<Task> {
     /**
     * 更新
      */
-    void updateTask(AuditResultDTO auditResultDTO);
+    void updateTask(AuditResultDTO auditResultDTO) throws MyException;
 
 
     /**
@@ -201,5 +202,15 @@ public interface ITaskService extends IService<Task> {
      *
      * @return 页面结果<任务>
      */
-    PageResult<TaskAcceptRecord> searchPageByAcceptor(int pageNum, int pageSize, String location, String description, Long taskType, Integer queryRules, TaskStatus status);    
+    PageResult<TaskAcceptRecord> searchPageByAcceptor(int pageNum, int pageSize, String location, String description, Long taskType, Integer queryRules, TaskStatus status);
+
+    /**
+     * 确认委托接受者
+     *
+     * @param taskId 任务 ID
+     * @param acceptRecords     同上
+     */
+    void confirmTheRecipient(Long taskId, TaskAcceptRecords acceptRecords) throws MyException;
+
+    List<Task> getTaskByCategoryId(Long id);
 }   

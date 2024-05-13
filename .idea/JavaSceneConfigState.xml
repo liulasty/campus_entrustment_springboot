@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="SmartInputSourceJavaSceneConfigState">
-    <option name="customChineseScenes" value="{&quot;capsLockState&quot;:false,&quot;code&quot;:&quot;PASSWORD_WORNG;DATA_VALIDATION_SUCCESS;USER_LOGOUT_FAILURE;TASK_CANCEL_SUCCESS;TASK_DRAFT_DELETE_SUCCESS;TASK_NOT_EXIST;Task_INFO_SUCCESS;ApiOperation();ApiModelProperty(notes,value);sendActivationEmail(msg);like(val);NotificationsType(webValue);put(key);MyException(message);setIsAuthentication(isAuthentication);Api(tags);IllegalArgumentException(s);success(msg);info(s)&quot;,&quot;enable&quot;:true,&quot;languageType&quot;:&quot;CHINESE&quot;,&quot;name&quot;:&quot;自定义中文切换&quot;,&quot;tip&quot;:&quot;&quot;}" />
+    <option name="customChineseScenes" value="{&quot;capsLockState&quot;:false,&quot;code&quot;:&quot;PASSWORD_WORNG;DATA_VALIDATION_SUCCESS;USER_LOGOUT_FAILURE;TASK_CANCEL_SUCCESS;TASK_DRAFT_DELETE_SUCCESS;TASK_NOT_EXIST;Task_INFO_SUCCESS;ACCEPT_CANCEL_SUCCESS;USER_INFO_ERROR;TASK_ACCEPT_SUCCESS;ApiOperation();ApiModelProperty(notes,value);sendActivationEmail(msg);like(val);NotificationsType(webValue);put(key);MyException(message);setIsAuthentication(isAuthentication);Api(tags);IllegalArgumentException(s);success(msg);info(s);Options(keyProperty)&quot;,&quot;enable&quot;:true,&quot;languageType&quot;:&quot;CHINESE&quot;,&quot;name&quot;:&quot;自定义中文切换&quot;,&quot;tip&quot;:&quot;&quot;}" />
   </component>
 </project>

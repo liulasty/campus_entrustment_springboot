@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/delegateauditrecords")
-public class DelegateauditrecordsController {
+public class DelegateAuditRecordsController {
 
     @Autowired
     private IDelegateAuditRecordsService delegateAuditRecordService;

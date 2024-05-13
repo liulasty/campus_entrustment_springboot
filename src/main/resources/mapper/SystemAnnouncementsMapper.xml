@@ -1,5 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.lz.mapper.SystemAnnouncementsMapper">
-
+<mapper namespace = "com.lz.mapper.SystemAnnouncementsMapper">
+	
+	<select id = "selectPageAdmin" resultType = "com.lz.pojo.entity.SystemAnnouncements">
+		SELECT * FROM system_announcements
+		where 1=1
+		<if test = "status != null and status != ''">
+			and status = #{status}
+		</if>
+		<if test = "description != null and description != ''">
+			and content like concat('%',#{description},'%')
+		</if>
+		<if test = "description != null and description != ''">
+			and title like concat('%',#{description},'%')
+		</if>
+		<if test = "queryRules == 1">
+			order by publish_time
+		</if>
+		<if test = "queryRules == 2 ">
+			order by start_effective_time
+		</if>
+		<if test = "queryRules == 3 ">
+			order by updated_at
+		</if>
+		<if test = "queryRules == 4 ">
+			order by created_at
+		</if>
+	</select>
 </mapper>

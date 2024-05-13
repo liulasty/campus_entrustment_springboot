@@ -9,14 +9,17 @@ package com.lz.controller.user;
 
 import com.lz.Exception.MyException;
 import com.lz.common.security.AuthenticationService;
+import com.lz.pojo.Enum.AcceptStatus;
 import com.lz.pojo.Enum.AuthenticationStatus;
 import com.lz.pojo.Enum.TaskStatus;
 import com.lz.pojo.constants.MessageConstants;
 import com.lz.pojo.dto.PublishDTO;
 import com.lz.pojo.entity.Task;
+import com.lz.pojo.entity.TaskAcceptRecords;
 import com.lz.pojo.entity.UsersInfo;
 import com.lz.pojo.result.PageResult;
 import com.lz.pojo.result.Result;
+import com.lz.service.ITaskAcceptRecordsService;
 import com.lz.service.ITaskService;
 import com.lz.service.IUsersInfoService;
 import io.swagger.annotations.Api;
@@ -40,6 +43,9 @@ public class PublisherController {
 
     @Autowired
     private ITaskService taskService;
+    
+    @Autowired
+    private ITaskAcceptRecordsService taskAcceptRecordsService;
 
     @GetMapping("/{id}")
     public Result getPublisher(@PathVariable("id") Long id) throws MyException {
@@ -130,6 +136,34 @@ public class PublisherController {
 
         // 返回响应数据，根据实际情况调整
         return Result.success(taskPageResult);
+    }
+
+
+    /**
+     * 确认委托接收者
+     *
+     * @param id 同上
+     *
+     * @return 后端统一返回结果
+     *
+     * @throws MyException 我的异常
+     */
+    @PutMapping("/confirm/{id}")
+    public Result confirm(@PathVariable("id") Long id) throws MyException {
+
+        TaskAcceptRecords acceptRecords = taskAcceptRecordsService.getById(id);
+        if (acceptRecords == null || acceptRecords.getStatus() != AcceptStatus.PENDING) {
+            log.error("数据库错误");
+            throw new MyException(MessageConstants.DATABASE_ERROR);
+        }
+        Task task = taskService.getById(acceptRecords.getTaskId());
+        if (task.getStatus() != TaskStatus.ONGOING) {
+            log.error("任务状态异常");
+            throw new MyException(MessageConstants.UNEXPECTED_EXCEPTION);
+        }
+        taskService.confirmTheRecipient(task.getTaskId(), acceptRecords);
+        return Result.success(MessageConstants.TASK_UPDATE_SUCCESS);
+        
     }
 
 }

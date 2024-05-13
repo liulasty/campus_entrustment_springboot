@@ -1,5 +1,7 @@
 package com.lz.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lz.pojo.entity.SystemAnnouncements;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -22,4 +24,8 @@ public interface ISystemAnnouncementsService extends IService<SystemAnnouncement
      * @return {@code SystemAnnouncements}
      */
     List<SystemAnnouncements> getNewestAnnouncement();
+
+    IPage<SystemAnnouncements> page(Page<SystemAnnouncements> page,
+                                    String status, String description,
+                                    Integer queryRules);
 }

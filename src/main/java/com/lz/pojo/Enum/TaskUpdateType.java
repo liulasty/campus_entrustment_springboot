@@ -60,6 +60,8 @@ public enum TaskUpdateType {
         this.dbValue = dbValue;
         this.webValue = webValue;
     }
+    
+    
 
 
 }

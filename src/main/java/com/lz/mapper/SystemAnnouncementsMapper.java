@@ -1,5 +1,7 @@
 package com.lz.mapper;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lz.pojo.entity.SystemAnnouncements;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
@@ -14,5 +16,9 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface SystemAnnouncementsMapper extends BaseMapper<SystemAnnouncements> {
+    
+    IPage<SystemAnnouncements> selectPageAdmin(Page<SystemAnnouncements> page,
+                                    String status, String description,
+                                    Integer queryRules);
 
 }

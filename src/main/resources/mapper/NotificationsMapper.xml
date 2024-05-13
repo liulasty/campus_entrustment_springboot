@@ -1,5 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.lz.mapper.NotificationsMapper">
-
+	
+	<select id="selectPageAdmin" resultType="com.lz.pojo.entity.Notifications">
+		SELECT * FROM notifications
+		<where>
+			<if test="messageType != null and messageType != ''">
+				AND NotificationType = #{messageType}
+			</if>
+			<if test="description != null and description != ''" >
+				AND description = #{description}
+			</if>
+			<if test="createAt != null">
+				AND DATE(NotificationTime) = #{createAt}
+			</if>
+		</where>
+		ORDER BY NotificationTime DESC
+	</select>
+	
+	<select id = "selectListByType" resultType = "com.lz.pojo.vo.NoticeItemVO">
+		SELECT n2.SendTime as date, n1.Title as title,n2.IsRead as isRead,n2.id as id 
+		FROM notifications n1 , notificationreadstatus n2
+		<where>
+			n1.NotificationId = n2.NotificationId
+			<if test="type != null and type != ''">
+				AND NotificationType = #{type}
+			</if>
+			<if test="userId != null">
+				AND n2.UserId = #{userId}
+			</if>
+		</where>
+	</select>
+	<select id = "getInfoById" resultType = "com.lz.pojo.vo.NoticeVO" parameterType = "java.lang.Long">
+		SELECT n2.id as id,n1.Title as title,n1.Message as description,n2.SendTime as date
+		FROM notifications n1,notificationreadstatus n2
+		<where>
+			n1.NotificationID = n2.NotificationID
+			and n2.id = #{id}
+		</where>
+	</select>
 </mapper>

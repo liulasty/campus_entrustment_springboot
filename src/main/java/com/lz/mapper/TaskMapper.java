@@ -3,7 +3,9 @@ package com.lz.mapper;
 import com.lz.pojo.dto.TaskCountDTO;
 import com.lz.pojo.entity.Task;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Options;
 
 import java.util.List;
 
@@ -53,4 +55,10 @@ public interface TaskMapper extends BaseMapper<Task> {
      * @return {@code Integer}
      */
     Integer getTasksTodayCount(String key);
+
+    @Insert("INSERT INTO task(CreatedAt, Description, OwnerId, status, " +
+            "TaskType,Location) VALUES" +
+            "(#{createdAt}, #{description}, #{ownerId}, #{status}, #{type}, #{location})")
+    @Options(useGeneratedKeys = true, keyProperty = "taskId")
+    int insert(Task task);
 }
