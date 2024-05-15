@@ -113,4 +113,5 @@ public class MessageConstants {
     public static final String TASK_CATEGORY_DELETE_FAIL = "委托类别删除失败";
     public static final String TASK_CATEGORY_NOT_EXIST_ERROR = "委托类别不存在";
     public static final String TASK_CATEGORY_ADD_SUCCESS = "委托类别添加成功";
+    public static final String TASK_CANCEL_PUBLISH_SUCCESS = "取消委托发布成功";
 }

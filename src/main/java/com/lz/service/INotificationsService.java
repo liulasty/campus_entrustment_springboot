@@ -58,5 +58,12 @@ public interface INotificationsService extends IService<Notifications> {
 
     List<NoticeItemVO> getNoticeType(String str) throws MyException;
 
+    /**
+     * 按id获取信息
+     *
+     * @param id
+     *
+     * @return 通知 VO
+     */
     NoticeVO   getInfoById(Long id);
 }

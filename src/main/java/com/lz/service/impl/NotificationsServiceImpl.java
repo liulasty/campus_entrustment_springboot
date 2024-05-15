@@ -10,6 +10,7 @@ import com.lz.pojo.constants.MessageConstants;
 import com.lz.pojo.dto.NoticeDTO;
 import com.lz.pojo.dto.NotificationDTO;
 import com.lz.pojo.dto.SendDataDTO;
+import com.lz.pojo.entity.NotificationReadStatus;
 import com.lz.pojo.entity.Notifications;
 import com.lz.mapper.NotificationsMapper;
 import com.lz.pojo.entity.SystemAnnouncements;
@@ -47,10 +48,10 @@ public class NotificationsServiceImpl extends ServiceImpl<NotificationsMapper, N
 
     @Autowired
     private NotificationsMapper notificationsMapper;
-    
+
     @Autowired
     private INotificationReadStatusService notificationReadStatusService;
-    
+
     @Autowired
     private UsersMapper usersMapper;
 
@@ -98,7 +99,7 @@ public class NotificationsServiceImpl extends ServiceImpl<NotificationsMapper, N
                 .userId(getCurrentAdmin().getUserId())
                 .build();
         boolean save = save(notifications);
-        if (!save){
+        if (!save) {
             log.error(MessageConstants.ADD_MESSAGE_FAILURE);
             throw new MyException(MessageConstants.ADD_MESSAGE_FAILURE);
         }
@@ -106,38 +107,38 @@ public class NotificationsServiceImpl extends ServiceImpl<NotificationsMapper, N
 
     @Override
     public void send(SendDataDTO sendData) throws MyException {
-        if (sendData.getSendObject().equals("all")){
+        if (sendData.getSendObject().equals("all")) {
             notificationReadStatusService.sendAllNotification(sendData.getSendId());
             return;
         }
-        
-        if (sendData.getSendObject().equals("authenticated")){
+
+        if (sendData.getSendObject().equals("authenticated")) {
             notificationReadStatusService.sendAuthenticatedNotification(sendData.getSendId());
             return;
         }
-        
-        if (sendData.getSendObject().equals("student")){
+
+        if (sendData.getSendObject().equals("student")) {
             notificationReadStatusService.sendStudentNotification(sendData.getSendId());
             return;
         }
-        
-        if (sendData.getSendObject().equals("teacher")){
+
+        if (sendData.getSendObject().equals("teacher")) {
             notificationReadStatusService.sendTeacherNotification(sendData.getSendId());
             return;
         }
-        
-        if (sendData.getSendObject().equals("admin")){
+
+        if (sendData.getSendObject().equals("admin")) {
             notificationReadStatusService.sendAdminNotification(sendData.getSendId());
             return;
         }
-        
-        if (sendData.getSendObject().equals("other")){
+
+        if (sendData.getSendObject().equals("other")) {
             notificationReadStatusService.sendOtherNotification(sendData.getSendId());
             return;
         }
-        
+
         throw new MyException(MessageConstants.DATA_VALIDATION_ERROR);
-        
+
     }
 
     @Override
@@ -149,7 +150,7 @@ public class NotificationsServiceImpl extends ServiceImpl<NotificationsMapper, N
                 .message(msg)
                 .userId(userId)
                 .build();
-       notificationsMapper.insert(notifications);
+        notificationsMapper.insert(notifications);
         return notifications.getNotificationId();
     }
 
@@ -162,14 +163,14 @@ public class NotificationsServiceImpl extends ServiceImpl<NotificationsMapper, N
 
     @Override
     public void getNoticeByIdANDType(NoticeDTO noticeDTO) {
-        
+
     }
 
     @Override
     public List<NoticeItemVO> getNoticeType(String str) throws MyException {
         List<NoticeItemVO> list = new ArrayList<>();
         log.info("通知类型: {}", NotificationsType.fromDbValue(str).getWebValue());
-        
+
         Users users = getCurrentAdmin();
         list =
                 notificationsMapper.selectListByType(users.getUserId(),
@@ -179,8 +180,16 @@ public class NotificationsServiceImpl extends ServiceImpl<NotificationsMapper, N
 
     @Override
     public NoticeVO getInfoById(Long id) {
-        if (id != null){
+        if (id != null) {
             NoticeVO noticeVO = notificationsMapper.getInfoById(id);
+            if (!noticeVO.getIsRead()){
+                NotificationReadStatus notificationReadStatus = new NotificationReadStatus();
+                notificationReadStatus.setId(id);
+                notificationReadStatus.setIsRead(true);
+                notificationReadStatus.setReadTime(new Date(System.currentTimeMillis()));
+                notificationReadStatusService.updateById(notificationReadStatus);
+            }
+            
             return noticeVO;
         }
         return null;
@@ -193,9 +202,6 @@ public class NotificationsServiceImpl extends ServiceImpl<NotificationsMapper, N
 
         return usersMapper.getByUsername(adminName);
     }
-    
-    
-    
 
 
 }

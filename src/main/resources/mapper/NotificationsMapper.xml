@@ -32,7 +32,7 @@
 		</where>
 	</select>
 	<select id = "getInfoById" resultType = "com.lz.pojo.vo.NoticeVO" parameterType = "java.lang.Long">
-		SELECT n2.id as id,n1.Title as title,n1.Message as description,n2.SendTime as date
+		SELECT n2.id as id,n1.Title as title,n1.Message as description,n2.SendTime as date,n2.IsRead as isRead
 		FROM notifications n1,notificationreadstatus n2
 		<where>
 			n1.NotificationID = n2.NotificationID

@@ -3,8 +3,11 @@
 <mapper namespace = "com.lz.mapper.TaskMapper">
 	<select id = "selectTaskTypeCountTop5" resultType = "com.lz.pojo.dto.TaskCountDTO">
 		SELECT TaskType as taskTypeId, COUNT(*) AS typeCount
-		FROM campus_entrustment.task
-		WHERE STATUS = 'ONGOING' or STATUS = 'ACCEPTED'
+		FROM campus_entrustment.task ,delegation_categories d
+		WHERE 
+		      STATUS = 'ONGOING' or STATUS = 'ACCEPTED' or STATUS = 'EXPIRED'
+				AND d.IsEnable = 1
+				AND TaskType = d.category_id
 		GROUP BY TaskType
 		ORDER BY typeCount DESC
 		LIMIT 5;

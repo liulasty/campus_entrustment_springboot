@@ -110,7 +110,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
             BeanUtils.copyProperties(auditResultDTO, delegateAuditRecords);
             delegateAuditRecords.setReviewTime(new Date(System.currentTimeMillis()));
             log.info("保存审核记录：{}", delegateAuditRecords);
-            
+
             delegateAuditRecordsService.save(delegateAuditRecords);
         } catch (BeansException e) {
             e.printStackTrace();
@@ -179,6 +179,11 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
                                      wrapper).getRecords();
     }
 
+    /**
+     * 获取热门委托类别
+     *
+     * @return map<字符串 ， 任务计数 DTO>
+     */
     @Override
     public Map<String, TaskCountDTO> getHotTaskCategory() {
 
@@ -658,7 +663,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
     @Override
     public List<Task> getTaskByCategoryId(Long id) {
         List<Task> taskList = taskMapper.selectList(new QueryWrapper<Task>().eq("taskType", id));
-        
+
         return taskList;
     }
 
@@ -670,5 +675,62 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
         return usersMapper.getByUsername(adminName);
     }
 
+    @Override
+    public void cancelPublish(Long id) throws MyException {Users users = getCurrentAdmin();
 
+        Task task = taskMapper.selectById(id);
+
+        if (!getCurrentAdmin().getRole().equals("USER")) {
+            log.error("用户权限异常");
+            throw new MyException(MessageConstants.USER_INFO_ERROR);
+        }
+        
+        if (task.getStatus() != TaskStatus.ONGOING) {
+            log.error("委托状态异常");
+            throw new MyException(MessageConstants.TASK_NOT_EXIST);
+        }
+        
+
+    }
+
+    @Override
+    public void cancelPublishUser(Long id) throws MyException {
+        Users users = getCurrentAdmin();
+
+        Task task = taskMapper.selectById(id);
+
+        if (!task.getOwnerId().equals(users.getUserId())) {
+            log.error("用户权限异常");
+            throw new MyException(MessageConstants.USER_INFO_ERROR);
+        }
+
+        if (task.getStatus() != TaskStatus.ONGOING) {
+            log.error("委托状态异常");
+            throw new MyException(MessageConstants.TASK_NOT_EXIST);
+        }
+
+        if (task.getStatus() == TaskStatus.ONGOING) {
+            log.info("取消发布任务 {}", id);
+            task.setStatus(TaskStatus.CANCELLED);
+            updateById(task);
+            TaskUpdates taskUpdates = TaskUpdates.builder()
+                    .taskId(id)
+                    .updateDescription(MessageConstants.TASK_CANCEL_PUBLISH_SUCCESS)
+                    .updateType(TaskUpdateType.RESULT)
+                    .updateTime(new Date(System.currentTimeMillis()))
+                    .build();
+            taskUpdateService.save(taskUpdates);
+            taskAcceptRecordsMapper.update(
+                    null, 
+                    new UpdateWrapper<TaskAcceptRecords>()
+                            .eq("taskId", id)
+                            .set("status", AcceptStatus.EXPIRED)
+                            .set("adoptTime",
+                                 new Date(System.currentTimeMillis())));
+        }
+        
+        throw new MyException(MessageConstants.TASK_NOT_EXIST);
+        
+
+    }
 }

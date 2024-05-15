@@ -213,4 +213,8 @@ public interface ITaskService extends IService<Task> {
     void confirmTheRecipient(Long taskId, TaskAcceptRecords acceptRecords) throws MyException;
 
     List<Task> getTaskByCategoryId(Long id);
+
+    void cancelPublish(Long id) throws MyException;
+
+    void cancelPublishUser(Long id) throws MyException;
 }   

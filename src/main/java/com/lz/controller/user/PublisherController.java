@@ -166,4 +166,10 @@ public class PublisherController {
         
     }
 
+    @PutMapping("/cancel/{id}")
+    public Result<String> cancelPublish(@PathVariable("id") Long id) throws MyException {
+        taskService.cancelPublishUser(id);
+        return Result.success(MessageConstants.TASK_CANCEL_PUBLISH_SUCCESS);
+    }
+
 }

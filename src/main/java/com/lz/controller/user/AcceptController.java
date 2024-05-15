@@ -48,7 +48,7 @@ public class AcceptController {
      */
     @GetMapping("/{id}")
     public Result<TaskAcceptRecords> getTaskAcceptRecordByTaskId(@PathVariable Long id) throws MyException {
-        log.info("接收委托信息 {}", id);
+        log.info("查询接收委托信息 {}", id);
         TaskAcceptRecords taskAcceptRecord =
                 taskAcceptRecordsService.getTaskAcceptRecordByTaskId(id);
         return Result.success(taskAcceptRecord);

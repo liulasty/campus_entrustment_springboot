@@ -73,8 +73,8 @@ public class DelegateAuditRecordsServiceImpl extends ServiceImpl<DelegateAuditRe
         DelegateAuditRecords delegateAuditRecords = new DelegateAuditRecords();
         delegateAuditRecords
                 .setDelegateId(taskId)
-                .setReviewComment(msg)
-                .setReviewStatus(status.getWebValue())
+                .setReviewComment(status.getWebValue())
+                .setReviewStatus(msg)
                 .setUserId(users.getUserId());
                 
         

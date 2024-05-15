@@ -35,10 +35,10 @@ import java.util.List;
 public class TaskUserController {
     @Autowired
     private ITaskService taskService;
-    
+
     @Autowired
     private IDelegationCategoriesService delegationCategoriesService;
-    
+
     @GetMapping("/page")
     public Result getTaskPage(
             @RequestParam(defaultValue = "1") int pageNum, // 默认值为1，如果请求中未提供则使用此默认值
@@ -54,13 +54,15 @@ public class TaskUserController {
 
         PageResult<Task> taskPageResult = taskService.searchPage(pageNum, pageSize, location, description,
                                                                  taskType,
-                                                                 queryRules,status);
+                                                                 queryRules, status);
 
         // 返回响应数据，根据实际情况调整
         return Result.success(taskPageResult);
     }
 
     /**
+     * 获取委托任务详情
+     *
      * @param id
      *
      * @return 后端统一返回结果
@@ -69,15 +71,18 @@ public class TaskUserController {
      */
     @GetMapping("/{id}")
     public Result getTask(@PathVariable("id") Long id) throws MyException {
-        TaskAndUserInfoVO taskAndUserInfo =  taskService.getTaskAndPublisherInfo(id);
-        
+        TaskAndUserInfoVO taskAndUserInfo = taskService.getTaskAndPublisherInfo(id);
+
         return Result.success(taskAndUserInfo);
     }
 
+
+    @GetMapping("/categories")
+    public Result getTaskCategory() throws MyException {
+        List<NameAndDescription> taskCategory = delegationCategoriesService.getTaskCategoryUser();
+        return Result.success(taskCategory);
+    }
+
     
-        @GetMapping("/categories")
-        public Result getTaskCategory() throws MyException {
-            List<NameAndDescription> taskCategory = delegationCategoriesService.getTaskCategoryUser();
-            return Result.success(taskCategory);
-        }
+       
 }

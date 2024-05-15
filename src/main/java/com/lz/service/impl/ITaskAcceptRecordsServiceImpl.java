@@ -79,14 +79,8 @@ public class ITaskAcceptRecordsServiceImpl extends ServiceImpl<TaskAcceptRecords
         Users currentAdmin = getCurrentAdmin();
         log.info("当前操作用户和委托任务{} {}",currentAdmin,task.getOwnerId());
         if (currentAdmin.getUserId().equals(task.getOwnerId())){
-            log.error("当前用户非法操作");
-            throw  new MyException("当前用户非法操作");
-        }
-        AuthenticationService authenticationService = new AuthenticationService();
-        log.info("设置用户认证信息到安全上下文 {}",authenticationService.getAuthentication());
-        if (task.getOwnerId().equals(acceptDTO.getUser())){
-            log.error("接受者不能是自己");
-            throw  new MyException("接受者不能是自己");
+            log.error("接受者与发布者不能是同一用户");
+            throw  new MyException("接受者不能是同一用户");
         }
         
         TaskAcceptRecords one =
