@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import com.lz.Exception.UsernameNotFoundException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -139,9 +139,9 @@ public class GlobalControllerAdvice {
 
     @ExceptionHandler(value = AuthenticationException.class)
     public Result<AuthenticationException> authenticationExceptionResult(AuthenticationException e){
-        log.error("发生系统异常！原因是:",e);
+        log.error("发生系统异常！原因是AuthenticationException:",e);
 
-        return Result.error(MessageConstants.USER_PASSWORD_ERROR);
+        return Result.error(e.getMessage());
     }
     
     //拦截AccessDeniedException

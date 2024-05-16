@@ -7,6 +7,7 @@ package com.lz.common.security;
  * @Description:
  */
 
+import com.lz.Exception.MyException;
 import com.lz.mapper.UsersMapper;
 import com.lz.pojo.entity.Users;
 import com.lz.service.IUsersService;
@@ -19,7 +20,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import com.lz.Exception.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.temporal.ValueRange;
@@ -34,9 +35,8 @@ public class MyUserDetailServiceImpl implements UserDetailsService {
     
     @Autowired
     private UsersMapper usersMapper;
-    
-    
-    
+    private String s;
+
 
     /**
      * 根据用户名获取用户信息
@@ -50,11 +50,18 @@ public class MyUserDetailServiceImpl implements UserDetailsService {
         Users user = usersMapper.getByUsername(username);
         
         if (user == null) {
+            log.info("该用户不存在");
             throw new UsernameNotFoundException("用户不存在");
         }
         
-        if (user.getIsActive() == null || !user.getIsActive() || !user.getIsEnabled()) {
-            log.info("用户信息：{}", user);
+        if (user.getIsActive() == null || !user.getIsActive() ){
+            log.error("用户未激活");
+            
+            throw new UsernameNotFoundException("用户未激活");
+        }
+        
+        if ( !user.getIsEnabled()) {
+            log.error("用户信息：{}", user);
             throw new UsernameNotFoundException("用户未启用");
         }
         Set<GrantedAuthority> authorities = new HashSet<>();

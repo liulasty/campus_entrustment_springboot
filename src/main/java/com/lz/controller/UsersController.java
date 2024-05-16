@@ -75,7 +75,8 @@ public class UsersController {
     @PostMapping(value = "/login")
     @ApiOperation("登录")
     public Result<UserLoginVO> login(@Validated @RequestBody UserLoginDTO userLoginDTO, BindingResult result) throws MyException {
-        log.info("用户登录:{}", userLoginDTO.getUsername());
+        log.info("用户登录:{},用户密码 {}", userLoginDTO.getUsername(),
+                 userLoginDTO.getPassword());
         //校验结果
         if (ValidateUtil.validate(result) != null) {
             log.info("用户登录校验失败:{}", ValidateUtil.validate(result));

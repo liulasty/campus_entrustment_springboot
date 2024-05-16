@@ -49,7 +49,7 @@ public class PasswordUtils implements PasswordEncoder {
      */
     @Override
     public String encode(CharSequence rawPassword) {
-        log.info("原始密码:{}",rawPassword.length());
+        log.info("原始密码:{}",rawPassword.toString());
         return hashPassword(rawPassword.toString());
     }
 
@@ -63,7 +63,7 @@ public class PasswordUtils implements PasswordEncoder {
      */
     @Override
     public boolean matches(CharSequence rawPassword, String encodedPassword) {
-        log.info("原始密码:{},哈希后的密码:{}",rawPassword,encodedPassword);
+        log.info("明文密码:{},哈希后的密码:{}",rawPassword,encodedPassword);
         boolean check = check(rawPassword.toString(), encodedPassword);
         log.info("密码校验结果 {}", check);
         return check;
