@@ -195,6 +195,45 @@ public class NotificationsServiceImpl extends ServiceImpl<NotificationsMapper, N
         return null;
     }
 
+    @Override
+    public void addTaskConfirmTheRecipient(Long userId,
+                                           String taskAcceptanceProcessedSuccess, NotificationsType task, String s, Long taskId) throws MyException {
+        Notifications notifications = Notifications.builder()
+                .userId(userId)
+                .notificationTime(new Date(System.currentTimeMillis()))
+                .notificationType(task)
+                .message(s)
+                .title(taskAcceptanceProcessedSuccess)
+                .build();
+        int insert = notificationsMapper.insert(notifications);
+        if (insert == 0) {
+            throw new MyException(MessageConstants.ADD_MESSAGE_FAILURE);
+        }
+        notificationReadStatusService.addTaskConfirmTheRecipient(insert,
+                                                                 taskId,
+                                                                 userId,
+                                                                 new Date(System.currentTimeMillis()));
+    }
+
+    @Override
+    public void addTaskAcceptanceSelected(Long userId, String taskAcceptanceProcessedFailed, NotificationsType task, String s, Long taskId) throws MyException {
+        Notifications notifications = Notifications.builder()
+                .userId(userId)
+                .notificationTime(new Date(System.currentTimeMillis()))
+                .notificationType(task)
+                .message(s)
+                .title(taskAcceptanceProcessedFailed)
+                .build();
+        int insert = notificationsMapper.insert(notifications);
+        if (insert == 0) {
+            throw new MyException(MessageConstants.ADD_MESSAGE_FAILURE);
+        }
+        notificationReadStatusService.addTaskConfirmTheRecipient(insert,
+                                                                 taskId,
+                                                                 userId,
+                                                                 new Date(System.currentTimeMillis()));
+    }
+
     public Users getCurrentAdmin() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String adminName = authentication.getName();

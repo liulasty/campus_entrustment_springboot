@@ -3,10 +3,7 @@ package com.lz.service;
 import com.lz.Exception.MyException;
 import com.lz.pojo.Enum.TaskStatus;
 import com.lz.pojo.Page.DraftConfig;
-import com.lz.pojo.dto.AuditResultDTO;
-import com.lz.pojo.dto.TaskCountDTO;
-import com.lz.pojo.dto.TaskDTO;
-import com.lz.pojo.dto.TaskPageDTO;
+import com.lz.pojo.dto.*;
 import com.lz.pojo.entity.Task;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.lz.pojo.entity.TaskAcceptRecords;
@@ -172,8 +169,11 @@ public interface ITaskService extends IService<Task> {
      *
      * @return <p>
      */
-    TaskAndUserInfoVO getTaskAndPublisherInfo(Long id) throws MyException;
+    TaskDetails getTaskAndPublisherInfo(Long id) throws MyException;
 
+
+    
+    TaskAndUserInfoVO publisherSearchTaskAndPublisherInfo(Long id) throws MyException;
     /**
      * 按发布者搜索页面
      *
@@ -217,4 +217,6 @@ public interface ITaskService extends IService<Task> {
     void cancelPublish(Long id) throws MyException;
 
     void cancelPublishUser(Long id) throws MyException;
+
+    void updateToCompleted(UpdateTaskToCompletedDTO dto) throws MyException;
 }   

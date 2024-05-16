@@ -3,11 +3,13 @@
 <mapper namespace = "com.lz.mapper.TaskMapper">
 	<select id = "selectTaskTypeCountTop5" resultType = "com.lz.pojo.dto.TaskCountDTO">
 		SELECT TaskType as taskTypeId, COUNT(*) AS typeCount
-		FROM campus_entrustment.task ,delegation_categories d
-		WHERE 
-		      STATUS = 'ONGOING' or STATUS = 'ACCEPTED' or STATUS = 'EXPIRED'
-				AND d.IsEnable = 1
-				AND TaskType = d.category_id
+		FROM campus_entrustment.task,
+			 delegation_categories d
+		WHERE STATUS = 'ONGOING'
+		   or STATUS = 'ACCEPTED'
+		   or STATUS = 'EXPIRED'
+			AND d.IsEnable = 1
+			AND TaskType = d.category_id
 		GROUP BY TaskType
 		ORDER BY typeCount DESC
 		LIMIT 5;
@@ -45,7 +47,29 @@
 		DATE_FORMAT(StartTime, '%Y-%m') = DATE_FORMAT(CURDATE(), '%Y-%m');
 	
 	</select>
-	
-	
+	<select id = "getPublishedTotal" resultType = "java.lang.Long" parameterType = "java.lang.Long">
+		SELECT COUNT(*)
+		FROM Task
+		WHERE (STATUS = 'ONGOING' or STATUS = 'ACCEPTED' or STATUS = 'EXPIRED' or STATUS = 'COMPLETED'
+			or STATUS = 'INCOMPLETE' or STATUS = 'CANCELLED')
+		  
+		  and OwnerId = #{id}
+	</select>
+	<select id = "getAcceptedTotal" resultType = "java.lang.Long" parameterType = "java.lang.Long">
+		SELECT COUNT(*)
+		FROM Task
+		WHERE STATUS = 'COMPLETED' and OwnerId = #{id}
+	</select>
+	<select id = "getOverdueTotal" resultType = "java.lang.Long" parameterType = "java.lang.Long">
+		SELECT COUNT(*)
+		FROM Task
+		WHERE STATUS = 'EXPIRED' and OwnerId = #{id}
+	</select>
+	<select id = "getCanceledTotal" resultType = "java.lang.Long" parameterType = "java.lang.Long">
+		SELECT COUNT(*)
+		FROM Task
+		WHERE STATUS = 'CANCELLED' and OwnerId = #{id}
+	</select>
+
 
 </mapper>

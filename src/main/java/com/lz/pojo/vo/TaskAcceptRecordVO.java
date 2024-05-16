@@ -24,4 +24,6 @@ public class TaskAcceptRecordVO {
     Long UserId;
     String UserName;
     String UserType;
+    Long taskAccomplishCount;
+    Long taskAccomplishGrade;
 }

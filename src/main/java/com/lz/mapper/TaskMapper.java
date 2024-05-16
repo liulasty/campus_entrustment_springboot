@@ -61,4 +61,12 @@ public interface TaskMapper extends BaseMapper<Task> {
             "(#{createdAt}, #{description}, #{ownerId}, #{status}, #{type}, #{location})")
     @Options(useGeneratedKeys = true, keyProperty = "taskId")
     int insert(Task task);
+
+    Long getPublishedTotal(Long id);
+
+    Long getAcceptedTotal(Long id);
+
+    Long getOverdueTotal(Long id);
+
+    Long getCanceledTotal(Long id);
 }

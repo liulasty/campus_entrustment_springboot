@@ -2,6 +2,7 @@ package com.lz.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lz.Exception.MyException;
+import com.lz.pojo.Enum.NotificationsType;
 import com.lz.pojo.dto.NoticeDTO;
 import com.lz.pojo.dto.NotificationDTO;
 import com.lz.pojo.dto.SendDataDTO;
@@ -66,4 +67,10 @@ public interface INotificationsService extends IService<Notifications> {
      * @return 通知 VO
      */
     NoticeVO   getInfoById(Long id);
+
+    void addTaskConfirmTheRecipient(Long userId,
+                                    String taskAcceptanceProcessedSuccess,
+                                    NotificationsType task, String s, Long taskId) throws MyException;
+
+    void addTaskAcceptanceSelected(Long userId, String taskAcceptanceProcessedFailed, NotificationsType task, String s, Long taskId) throws MyException;
 }

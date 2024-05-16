@@ -3,7 +3,7 @@ package com.lz.pojo.vo;
 /*
  * Created with IntelliJ IDEA.
  * @Author: lz
- * @Date: 2024/04/29/19:03
+ * @Date: 2024/05/16/22:04
  * @Description:
  */
 
@@ -14,7 +14,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.*;
+import java.util.List;
 
 /**
  * @author lz
@@ -22,10 +22,10 @@ import java.util.*;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TaskAndUserInfoVO {
+public class TaskDetails {
     UsersInfo usersInfo;
     Task task;
-    List<TaskAcceptRecordVO> taskAcceptRecords;
+    TaskAcceptRecords taskAcceptRecords;
     /**
      * 委托任务发布总数
      */
@@ -42,16 +42,4 @@ public class TaskAndUserInfoVO {
      * 委托任务取消总数
      */
     Long taskCanceledTotal;
-
-    public TaskAndUserInfoVO(Task task, UsersInfo usersInfo, List<TaskAcceptRecordVO> taskAcceptRecords) {
-        this.usersInfo = usersInfo;
-        this.task = task;
-        this.taskAcceptRecords = taskAcceptRecords;
-    }
-
-    public TaskAndUserInfoVO(Task task, UsersInfo usersInfo) {
-        this.usersInfo = usersInfo;
-        this.task = task;
-        this.taskAcceptRecords = new ArrayList<>();
-    }
 }

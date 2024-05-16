@@ -14,11 +14,14 @@ import com.lz.pojo.Enum.AuthenticationStatus;
 import com.lz.pojo.Enum.TaskStatus;
 import com.lz.pojo.constants.MessageConstants;
 import com.lz.pojo.dto.PublishDTO;
+import com.lz.pojo.dto.UpdateTaskToCompletedDTO;
 import com.lz.pojo.entity.Task;
 import com.lz.pojo.entity.TaskAcceptRecords;
+import com.lz.pojo.entity.Users;
 import com.lz.pojo.entity.UsersInfo;
 import com.lz.pojo.result.PageResult;
 import com.lz.pojo.result.Result;
+import com.lz.pojo.vo.TaskAndUserInfoVO;
 import com.lz.service.ITaskAcceptRecordsService;
 import com.lz.service.ITaskService;
 import com.lz.service.IUsersInfoService;
@@ -170,6 +173,30 @@ public class PublisherController {
     public Result<String> cancelPublish(@PathVariable("id") Long id) throws MyException {
         taskService.cancelPublishUser(id);
         return Result.success(MessageConstants.TASK_CANCEL_PUBLISH_SUCCESS);
+    }
+
+    /**
+     * 获取委托任务详情
+     *
+     * @param id
+     *
+     * @return 后端统一返回结果
+     *
+     * @throws MyException 我的异常
+     */
+    @GetMapping("/getTask/{id}")
+    public Result getTask(@PathVariable("id") Long id) throws MyException {
+        TaskAndUserInfoVO taskAndUserInfo = taskService.publisherSearchTaskAndPublisherInfo(id);
+
+        return Result.success(taskAndUserInfo);
+    }
+
+    @PutMapping("/completed/{id}")
+    public Result completed(@PathVariable Long id,
+                       @RequestBody UpdateTaskToCompletedDTO DTO) throws MyException {
+        taskService.updateToCompleted(DTO);
+
+        return Result.success(MessageConstants.TASK_UPDATE_SUCCESS);
     }
 
 }

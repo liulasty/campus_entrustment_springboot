@@ -14,6 +14,7 @@ import com.lz.pojo.result.NameAndDescription;
 import com.lz.pojo.result.PageResult;
 import com.lz.pojo.result.Result;
 import com.lz.pojo.vo.TaskAndUserInfoVO;
+import com.lz.pojo.vo.TaskDetails;
 import com.lz.service.IDelegationCategoriesService;
 import com.lz.service.ITaskService;
 import io.swagger.annotations.ApiModel;
@@ -71,7 +72,7 @@ public class TaskUserController {
      */
     @GetMapping("/{id}")
     public Result getTask(@PathVariable("id") Long id) throws MyException {
-        TaskAndUserInfoVO taskAndUserInfo = taskService.getTaskAndPublisherInfo(id);
+        TaskDetails taskAndUserInfo = taskService.getTaskAndPublisherInfo(id);
 
         return Result.success(taskAndUserInfo);
     }

@@ -157,6 +157,19 @@ public class NotificationReadStatusServiceImpl extends ServiceImpl<NotificationR
         remove(new QueryWrapper<NotificationReadStatus>().eq("NotificationID", id));
     }
 
+    @Override
+    public void addTaskConfirmTheRecipient(int NotificationId, Long taskId, Long userId, Date date) {
+        NotificationReadStatus notificationReadStatus = NotificationReadStatus.builder()
+                .notificationId((long) NotificationId)
+                .taskId(taskId)
+                .userId(userId)
+                .sendTime(date)
+                .build();
+        save(notificationReadStatus);
+
+    }
+
+    
     public Users getCurrentAdmin() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String adminName = authentication.getName();

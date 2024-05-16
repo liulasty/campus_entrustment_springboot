@@ -37,7 +37,6 @@ public enum TaskStatus {
      */
     @ApiModelProperty(value = "等待发布")
     PENDING_RELEASE("PENDING_RELEASE","等待发布"),
-    
     /**
      * 委托发布中
      */
@@ -47,8 +46,17 @@ public enum TaskStatus {
      * 已接收
      */
     @ApiModelProperty(value = "已接收")
-    ACCEPTED("ACCEPTED","已接受"),
-    
+    ACCEPTED("ACCEPTED","已接收"),
+    /**
+     * 已完成
+     */
+    @ApiModelProperty(value = "已完成")
+    COMPLETED("COMPLETED","已完成"),
+    /**
+     * 未完成
+     */
+    @ApiModelProperty(value = "未完成")
+    UNFINISHED("INCOMPLETE","未完成"),
     /**
      * 已过期
      */
@@ -59,6 +67,8 @@ public enum TaskStatus {
      */
     @ApiModelProperty(value = "已取消")
     CANCELLED("CANCELLED","已取消");
+    
+    
 
     
     /**
