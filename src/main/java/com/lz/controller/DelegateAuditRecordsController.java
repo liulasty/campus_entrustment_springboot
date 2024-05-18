@@ -2,15 +2,12 @@ package com.lz.controller;
 
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.lz.pojo.constants.MessageConstants;
 import com.lz.pojo.result.Result;
 import com.lz.service.IDelegateAuditRecordsService;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * <p>
@@ -49,7 +46,7 @@ public class DelegateAuditRecordsController {
     /**
      * 导出存储委托信息审核记录列表
      */
-    
+
     // @Log(title = "存储委托信息审核记录", businessType = BusinessType.EXPORT)
     // @PostMapping("/export")
     // public void export(HttpServletResponse response, Delegateauditrecords delegateauditrecords)
@@ -62,7 +59,7 @@ public class DelegateAuditRecordsController {
     /**
      * 获取存储委托信息审核记录详细信息
      */
-    
+
     // @GetMapping(value = "/{RecordID}")
     // public AjaxResult getInfo(@PathVariable("RecordID") Long RecordID)
     // {
@@ -72,7 +69,7 @@ public class DelegateAuditRecordsController {
     /**
      * 新增存储委托信息审核记录
      */
-    
+
     // @Log(title = "存储委托信息审核记录", businessType = BusinessType.INSERT)
     // @PostMapping
     // public AjaxResult add(@RequestBody Delegateauditrecords delegateauditrecords)
@@ -83,7 +80,7 @@ public class DelegateAuditRecordsController {
     /**
      * 修改存储委托信息审核记录
      */
-   
+
     // @Log(title = "存储委托信息审核记录", businessType = BusinessType.UPDATE)
     // @PutMapping
     // public AjaxResult edit(@RequestBody Delegateauditrecords delegateauditrecords)
@@ -94,16 +91,14 @@ public class DelegateAuditRecordsController {
     /**
      * 删除存储委托信息审核记录
      */
-    
-   /* @Log(title = "存储委托信息审核记录", businessType = BusinessType.DELETE)
-    @DeleteMapping("/{RecordIDs}")
-    public AjaxResult remove(@PathVariable Long[] RecordIDs)
-    {
-        return toAjax(delegateauditrecordsService.deleteDelegateauditrecordsByRecordIDs(RecordIDs));
-    }
-    */
-    
-    
-    
-    
+
+
+    // @DeleteMapping("/{RecordIDs}")
+    // public Result remove(@PathVariable Long[] RecordIDs) {
+    //    
+    //    
+    //     return Result.success(MessageConstants.TASK_RECORDS_DELETE_SUCCESS);
+    // }
+
+
 }

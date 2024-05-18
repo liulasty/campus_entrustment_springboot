@@ -111,8 +111,10 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
         try {
             if (auditResultDTO.getReviewStatus().equals(AuditResult.APPROVED)) {
                 updateById(Task.builder().taskId(auditResultDTO.getDelegateId()).status(TaskStatus.PENDING_RELEASE).build());
+                notificationsService.addTaskAuditNotificationService(auditResultDTO.getReviewStatus());
             } else if (auditResultDTO.getReviewStatus().equals(AuditResult.REJECTED)) {
                 updateById(Task.builder().taskId(auditResultDTO.getDelegateId()).status(TaskStatus.AUDIT_FAILED).build());
+                notificationsService.addTaskAuditNotificationService(auditResultDTO.getReviewStatus());
             }
             //todo 保存审核记录
             DelegateAuditRecords delegateAuditRecords = new DelegateAuditRecords();
@@ -478,7 +480,8 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
         if (status != null) {
             wrapper.eq("Status", status);
         } else {
-            wrapper.in("Status", TaskStatus.ACCEPTED, TaskStatus.ONGOING);
+            wrapper.in("Status", TaskStatus.ACCEPTED,
+                       TaskStatus.ONGOING,TaskStatus.COMPLETED);
         }
         if (taskTypeId != null) {
             wrapper.eq("TaskType", taskTypeId);

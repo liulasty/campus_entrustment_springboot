@@ -73,4 +73,6 @@ public interface INotificationsService extends IService<Notifications> {
                                     NotificationsType task, String s, Long taskId) throws MyException;
 
     void addTaskAcceptanceSelected(Long userId, String taskAcceptanceProcessedFailed, NotificationsType task, String s, Long taskId) throws MyException;
+
+    void addTaskAuditNotificationService(String reviewStatus);
 }

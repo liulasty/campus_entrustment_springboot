@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.lz.pojo.Enum.TaskUpdateType;
+import com.lz.pojo.constants.MessageConstants;
 import com.lz.pojo.entity.TaskUpdates;
 import com.lz.pojo.result.PageResult;
 import com.lz.pojo.result.Result;
@@ -69,5 +70,13 @@ public class TaskUpdatesController {
     public Result getType() {
         Map<String, String> map = EnumUtils.generateKeyValues(TaskUpdateType.values());
         return Result.success(map);
+    }
+    
+    @DeleteMapping("/{id}")
+    public Result deleteRecords(@PathVariable("id") Long id){
+        log.info("删除更新记录 {}",id);
+        taskUpdateService.removeById(id);
+        
+        return Result.success(MessageConstants.TASK_RECORDS_DELETE_SUCCESS);
     }
 }
