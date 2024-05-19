@@ -141,10 +141,11 @@ public class NotificationReadStatusServiceImpl extends ServiceImpl<NotificationR
     }
 
     @Override
-    public void addTaskNotification(Long id, Long ownerId, Long userId) {
+    public void addTaskNotification(Long id, Long taskId,  Long userId) {
         NotificationReadStatus notificationReadStatus = NotificationReadStatus.builder()
                 .notificationId(id)
-                .userId(ownerId)
+                .taskId(taskId)
+                .userId(userId)
                 .sendTime(new Date(System.currentTimeMillis()))
                 .isRead(false)
                 .build();

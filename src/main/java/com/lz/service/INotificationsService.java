@@ -62,7 +62,7 @@ public interface INotificationsService extends IService<Notifications> {
     /**
      * 按id获取信息
      *
-     * @param id
+     * @param id 同上
      *
      * @return 通知 VO
      */
@@ -75,4 +75,15 @@ public interface INotificationsService extends IService<Notifications> {
     void addTaskAcceptanceSelected(Long userId, String taskAcceptanceProcessedFailed, NotificationsType task, String s, Long taskId) throws MyException;
 
     void addTaskAuditNotificationService(String reviewStatus);
+
+    /**
+     * 添加发送任务通知
+     *
+     * @param title             标题
+     * @param updateDescription 更新说明
+     * @param taskId            任务 ID
+     * @param ownerId           所有者 ID
+     */
+    void sendTaskNotification(String title, String updateDescription, Long taskId
+            , Long ownerId);
 }

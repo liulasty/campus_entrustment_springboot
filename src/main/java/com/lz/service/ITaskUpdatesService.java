@@ -22,28 +22,28 @@ public interface ITaskUpdatesService extends IService<TaskUpdates> {
     /**
      * 完成审核操作，并返回对应的状态结果。
      *
-     * @return 审核完成状态（YourEnumClass.AUDITING）
+
      */
     void completeAudit();
 
     /**
      * 发布委托，并返回对应的状态结果。
      *
-     * @return 发布委托状态（YourEnumClass.PUBLISHED）
+
      */
     void publishAssignment();
 
     /**
      * 创建新任务，并返回对应的状态结果。
      *
-     * @return 新任务创建状态（YourEnumClass.CREATED）
+
      */
     void createNewTask();
 
     /**
      * 获取委托结果，并返回对应的状态结果。
      *
-     * @return 委托结果状态（YourEnumClass.RESULT）
+
      */
     void getAssignmentResult();
 
@@ -54,8 +54,6 @@ public interface ITaskUpdatesService extends IService<TaskUpdates> {
 
     /**
      * 记录：将委托回退为草稿
-     * @param taskID
-     *
      * @return {@code Boolean}
      */
     Boolean fallbackDraft(Long taskID) throws MyException;
@@ -69,4 +67,11 @@ public interface ITaskUpdatesService extends IService<TaskUpdates> {
 
 
     IPage<TaskUpdates> page(Page<TaskUpdates> page, String delegateComment, String reviewStatus, Date reviewTime);
+
+    /**
+     * 委托任务取消发布
+     *
+     * @param id 同上
+     */
+    TaskUpdates cancelPublish(Long id);
 }

@@ -219,4 +219,11 @@ public interface ITaskService extends IService<Task> {
     void cancelPublishUser(Long id) throws MyException;
 
     void updateToCompleted(UpdateTaskToCompletedDTO dto) throws MyException;
+
+    /**
+     * 按任务 ID 撤回释放
+     *
+     * @param id 同上
+     */
+    void withdrawReleaseByTaskID(Long id) throws MyException;
 }   

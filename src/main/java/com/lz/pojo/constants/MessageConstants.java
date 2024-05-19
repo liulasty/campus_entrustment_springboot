@@ -119,4 +119,5 @@ public class MessageConstants {
             "您的委托接收未被选中";
     public static final String TASK_COMPLETED_SUCCESS = "委托已完成";
     public static final String TASK_RECORDS_DELETE_SUCCESS = "委托记录删除成功";
+    public static final String TASK_WITHDRAW_SUCCESS = "委托撤回成功";
 }

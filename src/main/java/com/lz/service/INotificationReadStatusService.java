@@ -31,7 +31,7 @@ public interface INotificationReadStatusService extends IService<NotificationRea
 
     Page<NotificationReadStatusVO> selectList(Page<NotificationReadStatusVO> page, Date createAt, String messageType, String description);
 
-    void addTaskNotification(Long id, Long ownerId, Long userId);
+    void addTaskNotification(Long id, Long taskId, Long userId);
 
     void delNotification(Long id);
 

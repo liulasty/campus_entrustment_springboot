@@ -165,4 +165,18 @@ public class TaskUpdatesServiceImpl extends ServiceImpl<TaskUpdatesMapper, TaskU
                                                      reviewStatus, reviewTime);
         return list;
     }
+
+    @Override
+    public TaskUpdates cancelPublish(Long id) {
+        Users users = getCurrentAdmin();
+        TaskUpdates taskUpdates = TaskUpdates.builder().taskId(id)
+                .userId(users.getUserId())
+                .updateType(TaskUpdateType.RESULT)
+                .updateDescription("管理员取消发布委托编号为"+id+"的任务")
+                .updateTime(new Date(System.currentTimeMillis()))
+                .build();
+
+        save(taskUpdates);
+        return taskUpdates;
+    }
 }

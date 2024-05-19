@@ -239,6 +239,21 @@ public class NotificationsServiceImpl extends ServiceImpl<NotificationsMapper, N
         
     }
 
+    @Override
+    public void sendTaskNotification(String title, String updateDescription, Long taskId, Long ownerId) {
+        Notifications notifications = Notifications.builder().title(title)
+                .message(updateDescription)
+                .notificationTime(new Date(System.currentTimeMillis()))
+                .notificationType(NotificationsType.TASK)
+                .userId(ownerId)
+                .build();
+        notificationsMapper.insert(notifications);
+
+        notificationReadStatusService.addTaskNotification(notifications.getNotificationId(), taskId,
+                                                          ownerId);
+        
+        
+    }
     public Users getCurrentAdmin() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String adminName = authentication.getName();

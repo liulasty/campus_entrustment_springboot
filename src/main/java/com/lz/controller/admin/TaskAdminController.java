@@ -45,15 +45,19 @@ public class TaskAdminController {
     private final ITaskUpdatesService taskUpdatesService;
     private final INotificationReadStatusService notificationReadStatusService;
     private final INotificationsService notificationsService;
-    
+
 
     /**
      * 获取当前登录管理员的信息。
      *
-     * @return 当前登录管理员的用户实体（Users）
+     * @param taskService                   任务服务
+     * @param delegateAuditRecordsService   委派审计记录服务
+     * @param usersService                  用户服务
+     * @param taskUpdatesService            任务更新服务
+     * @param notificationReadStatusService 通知读取状态服务
+     * @param notificationsService          通知服务
+     *
      */
-
-
     @Autowired
     public TaskAdminController(ITaskService taskService,
                                IDelegateAuditRecordsService delegateAuditRecordsService,
@@ -244,6 +248,13 @@ public class TaskAdminController {
         log.info("管理员禁用{}", id);
         usersService.disableUser(id);
         return Result.success(MessageConstants.USER_DISABLE_SUCCESS);
+    }
+    
+    @PutMapping("/withdrawReleaseByTaskID/{id}")
+    public Result withdrawReleaseByTaskID(@PathVariable("id") Long id) throws MyException {
+        log.info("管理员撤回发布{}", id);
+        taskService.withdrawReleaseByTaskID(id);
+        return Result.success(MessageConstants.TASK_WITHDRAW_SUCCESS);
     }
     
     

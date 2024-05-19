@@ -49,6 +49,7 @@ public class RedisConfig {
 
     /**
      * 配置 Value 的序列化器为 JSON 序列化器
+     * 利用JSON序列化器将Value对象转换为易于传输和存储的JSON格式，同时也能轻松地将其还原回Java对象。
      */
     private void configureValueSerializer(RedisTemplate<String, Object> template) {
         Jackson2JsonRedisSerializer<Object> valueSerializer = new Jackson2JsonRedisSerializer<>(Object.class);

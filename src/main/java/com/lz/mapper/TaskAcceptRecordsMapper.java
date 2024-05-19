@@ -51,7 +51,7 @@ public interface TaskAcceptRecordsMapper extends BaseMapper<TaskAcceptRecords> {
      *
      * @return 接受者接受记录
      */
-    ArrayList<TaskAcceptRecords> getTaskAcceptRecordsByTaskId(Long taskId);
+   List<TaskAcceptRecords> getTaskAcceptRecordsByTaskId(Long taskId);
     
     
     // IPage<User> selectUsersWithRoleAndPage( @Param("userId") Long userId, @Param("orderByColumn") String orderByColumn, @Param("isAsc") );

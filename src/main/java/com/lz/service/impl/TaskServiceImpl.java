@@ -872,5 +872,44 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
         reviewsMapper.insert(reviews);
     }
 
+    /**
+     * 按委托任务 ID 撤回委托
+     *
+     * @param id 同上
+     *
+     * @throws MyException 我的异常
+     */
+    @Override
+    public void withdrawReleaseByTaskID(Long id) throws MyException {
+        Task     task = getById(id);
+        
+        if (task==null||task.getStatus() != TaskStatus.ONGOING) {
+            log.error("任务不存在或委托任务状态异常");
+           throw new MyException(MessageConstants.TASK_NOT_EXIST);
+        }
+        
+        task.setStatus(TaskStatus.CANCELLED);
+
+       List<TaskAcceptRecords> taskAcceptRecords = taskAcceptRecordsMapper.getTaskAcceptRecordsByTaskId(id);
+        
+        if (taskAcceptRecords.size() > 0){
+            taskAcceptRecords.forEach(taskAcceptRecord -> {
+                taskAcceptRecord.setStatus(AcceptStatus.EXPIRED);
+                taskAcceptRecord.setAdoptTime(new Date(System.currentTimeMillis()));
+                taskAcceptRecordsMapper.updateById(taskAcceptRecord);
+            });
+        }
+        
+        taskMapper.updateById(task);
+
+        TaskUpdates taskUpdates = taskUpdateService.cancelPublish(id);
+        
+        notificationsService.sendTaskNotification("您的委托已被管理员撤销发布",
+                                                  taskUpdates.getUpdateDescription(),
+                                                  task.getTaskId(),task.getOwnerId()
+                                                  );
+
+    }
+
 
 }
