@@ -1,9 +1,20 @@
 package com.lz.service.impl;
 
+import com.lz.mapper.TaskMapper;
+import com.lz.mapper.UsersMapper;
+import com.lz.pojo.Enum.TaskStatus;
+import com.lz.pojo.dto.ReviewsDTO;
 import com.lz.pojo.entity.Reviews;
 import com.lz.mapper.ReviewsMapper;
+import com.lz.pojo.entity.Task;
+import com.lz.pojo.entity.Users;
 import com.lz.service.IReviewsService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.lz.service.ITaskService;
+import com.lz.service.IUsersService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 /**
@@ -16,5 +27,40 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class ReviewsServiceImpl extends ServiceImpl<ReviewsMapper, Reviews> implements IReviewsService {
+    @Autowired
+    private TaskMapper taskMapper;
+    
+    @Autowired
+    private ReviewsMapper reviewsMapper;
+    
+    @Autowired
+    private UsersMapper usersMapper;
 
+    @Override
+    public void save(ReviewsDTO reviewsDTO) {
+        Task task = taskMapper.selectById(reviewsDTO.getTaskId());
+        if (task.getStatus()!= TaskStatus.COMPLETED){
+            throw new RuntimeException("任务未完成，不能评价");
+        }
+        
+        Reviews reviews = Reviews.builder()
+                .reviewerId(getCurrentAdmin().getUserId())
+                .acceptorId(task.getReceiverId())
+                .publisherId(task.getOwnerId())
+                .comment(reviewsDTO.getComment())
+                .rating(reviewsDTO.getRate())
+                .isApproved(false)
+                .build();
+        reviewsMapper.insert(reviews);
+        
+        
+    }
+
+    public Users getCurrentAdmin() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String adminName = authentication.getName();
+        // log.info("管理员: {}", adminName);
+
+        return usersMapper.getByUsername(adminName);
+    }
 }

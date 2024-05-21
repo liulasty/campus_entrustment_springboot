@@ -120,4 +120,8 @@ public class MessageConstants {
     public static final String TASK_COMPLETED_SUCCESS = "委托已完成";
     public static final String TASK_RECORDS_DELETE_SUCCESS = "委托记录删除成功";
     public static final String TASK_WITHDRAW_SUCCESS = "委托撤回成功";
+    public static final String TASK_CREATE_SUCCESS = "委托信息创建成功";
+    public static final String DATA_DELETE_SUCCESS = "数据删除成功";
+    public static final String TASK_DELETE_SUCCESS = "委托删除成功";
+    public static final String REVIEWS_ADD_SUCCESS = "评论添加成功";
 }

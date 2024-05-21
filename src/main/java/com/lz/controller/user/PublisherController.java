@@ -199,4 +199,10 @@ public class PublisherController {
         return Result.success(MessageConstants.TASK_UPDATE_SUCCESS);
     }
 
+    @DeleteMapping("/{id}")
+        public Result deleteTask(@PathVariable("id") Long id) throws MyException {
+        taskService.deleteCancelTask(id);
+        return Result.success(MessageConstants.TASK_DELETE_SUCCESS);
+    }
+
 }

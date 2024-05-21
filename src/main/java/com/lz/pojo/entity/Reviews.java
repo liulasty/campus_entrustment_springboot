@@ -68,6 +68,9 @@ public class Reviews implements Serializable {
     @TableField("COMMENT")
     private String comment;
 
+    /**
+     * 已获批准
+     */
     @ApiModelProperty(value = "是否已批准")
     @TableField("IsApproved")
     private Boolean isApproved;

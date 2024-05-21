@@ -2,6 +2,7 @@ package com.lz.controller;
 
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.lz.pojo.constants.MessageConstants;
 import com.lz.pojo.entity.NotificationReadStatus;
 import com.lz.pojo.entity.Notifications;
 import com.lz.pojo.result.PageResult;
@@ -49,6 +50,13 @@ public class NotificationReadStatusController {
                                                 description);
         log.info("分页查询结果：{}", notificationsPage);
         return Result.success(new PageResult<NotificationReadStatusVO>(notificationsPage.getTotal(), notificationsPage.getRecords()));
+    
+    }
+    
+    @DeleteMapping("/{id}")
+    public Result delNotification(@PathVariable("id") Long id) {
+        notificationReadStatusService.delNotification(id);
+        return Result.success(MessageConstants.DATA_DELETE_SUCCESS);
     }
 
 }

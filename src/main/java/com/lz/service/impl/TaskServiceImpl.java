@@ -911,5 +911,30 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
 
     }
 
+    /**
+     * 删除已取消的委托任务
+     *
+     * @param id 同上
+     */
+    @Override
+    public void deleteCancelTask(Long id) throws MyException {
+        Task task = getById(id);
+        if (task.getStatus() != TaskStatus.CANCELLED) {
+           throw new MyException(MessageConstants.TASK_NOT_EXIST);
+        }
 
+        List<TaskAcceptRecords> taskAcceptRecords = taskAcceptRecordsMapper.getTaskAcceptRecordsByTaskId(id);
+        
+        if (taskAcceptRecords.size() > 0){
+            taskAcceptRecords.forEach(taskAcceptRecord -> {
+                taskAcceptRecord.setStatus(AcceptStatus.EXPIRED);
+                taskAcceptRecord.setAdoptTime(new Date(System.currentTimeMillis()));
+                taskAcceptRecordsMapper.updateById(taskAcceptRecord);
+            });
+        }
+
+        taskMapper.deleteById(id);
+    }
+    
+    
 }

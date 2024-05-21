@@ -155,7 +155,14 @@ public class NotificationReadStatusServiceImpl extends ServiceImpl<NotificationR
 
     @Override
     public void delNotification(Long id) {
-        remove(new QueryWrapper<NotificationReadStatus>().eq("NotificationID", id));
+        if (getCurrentAdmin().getRole().equals("ADMIN")) {
+            removeById(id);
+           
+        }else {
+            throw new RuntimeException("权限不足");
+        }
+        
+        
     }
 
     @Override
