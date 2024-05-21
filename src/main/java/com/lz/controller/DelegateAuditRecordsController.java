@@ -5,7 +5,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lz.pojo.constants.MessageConstants;
 import com.lz.pojo.result.Result;
 import com.lz.service.IDelegateAuditRecordsService;
+import io.swagger.annotations.Api;
 import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +21,9 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping("/delegateauditrecords")
+@Slf4j
+@Api
+@CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
 public class DelegateAuditRecordsController {
 
     @Autowired

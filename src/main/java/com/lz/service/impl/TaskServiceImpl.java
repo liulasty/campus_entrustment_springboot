@@ -595,10 +595,10 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
                                                                                             userId));
         
         
-        Long publishedTotal = taskMapper.getPublishedTotal(userId);
-        Long acceptedTotal = taskMapper.getAcceptedTotal(userId);
-        Long overdueTotal = taskMapper.getOverdueTotal(userId);
-        Long canceledTotal = taskMapper.getCanceledTotal(userId);
+        Long publishedTotal = taskMapper.getPublishedTotal(task.getOwnerId());
+        Long acceptedTotal = taskMapper.getAcceptedTotal(task.getOwnerId());
+        Long overdueTotal = taskMapper.getOverdueTotal(task.getOwnerId());
+        Long canceledTotal = taskMapper.getCanceledTotal(task.getOwnerId());
 
         return new TaskDetails(usersInfo, task, taskAcceptRecords, publishedTotal,
                                      acceptedTotal, overdueTotal, canceledTotal);
@@ -911,5 +911,30 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
 
     }
 
+    /**
+     * 删除已取消的委托任务
+     *
+     * @param id 同上
+     */
+    @Override
+    public void deleteCancelTask(Long id) throws MyException {
+        Task task = getById(id);
+        if (task.getStatus() != TaskStatus.CANCELLED) {
+           throw new MyException(MessageConstants.TASK_NOT_EXIST);
+        }
 
+        List<TaskAcceptRecords> taskAcceptRecords = taskAcceptRecordsMapper.getTaskAcceptRecordsByTaskId(id);
+        
+        if (taskAcceptRecords.size() > 0){
+            taskAcceptRecords.forEach(taskAcceptRecord -> {
+                taskAcceptRecord.setStatus(AcceptStatus.EXPIRED);
+                taskAcceptRecord.setAdoptTime(new Date(System.currentTimeMillis()));
+                taskAcceptRecordsMapper.updateById(taskAcceptRecord);
+            });
+        }
+
+        taskMapper.deleteById(id);
+    }
+    
+    
 }

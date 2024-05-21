@@ -1,5 +1,6 @@
 package com.lz.service;
 
+import com.lz.pojo.dto.ReviewsDTO;
 import com.lz.pojo.entity.Reviews;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -13,4 +14,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IReviewsService extends IService<Reviews> {
 
+    void save(ReviewsDTO reviewsDTO);
 }

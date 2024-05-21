@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/user/accept")
 @Slf4j
 @CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
-@Api("接收者控制器")
+@Api(tags = "接收者控制器")
 public class AcceptController {
     @Autowired
     private ITaskAcceptRecordsService taskAcceptRecordsService;

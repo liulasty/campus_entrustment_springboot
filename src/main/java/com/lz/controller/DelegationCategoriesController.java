@@ -10,6 +10,7 @@ import com.lz.pojo.result.PageResult;
 import com.lz.pojo.result.Result;
 import com.lz.service.IDelegationCategoriesService;
 import com.lz.service.ITaskService;
+import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -29,6 +30,7 @@ import java.util.List;
 @RequestMapping("/delegation_categories")
 @CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
 @Slf4j
+@Api(tags = "委托类别常量控制器")
 public class DelegationCategoriesController {
 
     @Autowired

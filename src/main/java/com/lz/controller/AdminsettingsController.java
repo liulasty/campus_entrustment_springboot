@@ -25,7 +25,6 @@ import java.util.List;
 @Api(tags = "存储系统管理员相关设置相关接口")
 @Slf4j
 @CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
-
 public class AdminsettingsController {
     
     @Autowired
@@ -36,7 +35,7 @@ public class AdminsettingsController {
      * @return {@code Result}
      */
     @GetMapping("")
-    
+    @ApiOperation("获取系统管理员相关设置列表")
     public Result getAdminsettingsList() {
         List<AdminSettings> adminSettingsList = adminsettingsService.list();
         return Result.success(adminSettingsList);

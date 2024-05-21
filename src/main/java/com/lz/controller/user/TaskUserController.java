@@ -17,6 +17,7 @@ import com.lz.pojo.vo.TaskAndUserInfoVO;
 import com.lz.pojo.vo.TaskDetails;
 import com.lz.service.IDelegationCategoriesService;
 import com.lz.service.ITaskService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -32,7 +33,7 @@ import java.util.List;
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
 @RequestMapping("/user/task")
-@ApiModel(value = "任务控制器")
+@Api(tags = "用户委托任务控制器", value = "用户委托任务控制器")
 public class TaskUserController {
     @Autowired
     private ITaskService taskService;

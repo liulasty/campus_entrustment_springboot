@@ -10,6 +10,7 @@ import com.lz.service.ITaskService;
 import com.lz.service.IUsersInfoService;
 import com.lz.service.IUsersService;
 import com.lz.pojo.Enum.AuthenticationStatus;
+import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -17,9 +18,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Date;
 
 /**
- * <p>
+ * 
  * 存储系统用户详细信息 前端控制器
- * </p>
+ * 
  *
  * @author lz
  * @since 2024-04-04
@@ -27,6 +28,7 @@ import java.util.Date;
 @RestController
 @RequestMapping("/userInfo")
 @Slf4j
+@Api(tags = "用户详细信息相关接口")
 @CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
 public class UsersinfoController {
     @Autowired

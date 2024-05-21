@@ -38,7 +38,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/user/publisher")
 @Slf4j
 @CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
-@Api("发布者控制器")
+@Api(tags = "发布者控制器", value = "发布者控制器")
 public class PublisherController {
 
     @Autowired
@@ -197,6 +197,12 @@ public class PublisherController {
         taskService.updateToCompleted(DTO);
 
         return Result.success(MessageConstants.TASK_UPDATE_SUCCESS);
+    }
+
+    @DeleteMapping("/{id}")
+        public Result deleteTask(@PathVariable("id") Long id) throws MyException {
+        taskService.deleteCancelTask(id);
+        return Result.success(MessageConstants.TASK_DELETE_SUCCESS);
     }
 
 }

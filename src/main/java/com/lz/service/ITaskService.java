@@ -226,4 +226,11 @@ public interface ITaskService extends IService<Task> {
      * @param id 同上
      */
     void withdrawReleaseByTaskID(Long id) throws MyException;
+
+    /**
+     * 删除已取消的委托任务
+     *
+     * @param id 同上
+     */
+    void deleteCancelTask(Long id) throws MyException;
 }   

@@ -13,6 +13,7 @@ import com.lz.pojo.result.PageResult;
 import com.lz.pojo.result.Result;
 import com.lz.service.ITaskUpdatesService;
 import com.lz.utils.EnumUtils;
+import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -33,6 +34,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/taskUpdate")
 @Slf4j
+@Api(tags = "任务更新相关接口")
 @CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
 public class TaskUpdatesController {
 
