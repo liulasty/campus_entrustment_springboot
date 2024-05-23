@@ -5,6 +5,7 @@ import com.lz.Exception.MyException;
 import com.lz.config.AppConfig;
 import com.lz.pojo.Page.UsersConfig;
 import com.lz.pojo.constants.MessageConstants;
+import com.lz.pojo.dto.PassWordDTO;
 import com.lz.pojo.dto.UserDTO;
 import com.lz.pojo.dto.UserLoginDTO;
 import com.lz.pojo.dto.UsersPageDTO;
@@ -37,9 +38,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 /**
- * 
  * 存储系统用户信息 前端控制器
- * 
  *
  * @author lz
  * @since 2024-04-04
@@ -97,12 +96,12 @@ public class UsersController {
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             // 获取当前用户的角色信息
-            
+
             Users user = usersService.getByUsername(userLoginDTO.getUsername());
 
             HashMap<String, Object> claims = new HashMap<>();
             claims.put("username", user.getUsername());
-            claims.put("role",user.getRole());
+            claims.put("role", user.getRole());
             String token = JwtUtil.genToken(claims, appConfig.getJwtKey());
             UserLoginVO loginVO = UserLoginVO.builder()
                     .userId(user.getUserId())
@@ -237,14 +236,14 @@ public class UsersController {
     @GetMapping(value = "/page")
     @ApiOperation("分页查询用户信息")
     public Result<PageResult> getUserInfoByPage(
-            @RequestParam(required = false) String username,                 
+            @RequestParam(required = false) String username,
             @RequestParam(required = false) String email,
             @RequestParam(required = false) String isActive,
-            @RequestParam(defaultValue ="1") int page,
-            @RequestParam(defaultValue ="5") int size) {
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "5") int size) {
         log.info("分页查询用户信息:{}", isActive);
         Boolean is = null;
-        if (isActive != null && !"".equals(isActive)){
+        if (isActive != null && !"".equals(isActive)) {
             is = "TRUE".equals(isActive);
         }
         UsersConfig config = UsersConfig.builder()
@@ -317,12 +316,12 @@ public class UsersController {
     public Result<String> adminActivation(@PathVariable Long id) throws MyException {
         log.info("管理员激活用户");
         Users user = usersService.getById(id);
-        if (user == null){
+        if (user == null) {
             log.error("用户认证信息不存在");
             return Result.error(MessageConstants.USER_AUTHENTICATION_INFO_NOT_EXIST);
         }
 
-        if (!usersService.adminActivation(id)){
+        if (!usersService.adminActivation(id)) {
             throw new MyException(MessageConstants.USER_ACTIVE_FAIL);
         }
         log.info("管理员激活用户成功");
@@ -336,10 +335,10 @@ public class UsersController {
      *
      * @return {@code Result<String>}
      */
-    
+
     @PutMapping(value = "/handleDisableByAdmin/{id}")
     @ApiOperation("管理员禁用用户")
-    public Result<String> disableUserByAdmin(@PathVariable Long id) throws MyException{
+    public Result<String> disableUserByAdmin(@PathVariable Long id) throws MyException {
         log.info("管理员禁用用户:{}", id);
         usersService.disableUser(id);
         return Result.success(MessageConstants.USER_DISABLE_SUCCESS);
@@ -353,10 +352,10 @@ public class UsersController {
      *
      * @return {@code Result<String>}
      */
-    
+
     @PutMapping(value = "/handleEnableByAdmin/{id}")
     @ApiOperation("管理员取消禁用用户")
-    public Result<String> cancelDisableUserByAdmin(@PathVariable Long id) throws MyException{
+    public Result<String> cancelDisableUserByAdmin(@PathVariable Long id) throws MyException {
         log.info("管理员取消禁用用户:{}", id);
         usersService.cancelDisableUser(id);
         return Result.success(MessageConstants.USER_ABLE_SUCCESS);
@@ -377,7 +376,7 @@ public class UsersController {
         usersService.resetPassword(users);
         return Result.success(MessageConstants.USER_UPDATE_SUCCESS);
     }
-    
+
     @GetMapping("/check")
     @ApiOperation("检查用户是否登录")
     public Result<String> check() {
@@ -392,6 +391,20 @@ public class UsersController {
         // 其他业务逻辑
         usersService.deleteUsers(deleteUsers);
         return Result.success(MessageConstants.USER_DELETE_SUCCESS);
+    }
+
+
+    @ApiOperation("修改密码")
+    @PostMapping("/editPassword")
+    public Result<String> editPassword(@Validated @RequestBody PassWordDTO passWordDTO, BindingResult result) throws MyException {
+        //校验结果
+        if (ValidateUtil.validate(result) != null) {
+            log.info("用户修改密码校验失败:{}", ValidateUtil.validate(result));
+            return Result.error(ValidateUtil.validate(result));
+        }
+        log.info("修改密码:{}", passWordDTO);
+        usersService.editPassword(passWordDTO);
+        return Result.success(MessageConstants.PASSWORD_UPDATE_SUCCESS);
     }
 
 }

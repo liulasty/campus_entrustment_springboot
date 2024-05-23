@@ -124,4 +124,8 @@ public class MessageConstants {
     public static final String DATA_DELETE_SUCCESS = "数据删除成功";
     public static final String TASK_DELETE_SUCCESS = "委托删除成功";
     public static final String REVIEWS_ADD_SUCCESS = "评论添加成功";
+    public static final String BAD_PASSWORD_ERROR = "Bad credentials";
+    public static final String DATABASE_PASSWORD_ERROR = "用户名或者密码错误";
+    public static final String PASSWORD_UPDATE_SUCCESS = "密码修改成功";
+    public static final String PASSWORD_NOT_SAME = "两次密码不一致";
 }

@@ -9,6 +9,7 @@ import com.lz.pojo.Enum.AuthenticationStatus;
 import com.lz.pojo.Page.UsersConfig;
 import com.lz.pojo.constants.MessageConstants;
 import com.lz.mapper.UsersMapper;
+import com.lz.pojo.dto.PassWordDTO;
 import com.lz.pojo.dto.UserDTO;
 import com.lz.pojo.dto.UserLoginDTO;
 import com.lz.pojo.entity.Users;
@@ -21,6 +22,8 @@ import com.lz.utils.PasswordUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -285,6 +288,39 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
             
         
     }
-    
+
+    /**
+     * 获取当前用户信息
+     *
+     * @return {@code Users}
+     */
+    public  Users getCurrentAdmin() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String adminName = authentication.getName();
+        log.info("管理员: {}", adminName);
+
+        return usersMapper.getByUsername(adminName);
+    }
+
+    @Override
+    public void editPassword(PassWordDTO passWordDTO) throws MyException {
+        Users users = getCurrentAdmin();
+        if (passWordDTO.getNewPassword().equals(passWordDTO.getConfirmPassword())){
+           if (users.getPassword().equals(passWordDTO.getOldPassword())){
+               users.setPassword(passWordDTO.getNewPassword());
+               usersMapper.updateById(users);
+               log.info("修改密码成功");
+           }else {
+               log.info("旧密码错误");
+               throw new MyException(MessageConstants.PASSWORD_WRONG);
+           }
+            
+                
+        }else {
+            log.info("新密码不一致");
+            throw new MyException(MessageConstants.PASSWORD_NOT_SAME);
+        }
+    }
+
 
 }

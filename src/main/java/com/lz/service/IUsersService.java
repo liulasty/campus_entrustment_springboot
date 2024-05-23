@@ -2,6 +2,7 @@ package com.lz.service;
 
 import com.lz.Exception.MyException;
 import com.lz.pojo.Page.UsersConfig;
+import com.lz.pojo.dto.PassWordDTO;
 import com.lz.pojo.dto.UserDTO;
 import com.lz.pojo.dto.UserLoginDTO;
 import com.lz.pojo.dto.UsersPageDTO;
@@ -102,5 +103,11 @@ public interface IUsersService extends IService<Users>  {
      */
     void deleteUsers(int[] singleton) throws MyException;
 
-   
+
+    /**
+     * 编辑密码
+     *
+     * @param passWordDTO 密码 DTO
+     */
+    void editPassword(PassWordDTO passWordDTO) throws MyException;
 }

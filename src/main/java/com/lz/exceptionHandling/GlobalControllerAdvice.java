@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 
 /**
  * @author lz
- * 
+ * <p>
  * 通过全局异常处理的方式统一处理异常。
  */
 @RestControllerAdvice
@@ -35,13 +35,13 @@ import java.util.stream.Collectors;
 @Slf4j
 public class GlobalControllerAdvice {
     private static final String BAD_REQUEST_MSG = "客户端请求参数错误";
-    
+
 
     // <1> 处理 form data方式调用接口校验失败抛出的异常
 
     @ExceptionHandler(BindException.class)
     public Result<String> bindExceptionHandler(BindException e) {
-        log.info("form data方式调用接口校验失败 "+e);
+        log.info("form data方式调用接口校验失败 " + e);
         List<FieldError> fieldErrors = e.getBindingResult().getFieldErrors();
 
         List<String> collect = fieldErrors.stream()
@@ -58,7 +58,7 @@ public class GlobalControllerAdvice {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public Result<String> methodArgumentNotValidExceptionHandler(MethodArgumentNotValidException e) {
-        log.info("json 请求体调用接口校验失败 "+e);
+        log.info("json 请求体调用接口校验失败 " + e);
         List<FieldError> fieldErrors = e.getBindingResult().getFieldErrors();
 
         List<String> collect = fieldErrors.stream()
@@ -75,7 +75,7 @@ public class GlobalControllerAdvice {
 
     @ExceptionHandler(ConstraintViolationException.class)
     public Result<String> constraintViolationExceptionHandler(ConstraintViolationException e) {
-        log.info("单个参数校验失败 "+e);
+        log.info("单个参数校验失败 " + e);
         Set<ConstraintViolation<?>> constraintViolations = e.getConstraintViolations();
 
         List<String> collect = constraintViolations.stream()
@@ -87,10 +87,10 @@ public class GlobalControllerAdvice {
         return Result.error(collect.toString());
 
     }
-    
+
     @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
-    public Result<String> sqlIntegrityConstraintViolationException(SQLIntegrityConstraintViolationException e){
-        log.info("SQLIntegrityConstraintViolationException = "+e);        
+    public Result<String> sqlIntegrityConstraintViolationException(SQLIntegrityConstraintViolationException e) {
+        log.info("SQLIntegrityConstraintViolationException = " + e);
 
         return Result.error("SQLIntegrityConstraintViolationException");
     }
@@ -104,60 +104,63 @@ public class GlobalControllerAdvice {
      * @return {@code Result}
      */
     @ExceptionHandler(value = SQLException.class)
-    public Result<String> exceptionHandler(SQLException e)  {
-       
-        log.error("发生SQL异常！原因是:",e);
+    public Result<String> exceptionHandler(SQLException e) {
+
+        log.error("发生SQL异常！原因是:", e);
         return Result.error(e.getMessage());
     }
-    
+
     @ExceptionHandler(value = NullPointerException.class)
-    public Result<String> exceptionHandler(NullPointerException e){
-        log.error("发生系统异常！原因是:",e);
+    public Result<String> exceptionHandler(NullPointerException e) {
+        log.error("发生系统异常！原因是:", e);
         return Result.error(e.getMessage());
     }
-    
+
     @ExceptionHandler(value = MyException.class)
-    public Result<String> myException(MyException e){
-        log.error("发生系统异常！原因是:",e);
+    public Result<String> myException(MyException e) {
+        log.error("发生系统异常！原因是:", e);
         return Result.error(e.getMessage());
     }
 
     @ExceptionHandler(value = NoAthleteException.class)
-    public Result<NoAthleteException> noAthleteException(NoAthleteException e){
-        log.error("发生系统异常！原因是NoAthleteException:",e);
-        
+    public Result<NoAthleteException> noAthleteException(NoAthleteException e) {
+        log.error("发生系统异常！原因是NoAthleteException:", e);
+
         return Result.error(e);
     }
 
     @ExceptionHandler(value = UsernameNotFoundException.class)
-    public Result<UsernameNotFoundException> usernameNotFoundException(UsernameNotFoundException e){
-        log.error("发生系统异常！原因是UsernameNotFoundException:",e);
+    public Result<UsernameNotFoundException> usernameNotFoundException(UsernameNotFoundException e) {
+        log.error("发生系统异常！原因是UsernameNotFoundException:", e);
 
         return Result.error(e);
     }
-    
+
 
     @ExceptionHandler(value = AuthenticationException.class)
-    public Result<AuthenticationException> authenticationExceptionResult(AuthenticationException e){
-        log.error("发生系统异常！原因是AuthenticationException:",e);
+    public Result<AuthenticationException> authenticationExceptionResult(AuthenticationException e) {
+        log.error("发生系统异常！原因是AuthenticationException:", e);
+        if (e.getMessage().equals(MessageConstants.BAD_PASSWORD_ERROR)) {
+            return Result.error(MessageConstants.DATABASE_PASSWORD_ERROR);
+        }
 
         return Result.error(e.getMessage());
     }
-    
+
     //拦截AccessDeniedException
     @ExceptionHandler(value = AccessDeniedException.class)
-    public Result<AccessDeniedException> accessDeniedExceptionResult(AccessDeniedException e){
-        log.error("发生系统异常！原因是AccessDeniedException:",e);
+    public Result<AccessDeniedException> accessDeniedExceptionResult(AccessDeniedException e) {
+        log.error("发生系统异常！原因是AccessDeniedException:", e);
 
         return Result.error(e);
     }
-    
+
     //拦截RuntimeException
     @ExceptionHandler(value = InvalidTokenException.class)
-    public Result<InvalidTokenException> runtimeExceptionResult(InvalidTokenException e){
-        log.error("发生系统异常！原因是RuntimeException:",e);
+    public Result<InvalidTokenException> runtimeExceptionResult(InvalidTokenException e) {
+        log.error("发生系统异常！原因是RuntimeException:", e);
 
         return Result.error(e);
     }
-    
+
 }

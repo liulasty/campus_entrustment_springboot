@@ -26,6 +26,7 @@ import java.util.Date;
  * </p>
  *
  * @author lz
+ * @date 2024/05/22
  * @since 2024-04-10
  */
 @RestController
@@ -69,6 +70,13 @@ public class SystemAnnouncementsController {
         return Result.success(systemAnnouncementsPageResult);
     }
 
+    /**
+     * 删除系统公告
+     *
+     * @param id 同上
+     *
+     * @return 结果<字符串>
+     */
     @DeleteMapping(value = "/{id}")
     public Result<String> delete(@PathVariable("id") Integer id) {
         systemAnnouncementsService.removeById(id);
