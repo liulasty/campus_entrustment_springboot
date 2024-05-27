@@ -6,6 +6,8 @@ import com.lz.pojo.entity.SystemAnnouncements;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 /**
  * <p>
  * 存储系统公告的信息 Mapper 接口
@@ -20,5 +22,7 @@ public interface SystemAnnouncementsMapper extends BaseMapper<SystemAnnouncement
     IPage<SystemAnnouncements> selectPageAdmin(Page<SystemAnnouncements> page,
                                     String status, String description,
                                     Integer queryRules);
+    
+    List<SystemAnnouncements> getNewestAnnouncement();
 
 }

@@ -106,7 +106,7 @@ public class GlobalControllerAdvice {
     @ExceptionHandler(value = SQLException.class)
     public Result<String> exceptionHandler(SQLException e) {
 
-        log.error("发生SQL异常！原因是:", e);
+        log.error("发生SQL异常！原因是{} {}:", e.getMessage(), e);
         return Result.error(e.getMessage());
     }
 

@@ -64,7 +64,7 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
 
         try {
             Map<String, Object> map = JwtUtil.parseToken(token, appConfig.getJwtKey());
-            Integer id = (Integer) map.get("id");
+            Integer id = (Integer) map.get("acceptRecordId");
             log.info("当前用户id：{}", id);
             String username = (String) map.get("username");
             log.info("当前用户：{}", username);

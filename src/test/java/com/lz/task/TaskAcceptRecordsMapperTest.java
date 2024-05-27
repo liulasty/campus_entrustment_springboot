@@ -11,11 +11,14 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lz.mapper.TaskAcceptRecordsMapper;
 import com.lz.pojo.Enum.TaskStatus;
+import com.lz.pojo.entity.TaskAcceptRecords;
 import com.lz.pojo.vo.TaskAcceptRecord;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.List;
 
 /**
  * @author lz
@@ -48,5 +51,21 @@ public class TaskAcceptRecordsMapperTest {
         TaskAcceptRecord taskAcceptRecord = new TaskAcceptRecord();
         System.out.println("taskAcceptRecord.toString():" + taskAcceptRecord);
         log.info("Result: {}", result.getRecords());
+    }
+    
+    @Test
+    void testGetTaskAcceptRecordsByTaskId() {
+        Long id = 3L;
+        List<TaskAcceptRecords> taskAcceptRecords =
+                taskAcceptRecordsMapper.getTaskAcceptRecordsWithUser(id);
+        log.info("Result: {}", taskAcceptRecords);
+    }
+
+    @Test
+    void testGetTaskAcceptRecordsTaskId() {
+        Long id = 132L;
+        List<TaskAcceptRecords> taskAcceptRecords =
+                taskAcceptRecordsMapper.getTaskAcceptRecordsByTaskId(id);
+        log.info("Result: {}", taskAcceptRecords);
     }
 }

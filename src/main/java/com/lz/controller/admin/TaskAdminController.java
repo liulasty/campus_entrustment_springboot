@@ -144,7 +144,7 @@ public class TaskAdminController {
          Long id =
                  notificationsService.addTaskDeleteNotification(users.getUserId(), 
                                                        "您的委托已被删除");
-         // log.info("管理员删除委托成功{}", id);
+         // log.info("管理员删除委托成功{}", acceptRecordId);
         notificationReadStatusService.addTaskNotification(id,
                                                           task.getOwnerId(),
                                                           users.getUserId());

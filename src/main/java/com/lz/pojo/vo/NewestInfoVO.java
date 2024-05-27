@@ -12,6 +12,7 @@ import com.lz.pojo.dto.TaskCountDTO;
 import com.lz.pojo.dto.TaskDTO;
 import com.lz.pojo.entity.SystemAnnouncements;
 import com.lz.pojo.entity.Task;
+import com.lz.pojo.entity.TaskAcceptRecords;
 import io.swagger.annotations.ApiModel;
 import lombok.Data;
 
@@ -49,5 +50,7 @@ public class NewestInfoVO {
      * 与我相关的委托
      */
     List<Task> tasksWithUser;
+    
+    List<TaskAcceptRecords> taskAcceptRecordsWithUser;
     
 }

@@ -46,4 +46,9 @@ public class NewestInfoTest {
         log.info("委托信息统计：{}", transactionStats);
         log.info("与我相关：{}", tasksWithUser);
     }
+    
+    @Test
+    void getNewestAnnouncement(){
+        systemAnnouncementsService.getNewestAnnouncement();
+    }
 }

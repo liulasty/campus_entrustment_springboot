@@ -106,7 +106,7 @@ public class NotificationTest {
                 .content("测试公告内容")
                 .publisherId(9L)
                 .publishTime(new Date(System.currentTimeMillis()))
-                .status(AnnouncementStatus.DRAFT)
+                .status(AnnouncementStatus.DRAFT.getDbValue())
                 .startEffectiveTime(new Date(System.currentTimeMillis()))
                 .endEffectiveTime(new Date(System.currentTimeMillis() + (long) 24 * 1000 * 60 * 60))
                 .isPinned(true)

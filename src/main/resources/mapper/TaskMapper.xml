@@ -1,7 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace = "com.lz.mapper.TaskMapper">
-	<select id = "selectTaskTypeCountTop5" resultType = "com.lz.pojo.dto.TaskCountDTO">
+	<resultMap id = "BaseResultMap" type = "com.lz.pojo.entity.Task">
+		<id column = "TaskID" property = "taskId" jdbcType = "BIGINT"/>
+		<result column = "OwnerID" property = "ownerId" jdbcType = "BIGINT"/>
+		<result column = "TaskType" property = "type" jdbcType = "INTEGER" typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
+		<result column = "Description" property = "description" jdbcType = "VARCHAR"/>
+		<result column = "ReceiverID" property = "receiverId" jdbcType = "BIGINT"/>
+		<result column = "StartTime" property = "startTime" jdbcType = "TIMESTAMP"/>
+		<result column = "EndTime" property = "endTime" jdbcType = "TIMESTAMP"/>
+		<result column = "Location" property = "location" jdbcType = "VARCHAR"/>
+		<result column = "STATUS" property = "status" jdbcType = "VARCHAR"/>
+		<result column = "CreatedAt" property = "createdAt" jdbcType = "TIMESTAMP"/>
+
+	</resultMap>
+	<select id = "selectTaskTypeCountTop5" resultType="com.lz.pojo.dto.TaskCountDTO">
 		SELECT TaskType as taskTypeId, COUNT(*) AS typeCount
 		FROM delegation_categories d
 		left join task t on t.taskType = d.category_id

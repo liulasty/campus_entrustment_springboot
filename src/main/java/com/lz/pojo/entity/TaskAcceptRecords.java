@@ -34,9 +34,12 @@ import java.util.Date;
 @Builder
 @ApiModel(value="Task对象", description="存储接受委托留言记录相关信息")
 public class TaskAcceptRecords {
+
+    private static final long serialVersionUID = 1L;
+    
     @ApiModelProperty(value = "接受记录ID")
     @TableId(value = "AcceptRecordId", type = IdType.AUTO)
-    private Long id;
+    private Long acceptRecordId;
     
     @ApiModelProperty(value = "接受状态")
     @TableField(value = "status")
@@ -44,7 +47,7 @@ public class TaskAcceptRecords {
     
     @ApiModelProperty(value = "接受者ID")
     @TableField(value = "AccepterId")
-    private Long receiverId;
+    private Long accepterId;
     
     @ApiModelProperty(value = "委托任务ID")
     @TableField(value = "taskId")

@@ -47,4 +47,10 @@
 			parameterType = "java.lang.Long">
 		select * from taskacceptrecords where taskId = #{taskId}
 	</select>
+	<select id = "getTaskAcceptRecordsWithUser"
+			parameterType = "java.lang.Long" resultType = "com.lz.pojo.entity.TaskAcceptRecords">
+		select *
+		from taskacceptrecords 
+		where AccepterId = #{id}
+	</select>
 </mapper>

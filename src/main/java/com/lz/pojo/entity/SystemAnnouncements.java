@@ -58,7 +58,7 @@ public class SystemAnnouncements implements Serializable {
 
     @ApiModelProperty(value = "公告状态（如：草稿、已发布、已撤回等）")
     @TableField("status")
-    private AnnouncementStatus status;
+    private String status;
 
     @ApiModelProperty(value = "公告开始生效时间（如有）")
     @TableField("start_effective_time")

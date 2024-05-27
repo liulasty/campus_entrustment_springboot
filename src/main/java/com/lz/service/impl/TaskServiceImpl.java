@@ -24,8 +24,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -96,6 +94,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
         newestInfoVO.setHotTaskCategory(getHotTaskCategory());
         newestInfoVO.setTransactionStats(getTransactionStats());
         newestInfoVO.setTasksWithUser(getTasksWithUser(id));
+        newestInfoVO.setTaskAcceptRecordsWithUser( taskAcceptRecordsMapper.getTaskAcceptRecordsWithUser(id));
         log.info("最新信息：{}", newestInfoVO);
         return newestInfoVO;
     }
@@ -531,7 +530,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
         }
         ArrayList<TaskAcceptRecordVO> list = new ArrayList<>();
         for (TaskAcceptRecords record : records) {
-            UsersInfo info = usersInfoMapper.selectById(record.getReceiverId());
+            UsersInfo info = usersInfoMapper.selectById(record.getAccepterId());
             log.info("发布者信息 {}", info);
             if (info == null) {
                 throw new MyException(MessageConstants.USER_INFO_ERROR);
@@ -708,7 +707,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
         }
 
         List<TaskAcceptRecords> NotList = list.stream()
-                .filter(record -> !record.getReceiverId().equals(acceptRecords.getReceiverId()))
+                .filter(record -> !record.getAccepterId().equals(acceptRecords.getAccepterId()))
                 
                 .collect(Collectors.toList());
 
@@ -734,7 +733,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
             log.info("更新失败 update {} list.size() {}", update, list.size());
             throw new MyException(MessageConstants.DATABASE_ERROR);
         }
-        Task task = Task.builder().taskId(taskId).receiverId(acceptRecords.getReceiverId()).status(TaskStatus.ACCEPTED).build();
+        Task task = Task.builder().taskId(taskId).receiverId(acceptRecords.getAccepterId()).status(TaskStatus.ACCEPTED).build();
         updateById(task);
         //todo 通知接受者
         notificationsService.addTaskConfirmTheRecipient(getCurrentAdmin().getUserId(),
@@ -744,7 +743,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
                                                         task.getTaskId());
         NotList.forEach(record -> {
             try {
-                notificationsService.addTaskAcceptanceSelected(record.getReceiverId(),
+                notificationsService.addTaskAcceptanceSelected(record.getAccepterId(),
                                                                MessageConstants.TASK_ACCEPTANCE_PROCESSED_FAILED,
                                                                NotificationsType.TASK,
                                                                "您的编号为"+acceptRecords+"委托接收记录已被处理，处理的结果是"+MessageConstants.TASK_ACCEPTANCE_PROCESSED_FAILED,

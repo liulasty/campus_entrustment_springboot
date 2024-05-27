@@ -34,18 +34,9 @@ public class SystemAnnouncementsServiceImpl extends ServiceImpl<SystemAnnounceme
      */
     @Override
     public List<SystemAnnouncements> getNewestAnnouncement() {
-        Page<SystemAnnouncements> page = new Page<>(1, 3); // 分页查询，第1页，每页5条记录
+        
 
-        QueryWrapper<SystemAnnouncements> wrapper = new QueryWrapper<>();
-        // 设置查询条件
-        wrapper
-                // 设置排序规则
-                .orderByDesc("is_pinned", "publish_time")
-                .eq("STATUS", AnnouncementStatus.PUBLISHED);
-                // 设置查询条件
-                // .lt("status", AnnouncementStatus.PUBLISHED); 
-
-        List<SystemAnnouncements> announcements = systemAnnouncementsMapper.selectPage(page, wrapper).getRecords();
+        List<SystemAnnouncements> announcements = systemAnnouncementsMapper.getNewestAnnouncement();
         
         log.info("getNewestAnnouncement: {}", announcements);
         return announcements;

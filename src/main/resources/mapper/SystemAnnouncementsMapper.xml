@@ -27,4 +27,12 @@
 			order by created_at
 		</if>
 	</select>
+	
+	<select id="getNewestAnnouncement" resultType="com.lz.pojo.entity.SystemAnnouncements">
+		SELECT *
+		FROM system_announcements
+		WHERE status = 'PUBLISHED'
+		ORDER BY is_pinned DESC, publish_time DESC
+		LIMIT 3
+	</select>
 </mapper>

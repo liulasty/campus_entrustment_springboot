@@ -61,7 +61,7 @@ public class taskServiceTest {
     @Test
     public void test02() {
         // Task task = Task.builder()
-        //         .receiverId(null)
+        //         .accepterId(null)
         //         .createdAt(new Date(System.currentTimeMillis()))
         //         .endTime(new Date(System.currentTimeMillis() + 20 * 60 * 60 * 24 * 1000))
         //         .startTime(new Date(System.currentTimeMillis() + 10 * 60 * 60 * 24 * 1000))

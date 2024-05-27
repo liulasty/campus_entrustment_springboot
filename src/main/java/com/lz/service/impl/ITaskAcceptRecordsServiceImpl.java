@@ -8,10 +8,8 @@ package com.lz.service.impl;
  */
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.injector.methods.SelectList;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lz.Exception.MyException;
-import com.lz.common.security.AuthenticationService;
 import com.lz.mapper.TaskAcceptRecordsMapper;
 import com.lz.mapper.TaskMapper;
 import com.lz.mapper.UsersMapper;
@@ -32,7 +30,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author lz
@@ -91,7 +88,7 @@ public class ITaskAcceptRecordsServiceImpl extends ServiceImpl<TaskAcceptRecords
             throw new MyException("该任务已接收");
         }
         TaskAcceptRecords taskAcceptRecords = TaskAcceptRecords.builder()
-                .receiverId(acceptDTO.getUser())
+                .accepterId(acceptDTO.getUser())
                 .taskId(acceptDTO.getTask())
                 .str(acceptDTO.getStr())
                 .status(AcceptStatus.PENDING)
