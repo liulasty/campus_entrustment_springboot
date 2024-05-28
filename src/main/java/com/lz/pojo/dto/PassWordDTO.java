@@ -19,10 +19,10 @@ import javax.validation.constraints.NotBlank;
  */
 @Data
 public class PassWordDTO {
-    @NotBlank(message = "password 不能为空")
+    @NotBlank(message = "旧密码 不能为空")
     private String oldPassword;
-    @NotBlank(message = "password 不能为空")
+    @NotBlank(message = "新密码 不能为空")
     private String newPassword;
-    @NotBlank(message = "password 不能为空")
+    @NotBlank(message = "新密码 不能为空")
     private String confirmPassword;
 }

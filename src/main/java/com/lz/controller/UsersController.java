@@ -395,7 +395,7 @@ public class UsersController {
 
 
     @ApiOperation("修改密码")
-    @PostMapping("/editPassword")
+    @PutMapping("/editPassword")
     public Result<String> editPassword(@Validated @RequestBody PassWordDTO passWordDTO, BindingResult result) throws MyException {
         //校验结果
         if (ValidateUtil.validate(result) != null) {
