@@ -10,6 +10,8 @@ package com.lz.pojo.Enum;
 import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.baomidou.mybatisplus.annotation.IEnum;
 import com.fasterxml.jackson.annotation.JsonValue;
+import io.swagger.annotations.Api;
+import lombok.Getter;
 
 /**
  * 身份认证状态
@@ -17,8 +19,9 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * @author lz
  * @date 2024/04/15
  */
-
-public enum AuthenticationStatus implements IEnum<Integer> {
+@Getter
+@Api(value = "身份认证状态")
+public enum AuthenticationStatus  {
     /**
      * 未认证
      */
@@ -37,30 +40,23 @@ public enum AuthenticationStatus implements IEnum<Integer> {
     AUTHENTICATED(3, "认证通过");
 
     @EnumValue
-    private final int code;
+    private final int dbValue;
     @JsonValue
     private final String description;
 
-    AuthenticationStatus(int code, String description) {
-        this.code = code;
+    AuthenticationStatus(int dbValue, String description) {
+        this.dbValue = dbValue;
         this.description = description;
     }
 
-    @Override
-    public Integer getValue() {
-        return code;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public static AuthenticationStatus ofCode(int code) {
-        for (AuthenticationStatus status : values()) {
-            if (status.code == code) {
+    public static AuthenticationStatus fromDbValue(int dbValue) {
+        for (AuthenticationStatus status : AuthenticationStatus.values()) {
+            if (status.getDbValue() == dbValue ) {
                 return status;
             }
         }
-        throw new IllegalArgumentException("Invalid auth status code: " + code);
+        return null;
     }
+    
+    
 }

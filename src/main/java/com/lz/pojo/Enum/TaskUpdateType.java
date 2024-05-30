@@ -24,22 +24,22 @@ public enum TaskUpdateType {
     /**
      * 审核完成
      */
-    AUDITING("AUDITING", "审核"),
+    AUDITING("AUDITING",0, "审核"),
    //发布委托
-    PUBLISHED("PUBLISHED", "发布委托"),
+    PUBLISHED("PUBLISHED", 1,"发布委托"),
     
     /**
      * 新任务创建
      */
-    CREATED("CREATED", "新委托创建"),
+    CREATED("CREATED",2, "新委托创建"),
     
     // 委托结果
-    RESULT("RESULT", "委托结果"),
+    RESULT("RESULT",3, "委托结果"),
 
     /**
      * 回退草稿
      */
-    FALLBACK_DRAFT("FALLBACK_DRAFT", "回退草稿");
+    FALLBACK_DRAFT("FALLBACK_DRAFT",4, "回退草稿");
     
 
 
@@ -55,13 +55,49 @@ public enum TaskUpdateType {
      */
     @JsonValue
     private final String webValue;
+    
+    private final Integer code;
 
-    TaskUpdateType(String dbValue, String webValue) {
+    TaskUpdateType(String dbValue, Integer code, String webValue) {
         this.dbValue = dbValue;
+        this.code = code;
         this.webValue = webValue;
     }
     
+    public static TaskUpdateType fromDbValue(String dbValue) {
+        for (TaskUpdateType value : values()) {
+            if (value.getDbValue().equals(dbValue)) {
+                return value;
+            }
+        }
+        return null;
+    }
     
+    public static TaskUpdateType fromCode(Integer code) {
+        for (TaskUpdateType value : values()) {
+            if (value.getCode().equals(code)) {
+                return value;
+            }
+        }
+        return null;
+    }
+    
+    public static TaskUpdateType fromWebValue(String webValue) {
+        for (TaskUpdateType value : values()) {
+            if (value.getWebValue().equals(webValue)) {
+                return value;
+            }
+        }
+        return null;
+    }
 
 
+    public static TaskUpdateType getByDbValue(String dbValue) {
+        for (TaskUpdateType value : values()) {
+            if (value.getDbValue().equals(dbValue)) {
+                return value;
+            }
+        }
+        return null;
+    }
 }

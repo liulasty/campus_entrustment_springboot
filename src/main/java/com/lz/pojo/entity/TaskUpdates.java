@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 import com.lz.pojo.Enum.TaskUpdateType;
+import com.lz.pojo.Enum.handle.TaskUpdateTypeHandler;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
@@ -47,7 +48,7 @@ public class TaskUpdates implements Serializable {
     private Long userId;
     
     @ApiModelProperty(value = "更新类型")
-    @TableField(value = "UpdateType")
+    @TableField(value = "UpdateType",typeHandler = TaskUpdateTypeHandler.class)
     private TaskUpdateType updateType;
 
     @ApiModelProperty(value = "更新时间")

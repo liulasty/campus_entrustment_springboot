@@ -233,4 +233,6 @@ public interface ITaskService extends IService<Task> {
      * @param id 同上
      */
     void deleteCancelTask(Long id) throws MyException;
+
+    TaskStatus getTaskStatus(Long id);
 }   

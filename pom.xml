@@ -147,12 +147,12 @@
       <version>4.1.2</version>
     </dependency>
   
-    <!-- pagehelper 分页插件 -->
-    <dependency>
-      <groupId>com.github.pagehelper</groupId>
-      <artifactId>pagehelper-spring-boot-starter</artifactId>
-      <version>1.4.7</version>
-    </dependency>
+    <!--&lt;!&ndash; pagehelper 分页插件 &ndash;&gt;-->
+    <!--<dependency>-->
+    <!--  <groupId>com.github.pagehelper</groupId>-->
+    <!--  <artifactId>pagehelper-spring-boot-starter</artifactId>-->
+    <!--  <version>1.4.7</version>-->
+    <!--</dependency>-->
   
     <!-- 阿里JSON解析器 -->
     <dependency>

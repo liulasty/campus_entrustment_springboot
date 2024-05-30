@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 import com.lz.pojo.Enum.AuthenticationStatus;
+import com.lz.pojo.Enum.handle.AuthenticationStatusTypeHandler;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
@@ -72,8 +73,9 @@ public class UsersInfo implements Serializable {
     @TableField(value = "UserRole")
     private String userRole;
 
-    @TableField(value = "auth_status")
+    @ApiModelProperty(value = "认证状态")
+    @TableField(value = "auth_status",typeHandler =
+            AuthenticationStatusTypeHandler.class)
     private AuthenticationStatus authStatus;
-
-
+    
 }

@@ -9,11 +9,10 @@ import java.io.Serializable;
 import java.util.Date;
 
 import com.lz.pojo.Enum.TaskStatus;
+import com.lz.pojo.Enum.handle.TaskStatusTypeHandler;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 import lombok.experimental.Accessors;
 
 /**
@@ -25,6 +24,8 @@ import lombok.experimental.Accessors;
  * @since 2024-04-04
  */
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @TableName("task")
@@ -72,10 +73,7 @@ public class Task implements Serializable {
     private Date endTime;
 
     @ApiModelProperty(value = "任务状态")
-    @TableField("STATUS")
+    @TableField(value = "STATUS",typeHandler = TaskStatusTypeHandler.class)
     private TaskStatus status;
     
-    
-
-
 }

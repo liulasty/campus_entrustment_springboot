@@ -9,6 +9,7 @@ import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.lz.pojo.Enum.NotificationsType;
+import com.lz.pojo.Enum.handle.NotificationsTypeHandler;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
@@ -44,7 +45,7 @@ public class Notifications implements Serializable {
     private Long userId;
 
     @ApiModelProperty(value = "通知类型")
-    @TableField("NotificationType")
+    @TableField(value = "NotificationType",typeHandler = NotificationsTypeHandler.class)
     private NotificationsType notificationType;
     
     @ApiModelProperty(value = "通知标题")

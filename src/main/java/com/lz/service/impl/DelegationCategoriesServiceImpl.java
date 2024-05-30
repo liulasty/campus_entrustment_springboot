@@ -33,7 +33,7 @@ public class DelegationCategoriesServiceImpl extends ServiceImpl<DelegationCateg
     @Override
     public List<NameAndDescription> getTaskCategory() throws MyException {
         QueryWrapper<DelegationCategories> wrapper = new QueryWrapper<>();
-        wrapper
+        wrapper.eq("isEnable", 1)
                 .orderBy(true, false, "category_id");
         return getNameAndDescriptions(wrapper);
     }

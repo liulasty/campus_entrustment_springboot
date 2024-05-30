@@ -82,6 +82,23 @@
 		FROM Task
 		WHERE STATUS = 'CANCELLED' and OwnerId = #{id}
 	</select>
+	
+	<select id="queryOngoingTasks"  resultType="com.lz.pojo.entity.Task">
+		SELECT *
+		FROM task
+		<where> 1=1
+			<if test="now != null">
+				AND StartTime &lt; #{now}
+			</if>
+				AND status = 'ONGOING'
+		</where>
+		ORDER BY StartTime DESC
+	</select>
+	<select id = "getTaskStatus" resultType = "com.lz.pojo.Enum.TaskStatus" parameterType = "java.lang.Long">
+		SELECT STATUS
+		FROM Task
+		WHERE TaskID = #{id}
+	</select>
 
 
 </mapper>

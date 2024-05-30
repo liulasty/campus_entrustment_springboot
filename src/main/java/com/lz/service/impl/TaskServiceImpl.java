@@ -173,20 +173,17 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
      */
     @Override
     public List<Task> getNewestTask() {
-        Page<Task> page = new Page<>(1, 5); // 分页查询，第1页，每页5条记录
+        
         QueryWrapper<Task> wrapper = new QueryWrapper<>();
-        // 设置查询条件
-        wrapper
-                // 设置排序规则
-                .orderByDesc("StartTime")
-                .lt("StartTime", new Date(System.currentTimeMillis()))
-                // 设置查询条件
-                .eq("status", TaskStatus.ONGOING);
-        // 获取最新委托
 
+        long currentTimeMillis = System.currentTimeMillis();
+        long currentSecond = currentTimeMillis / 1000 * 1000; // 转换为精确到秒的毫秒值
+        Date date = new Date(currentSecond);
 
-        return taskMapper.selectPage(page,
-                                     wrapper).getRecords();
+        List<Task> tasks = taskMapper.queryOngoingTasks(date);
+        log.info("最新委托：{}", tasks);
+       
+        return tasks;
     }
 
     /**
@@ -315,6 +312,8 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
     @Override
     public void createTask(TaskDTO taskDTO) throws MyException {
         Users users = usersMapper.selectById(taskDTO.getOwnerId());
+
+        Users currentAdmin = getCurrentAdmin();
         if (users == null || !Objects.equals(users.getRole(), "USER")) {
             throw new MyException("用户不存在");
         }
@@ -328,14 +327,14 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
         Task task = Task.builder()
                 .createdAt(new Date(System.currentTimeMillis()))
                 .description(taskDTO.getContent())
-                .ownerId(taskDTO.getOwnerId())
+                .ownerId(currentAdmin.getUserId())
                 .status(TaskStatus.DRAFT)
                 .type(delegationCategories.getCategoryId())
                 .location(taskDTO.getLocation())
                 .build();
 
         taskMapper.insert(task);
-        //todo 添加更新记录
+    
         TaskUpdates taskUpdates =
                 TaskUpdates.builder()
                         .taskId(task.getTaskId())
@@ -934,6 +933,15 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
 
         taskMapper.deleteById(id);
     }
-    
-    
+
+    @Override
+    public TaskStatus getTaskStatus(Long id) {
+        if (id == null) {
+            return null;
+        }
+        TaskStatus taskStatus = taskMapper.getTaskStatus(id);
+        return taskStatus;
+    }
+
+
 }

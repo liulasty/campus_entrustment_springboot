@@ -175,11 +175,12 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
             BeanUtils.copyProperties(users, userPageVO);
             UsersInfo byId = usersInfoMapper.selectById(users.getUserId());
 
-            // 检查byId是否为null，若为null可提前处理，这里选择抛出一个异常
+            
             // 设置认证状态
             if (byId == null) {
                userPageVO.setAuthStatus(AuthenticationStatus.UNAUTHORIZED);
             }else {
+                log.info("用户信息 {}", byId);
                 userPageVO.setAuthStatus(byId.getAuthStatus());
             }
             userPageVOS.add(userPageVO);

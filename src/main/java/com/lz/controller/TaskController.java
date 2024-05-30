@@ -295,18 +295,7 @@ public class TaskController {
     }
 
 
-    @PostMapping("/searchTask")
-    @ApiOperation("搜索待审核委托")
-    public Result<String> searchTask() {
-        return null;
-    }
 
-
-    @PostMapping("/getHistory")
-    @ApiOperation("获取审核历史记录")
-    public Result<String> getHistory() {
-        return null;
-    }
 
     //最新发布的委托列表（简要信息）
     @GetMapping("/getNewTask/{id}")
@@ -322,6 +311,7 @@ public class TaskController {
     @PostMapping("/searchPage")
     @ApiOperation("分页查询")
     public Result<PageResult<Task>> searchPage(TaskPageDTO taskPageDTO) {
+        log.info("委托信息查询taskPageDTO:{}", taskPageDTO);
         PageResult<Task> taskPageResult = taskService.searchPage(taskPageDTO);
         return Result.success(taskPageResult);
     }
@@ -342,5 +332,13 @@ public class TaskController {
     public Result<List<UserDelegateDraft>> getUserDelegateDraft(@PathVariable Long userId) {
         List<UserDelegateDraft> tasksWithUser = taskService.getUserDelegateDraft(userId);
         return Result.success(tasksWithUser);
+    }
+    
+    //获取委托状态
+    @GetMapping("/getTaskStatus/{id}")
+    @ApiOperation("获取委托状态")
+    public Result<TaskStatus> getTaskStatus(@PathVariable Long id) {
+        TaskStatus status = taskService.getTaskStatus(id);
+        return Result.success(status);
     }
 }

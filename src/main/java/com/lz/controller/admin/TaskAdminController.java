@@ -78,6 +78,7 @@ public class TaskAdminController {
      *
      * @return {@code Users}
      */
+    
     public Users getCurrentAdmin() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String adminName = authentication.getName();
@@ -163,6 +164,7 @@ public class TaskAdminController {
      * @throws MyException 我的异常
      */
     @PutMapping("/getFallbackDraft/{TaskID}")
+    @ApiOperation("管理员回退草稿")
     public Result fallbackDraft(@PathVariable("TaskID") Long taskId) throws MyException {
         log.info("管理员获取回退草稿{}", taskId);
         Task task = taskService.getById(taskId);
@@ -190,6 +192,7 @@ public class TaskAdminController {
      * @throws MyException 我的异常
      */
     @PutMapping("/allowPublish/{TaskID}")
+    @ApiOperation("管理员允许发布")
     public Result allowPublish(@PathVariable("TaskID") Long taskId) throws MyException {
         log.info("管理员允许发布{}", taskId);
         Task task = taskService.getById(taskId);
@@ -218,6 +221,7 @@ public class TaskAdminController {
      * @throws MyException 我的异常
      */
     @PutMapping("/notAllowed/{TaskID}")
+    @ApiOperation("管理员不允许发布")
     public Result notAllowed(@PathVariable("TaskID") Long taskId) throws MyException {
         log.info("管理员不允许发布{}", taskId);
         Task task = taskService.getById(taskId);
@@ -237,6 +241,7 @@ public class TaskAdminController {
     
     
     @PutMapping("/handleEnableAdmin/{id}")
+    @ApiOperation("管理员启用")
     public Result handleEnableAdmin(@PathVariable("id") Long id) throws MyException {
         log.info("管理员启用{}", id);
         usersService.cancelDisableUser(id);
@@ -244,6 +249,7 @@ public class TaskAdminController {
     }
     
     @PutMapping("/handleDisableAdmin/{id}")
+    @ApiOperation("管理员禁用")
     public Result handleDisableAdmin(@PathVariable("id") Long id) throws MyException {
         log.info("管理员禁用{}", id);
         usersService.disableUser(id);
@@ -251,6 +257,7 @@ public class TaskAdminController {
     }
     
     @PutMapping("/withdrawReleaseByTaskID/{id}")
+    @ApiOperation("管理员撤回发布")
     public Result withdrawReleaseByTaskID(@PathVariable("id") Long id) throws MyException {
         log.info("管理员撤回发布{}", id);
         taskService.withdrawReleaseByTaskID(id);

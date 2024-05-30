@@ -12,6 +12,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.lz.pojo.Enum.AcceptStatus;
+import com.lz.pojo.Enum.handle.AcceptStatusTypeHandler;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
@@ -42,7 +43,7 @@ public class TaskAcceptRecords {
     private Long acceptRecordId;
     
     @ApiModelProperty(value = "接受状态")
-    @TableField(value = "status")
+    @TableField(value = "status",typeHandler = AcceptStatusTypeHandler.class)
     private AcceptStatus status;
     
     @ApiModelProperty(value = "接受者ID")

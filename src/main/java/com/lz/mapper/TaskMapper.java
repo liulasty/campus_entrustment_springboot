@@ -1,5 +1,7 @@
 package com.lz.mapper;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.lz.pojo.Enum.TaskStatus;
 import com.lz.pojo.dto.TaskCountDTO;
 import com.lz.pojo.entity.Task;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -7,6 +9,7 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -69,4 +72,8 @@ public interface TaskMapper extends BaseMapper<Task> {
     Long getOverdueTotal(Long id);
 
     Long getCanceledTotal(Long id);
+    
+    List<Task> queryOngoingTasks(Date now);
+
+    TaskStatus getTaskStatus(Long id);
 }
