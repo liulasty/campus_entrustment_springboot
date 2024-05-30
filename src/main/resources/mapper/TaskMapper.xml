@@ -1,19 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace = "com.lz.mapper.TaskMapper">
-	<resultMap id = "BaseResultMap" type = "com.lz.pojo.entity.Task">
-		<id column = "TaskID" property = "taskId" jdbcType = "BIGINT"/>
-		<result column = "OwnerID" property = "ownerId" jdbcType = "BIGINT"/>
-		<result column = "TaskType" property = "type" jdbcType = "INTEGER" typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
-		<result column = "Description" property = "description" jdbcType = "VARCHAR"/>
-		<result column = "ReceiverID" property = "receiverId" jdbcType = "BIGINT"/>
-		<result column = "StartTime" property = "startTime" jdbcType = "TIMESTAMP"/>
-		<result column = "EndTime" property = "endTime" jdbcType = "TIMESTAMP"/>
-		<result column = "Location" property = "location" jdbcType = "VARCHAR"/>
-		<result column = "STATUS" property = "status" jdbcType = "VARCHAR"/>
-		<result column = "CreatedAt" property = "createdAt" jdbcType = "TIMESTAMP"/>
-
-	</resultMap>
+	
 	<select id = "selectTaskTypeCountTop5" resultType="com.lz.pojo.dto.TaskCountDTO">
 		SELECT TaskType as taskTypeId, COUNT(*) AS typeCount
 		FROM delegation_categories d
@@ -32,7 +20,7 @@
 	<!-- 定义查询语句 -->
 	<select id = "getTasksTodayCount" resultType = "java.lang.Integer">
 		SELECT COUNT(*)
-		FROM Task
+		FROM task
 		WHERE
 		<if test = "key != null and key != ''">
 			STATUS = #{key} AND
@@ -41,7 +29,7 @@
 	</select>
 	<select id = "getTasksWeeklyCount" resultType = "java.lang.Integer">
 		SELECT COUNT(*)
-		FROM Task
+		FROM task
 		WHERE
 		<if test = "key != null and key != ''">
 			STATUS = #{key} AND
@@ -51,7 +39,7 @@
 	</select>
 	<select id = "getTasksMonthlyCount" resultType = "java.lang.Integer">
 		SELECT COUNT(*)
-		FROM Task
+		FROM task
 		WHERE
 		<if test = "key != null and key != ''">
 			STATUS = #{key} AND
@@ -61,7 +49,7 @@
 	</select>
 	<select id = "getPublishedTotal" resultType = "java.lang.Long" parameterType = "java.lang.Long">
 		SELECT COUNT(*)
-		FROM Task
+		FROM task
 		WHERE (STATUS = 'ONGOING' or STATUS = 'ACCEPTED' or STATUS = 'EXPIRED' or STATUS = 'COMPLETED'
 			or STATUS = 'INCOMPLETE' or STATUS = 'CANCELLED')
 		  
@@ -69,17 +57,17 @@
 	</select>
 	<select id = "getAcceptedTotal" resultType = "java.lang.Long" parameterType = "java.lang.Long">
 		SELECT COUNT(*)
-		FROM Task
+		FROM task
 		WHERE STATUS = 'COMPLETED' and OwnerId = #{id}
 	</select>
 	<select id = "getOverdueTotal" resultType = "java.lang.Long" parameterType = "java.lang.Long">
 		SELECT COUNT(*)
-		FROM Task
+		FROM task
 		WHERE STATUS = 'EXPIRED' and OwnerId = #{id}
 	</select>
 	<select id = "getCanceledTotal" resultType = "java.lang.Long" parameterType = "java.lang.Long">
 		SELECT COUNT(*)
-		FROM Task
+		FROM task
 		WHERE STATUS = 'CANCELLED' and OwnerId = #{id}
 	</select>
 	
@@ -96,7 +84,7 @@
 	</select>
 	<select id = "getTaskStatus" resultType = "com.lz.pojo.Enum.TaskStatus" parameterType = "java.lang.Long">
 		SELECT STATUS
-		FROM Task
+		FROM task
 		WHERE TaskID = #{id}
 	</select>
 

@@ -58,7 +58,7 @@ public class Task implements Serializable {
     
     @ApiModelProperty(value = "委托类型")
     @TableField("TaskType")
-    private Integer type;
+    private Long taskType;
     
     @ApiModelProperty(value = "任务地点")
     @TableField("Location")

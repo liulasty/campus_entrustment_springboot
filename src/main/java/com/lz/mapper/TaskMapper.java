@@ -61,7 +61,7 @@ public interface TaskMapper extends BaseMapper<Task> {
 
     @Insert("INSERT INTO task(CreatedAt, Description, OwnerId, status, " +
             "TaskType,Location) VALUES" +
-            "(#{createdAt}, #{description}, #{ownerId}, #{status}, #{type}, #{location})")
+            "(#{createdAt}, #{description}, #{ownerId}, #{status}, #{taskType}, #{location})")
     @Options(useGeneratedKeys = true, keyProperty = "taskId")
     int insert(Task task);
 

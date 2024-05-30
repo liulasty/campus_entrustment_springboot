@@ -139,7 +139,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
         log.info("查询结果：{}", task);
         TaskDraftVO taskDraftVO = new TaskDraftVO();
         BeanUtils.copyProperties(task, taskDraftVO);
-        taskDraftVO.setType(delegationCategoriesMapper.selectById(task.getType()).getCategoryName());
+        taskDraftVO.setType(delegationCategoriesMapper.selectById(task.getTaskType()).getCategoryName());
         return taskDraftVO;
 
     }
@@ -329,7 +329,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
                 .description(taskDTO.getContent())
                 .ownerId(currentAdmin.getUserId())
                 .status(TaskStatus.DRAFT)
-                .type(delegationCategories.getCategoryId())
+                .taskType(delegationCategories.getCategoryId())
                 .location(taskDTO.getLocation())
                 .build();
 

@@ -107,7 +107,7 @@ public class TaskController {
                 throw new MyException(MessageConstants.DATA_VALIDATION_ERROR);
             }
             Task task = Task.builder().taskId(taskDTO.getTaskId())
-                    .type(taskDTO.getType())
+                    .taskType(taskDTO.getType())
                     .description(taskDTO.getDescription())
                     .location(taskDTO.getLocation())
                     .status(TaskStatus.DRAFT)

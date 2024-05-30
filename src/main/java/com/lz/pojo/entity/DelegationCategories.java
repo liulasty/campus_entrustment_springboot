@@ -30,7 +30,7 @@ public class DelegationCategories implements Serializable {
 
     @ApiModelProperty(value = "委托类别唯一标识符")
     @TableId(value = "category_id", type = IdType.AUTO)
-    private Integer categoryId;
+    private Long categoryId;
 
     @ApiModelProperty(value = "委托类别的名称，要求唯一")
     @TableField(value = "category_name")

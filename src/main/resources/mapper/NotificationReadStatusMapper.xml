@@ -8,7 +8,7 @@
 		       n2.NotificationType as type,n.UserID as userId,
 		        u.Username as username,n2.Title as title, n2.Message as message,
 		       n.IsRead as isRead, n.ReadTime as readTime
-		from NotificationReadStatus n, notifications n2,Users u
+		from notificationReadStatus n, notifications n2,Users u
 		<where>
 			n.NotificationID = n2.NotificationID and n.UserID = u.UserID
 			<if test="createAt != null">

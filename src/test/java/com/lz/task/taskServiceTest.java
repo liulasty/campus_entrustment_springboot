@@ -51,7 +51,7 @@ public class taskServiceTest {
                 // .endTime(LocalDateTime.now().plusHours(1))
                 // .startTime(LocalDateTime.now())
                 .status(TaskStatus.DRAFT)
-                .type(1)
+                .taskType(1L)
                 .location("测试")
                 .build();
 

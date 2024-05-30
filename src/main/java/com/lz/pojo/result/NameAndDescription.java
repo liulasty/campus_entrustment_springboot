@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class NameAndDescription {
-    private Integer id;
+    private Long id;
     private String name;
     private String description;
 }

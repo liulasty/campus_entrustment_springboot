@@ -20,7 +20,7 @@ import java.util.Date;
 @Data
 public class TaskDraftDTO {
     Long taskId;
-    Integer type;
+    Long type;
     String location;
     String description;
     Date createdAt;
