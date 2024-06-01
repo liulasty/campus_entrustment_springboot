@@ -47,5 +47,28 @@ public class AdminsettingsController {
         
         return Result.success();
     }
+    
+    @GetMapping("/enable")
+    @ApiOperation("查询状态")
+    public Result<AdminSettings> enable() {
+        
+        AdminSettings adminSettings = adminsettingsService.getById(1);
+        return Result.success(adminSettings);
+    }
+    
+    @PutMapping("/update")
+    @ApiOperation("更新状态")
+    public Result<String> update() {
+        log.info("更新分类");
+        AdminSettings adminSettings = adminsettingsService.getById(1);
+        if (adminSettings.getSettingValue() == 1){
+            adminSettings.setSettingValue(0L);
+            adminsettingsService.updateById(adminSettings);
+        }else {
+            adminSettings.setSettingValue(1L);
+            adminsettingsService.updateById(adminSettings);
+        }
+        return Result.success();
+    }
 
 }

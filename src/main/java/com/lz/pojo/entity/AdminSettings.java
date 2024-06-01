@@ -1,5 +1,6 @@
 package com.lz.pojo.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -30,13 +31,15 @@ public class AdminSettings implements Serializable {
 
     @ApiModelProperty(value = "设置ID")
     @TableId(value = "SettingID", type = IdType.AUTO)
-    private Integer settingID;
+    private Long settingID;
 
     @ApiModelProperty(value = "设置键")
+    @TableField("SettingKey")
     private String settingKey;
 
     @ApiModelProperty(value = "设置值")
-    private String settingValue;
+    @TableField("SettingValue")
+    private Long settingValue;
     
 
 

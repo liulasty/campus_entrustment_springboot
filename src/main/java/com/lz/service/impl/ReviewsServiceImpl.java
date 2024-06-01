@@ -44,6 +44,7 @@ public class ReviewsServiceImpl extends ServiceImpl<ReviewsMapper, Reviews> impl
         }
         
         Reviews reviews = Reviews.builder()
+                .taskId(reviewsDTO.getTaskId())
                 .reviewerId(getCurrentAdmin().getUserId())
                 .acceptorId(task.getReceiverId())
                 .publisherId(task.getOwnerId())

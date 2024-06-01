@@ -14,6 +14,7 @@ import com.lz.pojo.entity.UsersInfo;
 import com.lz.pojo.result.PageResult;
 import com.lz.pojo.result.Result;
 import com.lz.pojo.vo.UserLoginVO;
+import com.lz.service.IUsersInfoService;
 import com.lz.service.IUsersService;
 import com.lz.utils.JwtUtil;
 import com.lz.utils.ValidateUtil;
@@ -50,11 +51,14 @@ import java.util.*;
 @Slf4j
 public class UsersController {
 
-    private static final String ROLE_ADMIN = "ROLE_ADMIN";
-    private static final String ROLE_USER = "ROLE_USER";
+    private static final String ROLE_ADMIN = "ADMIN";
+    private static final String ROLE_USER = "USER";
 
     @Autowired
     private IUsersService usersService;
+    
+    @Autowired
+    private IUsersInfoService userInfoService;
 
     @Autowired
     private AppConfig appConfig;
@@ -103,9 +107,16 @@ public class UsersController {
             claims.put("username", user.getUsername());
             claims.put("role", user.getRole());
             String token = JwtUtil.genToken(claims, appConfig.getJwtKey());
+            UsersInfo usersInfo = null;
+            if (user.getRole() != ROLE_ADMIN){
+                usersInfo = userInfoService.getById(user.getUserId());
+            }
+
+            
             UserLoginVO loginVO = UserLoginVO.builder()
                     .userId(user.getUserId())
                     .userType(user.getRole())
+                    .Authorization(usersInfo == null ? null : usersInfo.getAuthStatus().getDescription())
                     .token(token)
                     .build();
             // boolean login = usersService.login(userLoginDTO);

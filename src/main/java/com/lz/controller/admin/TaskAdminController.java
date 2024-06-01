@@ -150,7 +150,7 @@ public class TaskAdminController {
                                                           task.getOwnerId(),
                                                           users.getUserId());
         log.info("管理员删除委托成功{}", taskID);
-        return Result.success(MessageConstants.TASK_DRAFT_DELETE_SUCCESS);
+        return Result.success(MessageConstants.TASK_DELETE_SUCCESS);
     }
 
 

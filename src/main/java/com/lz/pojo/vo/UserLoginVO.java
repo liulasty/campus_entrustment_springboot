@@ -27,6 +27,11 @@ import lombok.NoArgsConstructor;
 public class UserLoginVO {
     Long userId;
     String userName;
+    
     String userType;
     String token;
+    /**
+     * 授权
+     */
+    String Authorization;
 }

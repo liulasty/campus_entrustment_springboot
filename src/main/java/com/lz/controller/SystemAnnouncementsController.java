@@ -96,7 +96,7 @@ public class SystemAnnouncementsController {
                         .setUpdatedBy(getCurrentAdmin().getUserId());
         log.info("更新系统公告 {}", systemAnnouncements);
         systemAnnouncementsService.updateById(systemAnnouncements);
-        return Result.success(MessageConstants.TASK_UPDATE_SUCCESS);
+        return Result.success(MessageConstants.TASK_SYSTEMANNOUNCEMENT_UPDATE_SUCCESS);
     }
     public Users getCurrentAdmin() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

@@ -21,8 +21,8 @@ public class UserDelegateDraft {
     /**
      * 类别
      */
-    private Integer type;
-    /**
+    private Long TaskType;
+    /** 
      * 位置
      */
     private String location;

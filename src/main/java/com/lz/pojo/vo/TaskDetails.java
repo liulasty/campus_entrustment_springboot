@@ -42,4 +42,8 @@ public class TaskDetails {
      * 委托任务取消总数
      */
     Long taskCanceledTotal;
+    /**
+     * 委托发布者的评分
+     */
+    Double publisherScore;
 }

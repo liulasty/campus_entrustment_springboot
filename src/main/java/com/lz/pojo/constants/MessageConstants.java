@@ -128,4 +128,5 @@ public class MessageConstants {
     public static final String DATABASE_PASSWORD_ERROR = "用户名或者密码错误";
     public static final String PASSWORD_UPDATE_SUCCESS = "密码修改成功";
     public static final String PASSWORD_NOT_SAME = "两次密码不一致";
+    public static final String TASK_SYSTEMANNOUNCEMENT_UPDATE_SUCCESS = "系统公告更新成功";
 }

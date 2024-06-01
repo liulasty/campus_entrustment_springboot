@@ -298,6 +298,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
         for (Task task : tasks) {
             UserDelegateDraft userDelegateDraft = new UserDelegateDraft();
             BeanUtils.copyProperties(task, userDelegateDraft);
+            userDelegateDraft.setTaskType(task.getTaskType());
             userDelegateDraft.setCreateTime(task.getCreatedAt());
             userDelegateDrafts.add(userDelegateDraft);
         }
@@ -598,8 +599,19 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
         Long overdueTotal = taskMapper.getOverdueTotal(task.getOwnerId());
         Long canceledTotal = taskMapper.getCanceledTotal(task.getOwnerId());
 
+        List<Reviews> list = reviewsMapper.selectList(new QueryWrapper<Reviews>()
+                                                              .eq("AcceptorID", userId));
+        Double Rate = 0.0;
+        if (list.size() != 0) {
+            Long sum = list.stream()
+                    .mapToLong(Reviews::getRating)
+                    .sum();
+            Rate = (double) (sum / list.size());
+        }
+
         return new TaskDetails(usersInfo, task, taskAcceptRecords, publishedTotal,
-                                     acceptedTotal, overdueTotal, canceledTotal);
+                                     acceptedTotal, overdueTotal,
+                               canceledTotal,Rate);
     }
 
     /**
