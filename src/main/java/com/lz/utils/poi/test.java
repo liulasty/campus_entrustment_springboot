@@ -30,6 +30,8 @@ public class test {
         ExcelUtil<Reviews> util = new ExcelUtil<Reviews>(Reviews.class);
         List<Reviews> userList = util.importExcel(is);
         
+        
+        
         System.out.println(userList);
     }
     

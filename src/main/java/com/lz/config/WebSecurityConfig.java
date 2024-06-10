@@ -48,7 +48,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/druid/**",
             "/doc.html",
             "/img/upload",
-            "/user/logout"
+            "/user/logout",
+            "/common/**"
     };
 
     @Autowired

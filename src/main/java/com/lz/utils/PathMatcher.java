@@ -47,7 +47,8 @@ public class PathMatcher {
                 Pattern.compile(PATH_SEPARATOR + "/doc.html"),
                 Pattern.compile(PATH_SEPARATOR + "/favicon.ico"),
                 Pattern.compile(PATH_SEPARATOR + "/user/logout"),
-                Pattern.compile(PATH_SEPARATOR + "/img/upload")
+                Pattern.compile(PATH_SEPARATOR + "/img/upload"),
+                Pattern.compile(PATH_SEPARATOR + "/common/.*")
         );
     }
 

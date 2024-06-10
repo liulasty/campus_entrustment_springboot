@@ -60,7 +60,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         try {
-            // log.info("请求路径: {}", request.getRequestURI());
+            log.info("请求路径: {}", request.getRequestURI());
             if (PathMatcher.isUrlWhitelisted(request.getRequestURI())) {
                 // log.info("请求路径在白名单中，无需验证");
                 filterChain.doFilter(request, response);
