@@ -49,7 +49,7 @@ public class DelegateAuditRecordsServiceImpl extends ServiceImpl<DelegateAuditRe
      */
     @Override
     public DelegateAuditRecords getFailReasonById(Long id) {
-        QueryWrapper<DelegateAuditRecords> queryWrapper = new QueryWrapper();
+        QueryWrapper<DelegateAuditRecords> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("DelegateID", id)
                 .eq("ReviewStatus", AuditResult.REJECTED)
                 .orderByDesc("ReviewTime");
@@ -64,6 +64,12 @@ public class DelegateAuditRecordsServiceImpl extends ServiceImpl<DelegateAuditRe
     @Override
     public void createNewRecord(Long taskId, String s) {
         DelegateAuditRecords delegateAuditRecords = new DelegateAuditRecords();
+        delegateAuditRecords
+                .setDelegateId(taskId)
+                .setReviewComment(s)
+                .setReviewStatus(AuditResult.PENDING)
+                .setUserId(getCurrentAdmin().getUserId());
+        save(delegateAuditRecords);
         
     }
 

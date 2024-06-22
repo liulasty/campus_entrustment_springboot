@@ -3,7 +3,6 @@ package com.lz.controller;
 
 import com.lz.pojo.constants.MessageConstants;
 import com.lz.pojo.dto.ReviewsDTO;
-import com.lz.pojo.entity.Reviews;
 import com.lz.pojo.result.Result;
 import com.lz.service.IReviewsService;
 import io.swagger.annotations.Api;
@@ -33,5 +32,7 @@ public class ReviewsController {
         reviewsService.save(reviewsDTO);
         return Result.success(MessageConstants.REVIEWS_ADD_SUCCESS);
     }
+
+    
 
 }
