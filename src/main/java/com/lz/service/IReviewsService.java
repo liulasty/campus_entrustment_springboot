@@ -4,6 +4,9 @@ import com.lz.pojo.dto.ReviewsDTO;
 import com.lz.pojo.entity.Reviews;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+
 /**
  * <p>
  * 存储用户对任务的评价信息 服务类
@@ -15,4 +18,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 public interface IReviewsService extends IService<Reviews> {
 
     void save(ReviewsDTO reviewsDTO);
+
+    List<Reviews> exportExcel();
 }

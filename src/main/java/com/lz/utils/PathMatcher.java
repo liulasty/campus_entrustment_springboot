@@ -49,6 +49,7 @@ public class PathMatcher {
                 Pattern.compile(PATH_SEPARATOR + "/user/logout"),
                 Pattern.compile(PATH_SEPARATOR + "/img/upload"),
                 Pattern.compile(PATH_SEPARATOR + "/common/.*")
+                
         );
     }
 
@@ -68,6 +69,7 @@ public class PathMatcher {
         String normalizedUrl = url.split("\\?")[0].split("#")[0];
 
         try {
+            log.info("正在判断URL是否在白名单内：{}", normalizedUrl);
             return WHITELIST_PATTERNS.stream()
                     .anyMatch(pattern -> pattern.matcher(normalizedUrl).matches());
         } catch (PatternSyntaxException e) {

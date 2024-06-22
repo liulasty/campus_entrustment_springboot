@@ -96,8 +96,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers(AUTH_WHITELIST).permitAll()
                 .anyRequest().authenticated();// 其他请求都需要认证
+                // 确保/error也受到保护
+       
     }
-    
-    
+
 
 }

@@ -1,14 +1,21 @@
 package com.lz.controller;
 
 
+import com.alibaba.excel.EasyExcel;
 import com.lz.pojo.constants.MessageConstants;
 import com.lz.pojo.dto.ReviewsDTO;
+import com.lz.pojo.entity.Reviews;
 import com.lz.pojo.result.Result;
 import com.lz.service.IReviewsService;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.util.List;
 
 /**
  * <p>
@@ -32,6 +39,26 @@ public class ReviewsController {
         reviewsService.save(reviewsDTO);
         return Result.success(MessageConstants.REVIEWS_ADD_SUCCESS);
     }
+    
+    //导出excel
+    @GetMapping("/exportExcel")
+    public void exportExcel(HttpServletResponse response) throws IOException {
+        List<Reviews> reviewsList = reviewsService.exportExcel();
+        if (reviewsList !=null) {
+            String fileName = URLEncoder.encode("评论信息", "UTF-8");
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setCharacterEncoding("UTF-8");
+            String headerValue = "attachment; filename=" + fileName + ".xlsx";
+            response.setHeader("Content-disposition", headerValue);
+            
+            EasyExcel.write(response.getOutputStream(), Reviews.class)
+                    .sheet("评论信息").doWrite(reviewsList);
+            log.info("导出Excel成功 {}", reviewsList);
+           
+        }
+       
+    }
+    
 
     
 

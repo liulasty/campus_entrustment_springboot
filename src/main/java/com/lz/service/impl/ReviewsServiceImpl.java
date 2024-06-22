@@ -17,6 +17,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+
 /**
  * <p>
  * 存储用户对任务的评价信息 服务实现类
@@ -55,6 +58,15 @@ public class ReviewsServiceImpl extends ServiceImpl<ReviewsMapper, Reviews> impl
         reviewsMapper.insert(reviews);
         
         
+    }
+
+    @Override
+    public List<Reviews> exportExcel() {
+        List<Reviews> reviews = reviewsMapper.selectList(null);
+        if (reviews.size()>0){
+            return reviews;
+        }
+        return null;
     }
 
     public Users getCurrentAdmin() {

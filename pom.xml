@@ -140,6 +140,13 @@
       <version>1.2.83</version>
     </dependency>
   
+    <!-- EasyExcel 依赖 -->
+    <dependency>
+      <groupId>com.alibaba</groupId>
+      <artifactId>easyexcel</artifactId>
+      <version>2.1.1</version>
+    </dependency>
+
 
 
   </dependencies>
