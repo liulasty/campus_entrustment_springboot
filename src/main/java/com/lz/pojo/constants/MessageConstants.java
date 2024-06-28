@@ -130,4 +130,6 @@ public class MessageConstants {
     public static final String PASSWORD_NOT_SAME = "两次密码不一致";
     public static final String TASK_SYSTEMANNOUNCEMENT_UPDATE_SUCCESS = "系统公告更新成功";
     public static final String EXPORT_EXCEL_SUCCESS = "导出Excel成功";
+    public static final String REVIEWS_EXPORT_SUCCESS = "评论导出成功";
+    public static final String REVIEWS_EXPORT_FAIL = "评论导出失败";
 }

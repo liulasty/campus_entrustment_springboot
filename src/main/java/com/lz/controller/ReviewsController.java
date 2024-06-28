@@ -43,23 +43,22 @@ public class ReviewsController {
     //导出excel
     @GetMapping("/exportExcel")
     public void exportExcel(HttpServletResponse response) throws IOException {
+        log.info("导出excel");
         List<Reviews> reviewsList = reviewsService.exportExcel();
-        if (reviewsList !=null) {
-            String fileName = URLEncoder.encode("评论信息", "UTF-8");
+        if (reviewsList != null) {
             response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            response.setCharacterEncoding("UTF-8");
-            String headerValue = "attachment; filename=" + fileName + ".xlsx";
-            response.setHeader("Content-disposition", headerValue);
+            
+            String fileName = URLEncoder.encode("reviews", "UTF-8").replaceAll("\\+", "%20");
+            response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
             
             EasyExcel.write(response.getOutputStream(), Reviews.class)
+                    .sheet("reviews").doWrite(reviewsList);
+            
+            // 保存到服务器磁盘（这部分根据实际需要决定是否保留）
+            EasyExcel.write("D:\\reviews.xlsx", Reviews.class)
                     .sheet("评论信息").doWrite(reviewsList);
+            
             log.info("导出Excel成功 {}", reviewsList);
-           
         }
-       
     }
-    
-
-    
-
 }
