@@ -23,5 +23,5 @@ public class TaskDraftDTO {
     Long type;
     String location;
     String description;
-    Date createdAt;
+    private Date createdAt;
 }

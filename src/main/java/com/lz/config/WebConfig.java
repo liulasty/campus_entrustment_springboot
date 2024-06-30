@@ -10,7 +10,6 @@ package com.lz.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lz.Interceptor.JwtTokenAdminInterceptor;
-import com.lz.common.json.JacksonObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -20,7 +19,6 @@ import org.springframework.format.FormatterRegistry;
 import org.springframework.format.datetime.standard.DateTimeFormatterRegistrar;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
@@ -44,6 +42,9 @@ import java.util.List;
 @Configuration
 @Slf4j
 public class WebConfig extends WebMvcConfigurationSupport {
+
+
+    
 
     @Autowired
     private JwtTokenAdminInterceptor jwtTokenAdminInterceptor;
@@ -73,6 +74,7 @@ public class WebConfig extends WebMvcConfigurationSupport {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         log.info("开始设置静态资源映射");
+        
         registry.addResourceHandler("/doc.html").addResourceLocations("classpath:/META-INF/resources/");
         registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
     }
@@ -142,6 +144,9 @@ public class WebConfig extends WebMvcConfigurationSupport {
         
         registrar.registerFormatters(registry);
     }
+
+
+
 
 
     

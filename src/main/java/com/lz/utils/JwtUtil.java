@@ -1,9 +1,9 @@
 package com.lz.utils;
 
-/**
- * Created with IntelliJ IDEA.
- *
- * @Author: lz
+/*
+  Created with IntelliJ IDEA.
+ 
+  @Author: lz
  * @Date: 2023/11/08/10:14
  * @Description:
  */
