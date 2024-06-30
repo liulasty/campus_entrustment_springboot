@@ -3,8 +3,6 @@ package com.lz.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lz.pojo.constants.MessageConstants;
-import com.lz.pojo.entity.NotificationReadStatus;
-import com.lz.pojo.entity.Notifications;
 import com.lz.pojo.result.PageResult;
 import com.lz.pojo.result.Result;
 import com.lz.pojo.vo.NotificationReadStatusVO;
@@ -49,7 +47,7 @@ public class NotificationReadStatusController {
                 notificationReadStatusService.selectList(page, createAt, messageType,
                                                 description);
         log.info("分页查询结果：{}", notificationsPage);
-        return Result.success(new PageResult<NotificationReadStatusVO>(notificationsPage.getTotal(), notificationsPage.getRecords()));
+        return Result.success(new PageResult<>(notificationsPage.getTotal(), notificationsPage.getRecords()));
     
     }
     
