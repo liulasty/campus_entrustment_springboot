@@ -12,6 +12,7 @@ import com.lz.pojo.result.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
+import org.springframework.lang.Nullable;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
@@ -26,7 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 @Slf4j
 public class CustomReturnValueHandler implements HandlerMethodReturnValueHandler {
 
-    private  HandlerMethodReturnValueHandler returnValueHandler;
+    private final HandlerMethodReturnValueHandler returnValueHandler;
     
     
     public CustomReturnValueHandler(HandlerMethodReturnValueHandler returnValueHandler) {
@@ -46,12 +47,12 @@ public class CustomReturnValueHandler implements HandlerMethodReturnValueHandler
      */
     @Override
     public boolean supportsReturnType(MethodParameter returnType) {
-        log.info("返回值类型：{}", returnType.getParameterType().getName());
+        
         return this.returnValueHandler.supportsReturnType(returnType);
     }
 
     @Override
-    public void handleReturnValue(Object returnValue, 
+    public void handleReturnValue(@Nullable Object returnValue, 
                                   MethodParameter returnType, 
                                   ModelAndViewContainer mavContainer, 
                                   NativeWebRequest webRequest) throws Exception {
@@ -79,15 +80,21 @@ public class CustomReturnValueHandler implements HandlerMethodReturnValueHandler
           @param nativeRequest 原生请求对象，从中获取最佳匹配的处理器属性。
          * @return HandlerMethod 对象，表示处理当前请求的方法。
          */
-        HandlerMethod handlerMethod = (HandlerMethod) nativeRequest.getAttribute(HandlerMapping.BEST_MATCHING_HANDLER_ATTRIBUTE);
+        HandlerMethod handlerMethod = null;
+        if (nativeRequest != null) {
+            handlerMethod = (HandlerMethod) nativeRequest.getAttribute(HandlerMapping.BEST_MATCHING_HANDLER_ATTRIBUTE);
+        }
         
         /*
           检查当前处理方法是否注解了 NoReturnHandle。
           这个注解用于标记那些在执行完成后不需要返回任何内容的方法。
           通过检查这个注解，可以决定是否需要对方法的执行结果进行处理。
          */
-        boolean isNoReturnHandle = handlerMethod.getMethod().isAnnotationPresent(NoReturnHandle.class);
-        
+        boolean isNoReturnHandle = false;
+        if (handlerMethod != null) {
+            isNoReturnHandle = handlerMethod.getMethod().isAnnotationPresent(NoReturnHandle.class);
+        }
+
         if (isNoReturnHandle) {
             // 如果是，则直接返回
             this.returnValueHandler.handleReturnValue(returnValue, returnType, mavContainer, webRequest);

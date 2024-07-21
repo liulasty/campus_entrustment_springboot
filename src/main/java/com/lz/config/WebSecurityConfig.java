@@ -32,6 +32,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
+/*
+ * 自定义Web安全配置类，继承自WebSecurityConfigurerAdapter。
+ * 该类用于配置Spring Security的Web安全设置，包括认证和授权等。
+ */
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private static final String PATH_SEPARATOR = "/campus_entrustment";
     private static final String[] AUTH_WHITELIST = {

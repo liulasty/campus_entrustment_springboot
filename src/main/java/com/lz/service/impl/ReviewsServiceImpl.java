@@ -63,7 +63,7 @@ public class ReviewsServiceImpl extends ServiceImpl<ReviewsMapper, Reviews> impl
     @Override
     public List<Reviews> exportExcel() {
         List<Reviews> reviews = reviewsMapper.selectList(null);
-        if (reviews.size()>0){
+        if (!reviews.isEmpty()){
             return reviews;
         }
         return null;

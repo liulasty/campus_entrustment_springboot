@@ -19,7 +19,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * 返回值配置
+ *
  * @author lz
+ * @date 2024/07/06
  */
 @Configuration
 public class ReturnValueConfig implements InitializingBean {

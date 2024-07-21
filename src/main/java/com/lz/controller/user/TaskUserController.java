@@ -22,6 +22,7 @@ import io.swagger.annotations.ApiModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -42,7 +43,7 @@ public class TaskUserController {
     private IDelegationCategoriesService delegationCategoriesService;
 
     @GetMapping("/page")
-    public Result getTaskPage(
+    public Result<PageResult<Task>> getTaskPage(
             @RequestParam(defaultValue = "1") int pageNum, // 默认值为1，如果请求中未提供则使用此默认值
             @RequestParam(defaultValue = "10") int pageSize, // 默认每页大小为10
             @RequestParam(required = false) String location, // 类型阶段参数
@@ -72,7 +73,7 @@ public class TaskUserController {
      * @throws MyException 我的异常
      */
     @GetMapping("/{id}")
-    public Result getTask(@PathVariable("id") Long id) throws MyException {
+    public Result<TaskDetails> getTask(@PathVariable("id") Long id) throws MyException {
         TaskDetails taskAndUserInfo = taskService.getTaskAndPublisherInfo(id);
 
         return Result.success(taskAndUserInfo);
@@ -80,7 +81,7 @@ public class TaskUserController {
 
 
     @GetMapping("/categories")
-    public Result getTaskCategory() throws MyException {
+    public Result<List<NameAndDescription>> getTaskCategory() throws MyException {
         List<NameAndDescription> taskCategory = delegationCategoriesService.getTaskCategoryUser();
         return Result.success(taskCategory);
     }
