@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
-    
+
 
 
     @Autowired
@@ -60,7 +60,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         try {
-            log.info("请求路径: {}", request.getRequestURI());
+//            log.info("请求路径: {}", request.getRequestURI());
             if (PathMatcher.isUrlWhitelisted(request.getRequestURI())) {
                 // log.info("请求路径在白名单中，无需验证");
                 filterChain.doFilter(request, response);
@@ -88,7 +88,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
 
     private boolean isValidToken(String token) {
-        
+
         if (token == null || token.isEmpty()) {
             return false;
         }
@@ -108,13 +108,13 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
                 return false;
             }
 
-            
+
 
 
             AuthenticationService authenticationService = new AuthenticationService();
             authenticationService.setAuthentication(username, role);
-            
-            
+
+
             List<String> roles = extractUserRoles();
             // log.info("用户: {} 角色: {}", username, roles);
             return true;

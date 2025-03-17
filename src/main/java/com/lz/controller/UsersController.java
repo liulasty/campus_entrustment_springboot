@@ -1,6 +1,7 @@
 package com.lz.controller;
 
 
+import com.lz.Annotation.NoReturnHandle;
 import com.lz.Exception.MyException;
 import com.lz.config.AppConfig;
 import com.lz.pojo.Page.UsersConfig;
@@ -77,6 +78,7 @@ public class UsersController {
      */
     @PostMapping(value = "/login")
     @ApiOperation("登录")
+    @NoReturnHandle
     public Result<UserLoginVO> login(@Validated @RequestBody UserLoginDTO userLoginDTO, BindingResult result) throws MyException {
         log.info("用户登录:{},用户密码 {}", userLoginDTO.getUsername(),
                  userLoginDTO.getPassword());

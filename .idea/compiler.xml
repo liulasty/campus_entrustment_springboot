@@ -10,11 +10,15 @@
         <module name="campus_entrustment" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="logging-module" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="campus_entrustment" options="-parameters" />
       <module name="campus_entrustment_springboot" options="-parameters" />
+      <module name="logging-module" options="-parameters" />
     </option>
   </component>
 </project>

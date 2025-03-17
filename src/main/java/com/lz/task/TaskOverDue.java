@@ -54,7 +54,7 @@ public class TaskOverDue {
         
     }
 
-    @Scheduled(cron = "0/30 * * * * ?")
+//    @Scheduled(cron = "0/30 * * * * ?")
     public void SimpleQueue() {
         // 队列名称
         String queueName = "simple.queue";
@@ -88,7 +88,7 @@ public class TaskOverDue {
         }
     }
 
-    @Scheduled(cron = "0/30 * * * * ?")
+//    @Scheduled(cron = "0/30 * * * * ?")
     public void testFanoutExchange() {
         // 队列名称
         String exchangeName = "lz.fanout";

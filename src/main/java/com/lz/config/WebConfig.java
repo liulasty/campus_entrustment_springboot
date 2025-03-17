@@ -29,7 +29,6 @@ import springfox.documentation.service.ApiInfo;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 
-import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -46,8 +45,7 @@ public class WebConfig extends WebMvcConfigurationSupport {
 
     
 
-    @Autowired
-    private JwtTokenAdminInterceptor jwtTokenAdminInterceptor;
+
 
 
     @Override
@@ -84,57 +82,36 @@ public class WebConfig extends WebMvcConfigurationSupport {
      *
      * @return
      */
-    @Bean
-    public Docket docket1() {
-        log.info("准备生成接口文档");
-        ApiInfo apiInfo = new ApiInfoBuilder()
-                .title("校园委托项目接口文档")
-                .version("1.0")
-                .description("校园委托项目接口文档")
-                .build();
+//    @Bean
+//    public Docket docket1() {
+//        log.info("准备生成接口文档");
+//        ApiInfo apiInfo = new ApiInfoBuilder()
+//                .title("校园委托项目接口文档")
+//                .version("1.0")
+//                .description("校园委托项目接口文档")
+//                .build();
+//
+//        Docket docket = new Docket(DocumentationType.SWAGGER_2)
+//                .groupName("用户端")
+//                .apiInfo(apiInfo)
+//                .select()
+//                .apis(RequestHandlerSelectors.basePackage("com.lz.controller"))
+//                .paths(PathSelectors.any())
+//                .build();
+//        log.info("接口文档生成完毕:{}",docket);
+//        return docket;
+//    }
 
-        Docket docket = new Docket(DocumentationType.SWAGGER_2)
-                .groupName("用户端")
-                .apiInfo(apiInfo)
-                .select()
-                .apis(RequestHandlerSelectors.basePackage("com.lz.controller"))
-                .paths(PathSelectors.any())
-                .build();
-        log.info("接口文档生成完毕:{}",docket);
-        return docket;
-    }
 
-    /**
-     * 扩展Spring MVC消息转换器
-     * @param converters
-     */
+    @Autowired
+    private ObjectMapper objectMapper;
     @Override
-    protected void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
-        log.info("扩展消息转换器...");
-        
+    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+        converters.add(new MappingJackson2HttpMessageConverter(objectMapper));
 
-        for (HttpMessageConverter<?> converter : converters) {
-            if (converter instanceof MappingJackson2HttpMessageConverter) {
-                MappingJackson2HttpMessageConverter jsonConverter = (MappingJackson2HttpMessageConverter) converter;
-                ObjectMapper objectMapper = jsonConverter.getObjectMapper();
-
-                objectMapper.setDateFormat(new SimpleDateFormat("yyyy年MM" +
-                                                                        "月dd" +
-                                                                        "日HH:mm:ss"));
-                // objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
-                // 或者使用 Java 8 DateTimeFormatter
-                // objectMapper.setDateFormat(new StdDateFormat().withTimeZone(TimeZone.getTimeZone("UTC")));
-
-                // 可以添加其他定制配置
-            }
-        }
-        // 创建一个消息转换器对象
-        // MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
-        // 需要为消息转换器设置一个对象转换器，对象转换器可以将Java对象序列化为json数据
-        // converter.setObjectMapper(new JacksonObjectMapper());
-        // 将自己的消息转化器加入容器中
-        // converters.add(0,converter);
     }
+
+
 
     @Override
     public void addFormatters(FormatterRegistry registry) {

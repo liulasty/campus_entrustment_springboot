@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.io.Serializable;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.ToString;
 
 /**
  * 后端统一返回结果
@@ -104,4 +105,6 @@ public class Result<T> implements Serializable {
         this.errorCode = errorCode;
         return this;
     }
+
+
 }

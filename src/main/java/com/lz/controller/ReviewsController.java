@@ -6,12 +6,14 @@ import com.alibaba.excel.ExcelWriter;
 import com.alibaba.excel.support.ExcelTypeEnum;
 import com.alibaba.excel.write.metadata.WriteSheet;
 import com.alibaba.fastjson.JSON;
+import com.lz.Annotation.NoReturnHandle;
 import com.lz.Exception.MyException;
 import com.lz.pojo.constants.MessageConstants;
 import com.lz.pojo.dto.ReviewsDTO;
 import com.lz.pojo.entity.Reviews;
 import com.lz.pojo.result.Result;
 import com.lz.service.IReviewsService;
+import com.lz.utils.excelutil.EasyExcelUtil;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
@@ -50,8 +52,8 @@ public class ReviewsController {
     }
 
     @GetMapping("/exportExcel")
-    public void exportExcel(HttpServletResponse response) throws IOException, MyException {
-        ServletOutputStream outputStream = response.getOutputStream();
+    @NoReturnHandle
+    public void exportExcel(HttpServletResponse response) throws MyException {
         log.info("开始导出excel");
 
         List<Reviews> reviewsList = reviewsService.exportExcel();
@@ -65,44 +67,16 @@ public class ReviewsController {
         if (reviewsList.isEmpty()) {
             throw new MyException(MessageConstants.REVIEWS_EXPORT_FAIL);
         }
-
-        try {
-            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            // 对文件名进行安全处理
-            String safeFileName = FilenameUtils.getName(URLEncoder.encode("reviews", StandardCharsets.UTF_8.toString()).replaceAll("\\+", "%20"));
-            response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + safeFileName + ".xlsx");
-
-            writeExcel(outputStream, reviewsList, "reviews");
-
-            // 如果需要保存到服务器磁盘，取消注释下面的代码，并确保路径来自配置
-            // saveToDisk(reviewsList);
-
-            log.info("导出Excel成功");
-        } catch (IOException e) {
-            log.error("导出Excel数据失败" );
-            throw new MyException(MessageConstants.REVIEWS_EXPORT_FAIL);
-        } finally {
-            // 确保输出流被正确关闭
-            try {
-                outputStream.close();
-            } catch (IOException e) {
-                log.error("关闭输出流失败", e);
-            }
-            log.info("关闭输出流");
-        }
+        EasyExcelUtil.exportExcel(response,
+                "评论信息",
+                "评论信息",
+                "评论信息",
+                reviewsList,
+                Reviews.class);
+        log.info("导出Excel成功");
     }
 
-    private void writeExcel(ServletOutputStream outputStream, List<Reviews> reviewsList, String sheetName) throws IOException {
-        ExcelWriter excelWriter = EasyExcel.write(outputStream, Reviews.class).build();
-        WriteSheet writeSheet = EasyExcel.writerSheet(sheetName).build();
-        excelWriter.write(reviewsList, writeSheet);
-        // 确保在finally块中调用finish，以避免在关闭时发生异常
-        try {
-            excelWriter.finish();
-        } finally {
-            excelWriter.close();
-        }
-    }
+
 
     // 可选：保存到服务器磁盘的方法，路径应来自配置
     private void saveToDisk(List<Reviews> reviewsList) {

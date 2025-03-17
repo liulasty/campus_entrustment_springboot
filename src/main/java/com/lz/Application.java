@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * @author lz
  */
 @SpringBootApplication
-@CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
 @EnableScheduling
 @Slf4j
 public class Application {

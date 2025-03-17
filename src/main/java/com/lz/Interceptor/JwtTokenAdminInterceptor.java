@@ -55,12 +55,12 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
         if (!(handler instanceof HandlerMethod)) {
             log.info("处理非Controller方法的请求");
             // 直接放行非Controller方法的请求
-            return true; 
+            return true;
         }
         // 校验JWT
         String token = request.getHeader("jwt");
         // 注意：生产环境中需评估是否记录JWT
-        log.info("jwt校验:{}", token); 
+        log.info("jwt校验:{}", token);
 
         try {
             Map<String, Object> map = JwtUtil.parseToken(token, appConfig.getJwtKey());
@@ -70,10 +70,10 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
             log.info("当前用户：{}", username);
             BaseContext.setCurrentId(((long) id));
             // 通过验证，放行
-            return true; 
+            return true;
         } catch (Exception ex) {
             // 将错误处理逻辑封装至独立方法
-            handleJwtException(response, ex); 
+            handleJwtException(response, ex);
             return false;
         }
     }
@@ -82,7 +82,6 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
      * 处理JWT验证异常
      */
     private void handleJwtException(HttpServletResponse response, Exception ex) throws IOException {
-        // 使用日志框架记录错误，避免使用printStackTrace()
         log.error("校验失败", ex);
 
         ErrorResponse errorResponse = new ErrorResponse();

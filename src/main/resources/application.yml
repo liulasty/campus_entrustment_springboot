@@ -43,6 +43,7 @@ logging:
     org.springframework.data.convert.CustomConversions: ERROR
     org.springframework.data.mongodb: info
     ebank: info
+#    org.springframework.amqp: DEBUG
   pattern:
     file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-6level %logger{36} - %msg%n"
 #    console: "%d %clr(%5p) --- [%16t] %clr(%-40.40c){cyan} : %m %n "

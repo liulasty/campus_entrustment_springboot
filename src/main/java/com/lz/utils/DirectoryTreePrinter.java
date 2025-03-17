@@ -11,7 +11,7 @@ import java.io.File;
 public class DirectoryTreePrinter {
 
     public static void main(String[] args) {
-        String targetDirectory = "C:\\Users\\Administrator\\Desktop\\studious-waffle-main";
+        String targetDirectory = "D:\\zhnj\\tuba-java\\msg";
         printDirectoryTree2(targetDirectory, "");
     }
 

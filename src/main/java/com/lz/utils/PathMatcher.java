@@ -40,7 +40,7 @@ public class PathMatcher {
                 //将“**”转换为“.*”以进行正则表达式匹配
                 Pattern.compile(PATH_SEPARATOR + "/webjars/.*"), 
                 Pattern.compile(PATH_SEPARATOR + "/swagger-resources"), 
-                
+//                Pattern.compile(PATH_SEPARATOR + "/reviews/exportExcel"),
                 Pattern.compile(PATH_SEPARATOR + "/v2/api-docs"),
                 // 将“**”转换为“.*”以进行正则表达式匹配
                 Pattern.compile(PATH_SEPARATOR + "/druid/.*"), 
@@ -69,7 +69,7 @@ public class PathMatcher {
         String normalizedUrl = url.split("\\?")[0].split("#")[0];
 
         try {
-            log.info("正在判断URL是否在白名单内：{}", normalizedUrl);
+//            log.info("正在判断URL是否在白名单内：{}", normalizedUrl);
             return WHITELIST_PATTERNS.stream()
                     .anyMatch(pattern -> pattern.matcher(normalizedUrl).matches());
         } catch (PatternSyntaxException e) {
