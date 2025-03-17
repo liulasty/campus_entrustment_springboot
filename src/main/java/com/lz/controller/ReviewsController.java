@@ -5,7 +5,9 @@ import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.ExcelWriter;
 import com.alibaba.excel.support.ExcelTypeEnum;
 import com.alibaba.excel.write.metadata.WriteSheet;
+import com.alibaba.excel.write.style.column.LongestMatchColumnWidthStyleStrategy;
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.lz.Annotation.NoReturnHandle;
 import com.lz.Exception.MyException;
 import com.lz.pojo.constants.MessageConstants;
@@ -26,6 +28,8 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
@@ -51,9 +55,33 @@ public class ReviewsController {
         return Result.success(MessageConstants.REVIEWS_ADD_SUCCESS);
     }
 
+//    @GetMapping("/exportExcel")
+//    @NoReturnHandle
+//    public void exportExcel(HttpServletResponse response) throws MyException {
+//        log.info("开始导出excel");
+//
+//        List<Reviews> reviewsList = reviewsService.exportExcel();
+//
+//        // 检查返回的列表是否为空或null，并处理其中的null元素
+//        if (reviewsList == null) {
+//            throw new MyException(MessageConstants.REVIEWS_EXPORT_FAIL);
+//        }
+//        reviewsList.replaceAll(review -> review == null ? new Reviews() : review);
+//
+//        if (reviewsList.isEmpty()) {
+//            throw new MyException(MessageConstants.REVIEWS_EXPORT_FAIL);
+//        }
+//        EasyExcelUtil.exportExcel(response,
+//                "评论信息",
+//                "评论信息",
+//                "评论信息",
+//                reviewsList,
+//                Reviews.class);
+//        log.info("导出Excel成功");
+//    }
     @GetMapping("/exportExcel")
     @NoReturnHandle
-    public void exportExcel(HttpServletResponse response) throws MyException {
+    public Result exportExcel(HttpServletResponse response) throws MyException {
         log.info("开始导出excel");
 
         List<Reviews> reviewsList = reviewsService.exportExcel();
@@ -62,18 +90,20 @@ public class ReviewsController {
         if (reviewsList == null) {
             throw new MyException(MessageConstants.REVIEWS_EXPORT_FAIL);
         }
-        reviewsList.replaceAll(review -> review == null ? new Reviews() : review);
-
-        if (reviewsList.isEmpty()) {
-            throw new MyException(MessageConstants.REVIEWS_EXPORT_FAIL);
-        }
-        EasyExcelUtil.exportExcel(response,
-                "评论信息",
-                "评论信息",
-                "评论信息",
-                reviewsList,
-                Reviews.class);
         log.info("导出Excel成功");
+        return Result.success(reviewsList);
+//        reviewsList.replaceAll(review -> review == null ? new Reviews() : review);
+//
+//        if (reviewsList.isEmpty()) {
+//            throw new MyException(MessageConstants.REVIEWS_EXPORT_FAIL);
+//        }
+//        EasyExcelUtil.exportExcel(response,
+//                "评论信息",
+//                "评论信息",
+//                "评论信息",
+//                reviewsList,
+//                Reviews.class);
+
     }
 
 
