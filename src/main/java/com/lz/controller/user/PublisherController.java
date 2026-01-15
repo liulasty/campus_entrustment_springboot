@@ -8,7 +8,6 @@ package com.lz.controller.user;
  */
 
 import com.lz.Exception.MyException;
-import com.lz.common.security.AuthenticationService;
 import com.lz.pojo.Enum.AcceptStatus;
 import com.lz.pojo.Enum.AuthenticationStatus;
 import com.lz.pojo.Enum.TaskStatus;

@@ -24,18 +24,36 @@ import java.util.Date;
  * @date 2024/05/10
  */
 public  class DateDeserializer extends JsonDeserializer<Date> {
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-
-    
 
     @Override
     public Date deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JacksonException {
         String dateString = jsonParser.getText();
+        if (dateString == null || dateString.trim().isEmpty()) {
+            return null;
+        }
 
+        // 1. 尝试解析为时间戳 (Long)
         try {
-            return dateFormat.parse(dateString);
+            long timestamp = Long.parseLong(dateString);
+            return new Date(timestamp);
+        } catch (NumberFormatException e) {
+            // 忽略，继续尝试其他格式
+        }
+
+        // 2. 尝试解析 yyyy-MM-dd
+        try {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            return simpleDateFormat.parse(dateString);
         } catch (ParseException e) {
-            throw new IOException("Failed to deserialize Date", e);
+            // 忽略，继续尝试其他格式
+        }
+
+        // 3. 尝试解析 yyyy-MM-dd HH:mm:ss
+        try {
+            SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            return dateTimeFormat.parse(dateString);
+        } catch (ParseException e) {
+            throw new IOException("Failed to deserialize Date: " + dateString, e);
         }
     }
 }

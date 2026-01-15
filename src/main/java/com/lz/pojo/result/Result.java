@@ -86,6 +86,18 @@ public class Result<T> implements Serializable {
         return result;
     }
 
+    public static <T> Result<T> error(ErrorCode errorCode) {
+        Result<T> result = new Result<>(0, errorCode.getMsg(), null);
+        result.setErrorCode(errorCode.getCode());
+        return result;
+    }
+
+    public static <T> Result<T> error(ErrorCode errorCode, String msg) {
+        Result<T> result = new Result<>(0, msg, null);
+        result.setErrorCode(errorCode.getCode());
+        return result;
+    }
+
     public Result<T> code(Integer code) {
         this.code = code;
         return this;

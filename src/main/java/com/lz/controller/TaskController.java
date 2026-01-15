@@ -10,6 +10,7 @@ import com.lz.pojo.dto.TaskDTO;
 import com.lz.pojo.dto.TaskDraftDTO;
 import com.lz.pojo.dto.TaskPageDTO;
 import com.lz.pojo.entity.DelegateAuditRecords;
+import com.lz.pojo.entity.DelegationCategories;
 import com.lz.pojo.entity.Task;
 import com.lz.pojo.entity.UsersInfo;
 import com.lz.pojo.result.NameAndDescription;
@@ -106,8 +107,12 @@ public class TaskController {
             if (byId == null) {
                 throw new MyException(MessageConstants.DATA_VALIDATION_ERROR);
             }
+            DelegationCategories delegationCategories = delegationCategoriesService.getTaskCategoryByCategoryName(taskDTO.getType());
+            if (delegationCategories == null) {
+                throw new MyException("类别不存在");
+            }
             Task task = Task.builder().taskId(taskDTO.getTaskId())
-                    .taskType(taskDTO.getType())
+                    .taskType(delegationCategories.getCategoryId())
                     .description(taskDTO.getDescription())
                     .location(taskDTO.getLocation())
                     .status(TaskStatus.DRAFT)
@@ -116,7 +121,7 @@ public class TaskController {
             taskService.updateById(task);
             return Result.success(MessageConstants.TASK_UPDATE_SUCCESS);
         } catch (Exception e) {
-            throw new MyException(MessageConstants.UNEXPECTED_EXCEPTION);
+            throw new MyException(e.getMessage());
         }
     }
 

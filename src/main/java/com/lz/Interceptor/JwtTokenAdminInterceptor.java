@@ -4,7 +4,8 @@ package com.lz.Interceptor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lz.config.AppConfig;
 import com.lz.context.BaseContext;
-import com.lz.pojo.error.ErrorResponse;
+import com.lz.pojo.result.ErrorCode;
+import com.lz.pojo.result.Result;
 import com.lz.utils.JwtUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,19 +85,14 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
     private void handleJwtException(HttpServletResponse response, Exception ex) throws IOException {
         log.error("校验失败", ex);
 
-        ErrorResponse errorResponse = new ErrorResponse();
-        // 使用401未授权状态码
-        errorResponse.setStatus(401);
-        errorResponse.setCode("1");
-        errorResponse.setMessage("令牌校验失败");
-        errorResponse.setTimestamp(System.currentTimeMillis());
         // 设置响应状态码
         response.setStatus(401);
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         try {
             // 使用注入的objectMapper
-            response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
+            Result<String> result = Result.error(ErrorCode.TOKEN_INVALID);
+            response.getWriter().write(objectMapper.writeValueAsString(result));
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -11,32 +11,38 @@ package com.lz.config;
  * @author lz
  */
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lz.common.security.JWTAuthorizationFilter;
 import com.lz.common.security.MyUserDetailServiceImpl;
+import com.lz.pojo.result.ErrorCode;
+import com.lz.pojo.result.Result;
 import com.lz.utils.PasswordUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import javax.servlet.http.HttpServletResponse;
 
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 /*
- * 自定义Web安全配置类，继承自WebSecurityConfigurerAdapter。
+ * 自定义Web安全配置类
  * 该类用于配置Spring Security的Web安全设置，包括认证和授权等。
  */
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfig {
     private static final String PATH_SEPARATOR = "/campus_entrustment";
     private static final String[] AUTH_WHITELIST = {
             PATH_SEPARATOR + "/user/login",
@@ -52,7 +58,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/doc.html",
             "/img/upload",
             "/user/logout",
-            "/common/**"
+            "/common/**",
+            "/favicon.ico"
     };
 
     @Autowired
@@ -62,11 +69,36 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Lazy
     private JWTAuthorizationFilter jwtAuthorizationFilter;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @Bean
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        // 将AuthenticationManager作为一个Bean暴露出来
-        return super.authenticationManagerBean();
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+                .cors().and()
+                .csrf().disable()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .authorizeRequests()
+                .antMatchers(AUTH_WHITELIST).permitAll()
+                .anyRequest().authenticated()
+                .and()
+                .exceptionHandling()
+                .authenticationEntryPoint((request, response, authException) -> {
+                    response.setContentType("application/json;charset=UTF-8");
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    Result<String> result = Result.error(ErrorCode.UNAUTHORIZED);
+                    response.getWriter().write(objectMapper.writeValueAsString(result));
+                })
+                .and()
+                .addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
+        
+        return http.build();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 
     @Bean
@@ -75,34 +107,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return new PasswordUtils();
     }
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        // 配置AuthenticationManager以使用自定义的userDetailsService和passwordEncoder
-        auth.userDetailsService(myUserDetailService).passwordEncoder(passwordEncoder());
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(myUserDetailService);
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return authProvider;
     }
-
-    @Override
-    public void configure(WebSecurity web) throws Exception {
-        // 配置忽略对AUTH_WHITELIST中指定路径的安全检查
-        // web.ignoring().antMatchers(AUTH_WHITELIST);
-    }
-
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-                .cors()
-                .and()
-                .csrf().disable()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class)
-                .authorizeRequests()
-                .antMatchers(AUTH_WHITELIST).permitAll()
-                .anyRequest().authenticated();// 其他请求都需要认证
-                // 确保/error也受到保护
-       
-    }
-
-
 }

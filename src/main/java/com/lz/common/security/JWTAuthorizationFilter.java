@@ -8,24 +8,19 @@ package com.lz.common.security;
  */
 
 
-
 import com.lz.Exception.InvalidTokenException;
-import com.lz.Exception.MyException;
-import com.lz.Exception.NoAthleteException;
 import com.lz.config.AppConfig;
 import com.lz.utils.JwtUtil;
-import com.lz.utils.PathMatcher;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -43,53 +38,45 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Component
-public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
-
-
+public class JWTAuthorizationFilter extends OncePerRequestFilter {
 
     @Autowired
     private AppConfig appConfig;
 
-    @Autowired
-    public JWTAuthorizationFilter(AuthenticationManager authenticationManager) {
-        super(authenticationManager);
-    }
-
-
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        try {
-//            log.info("请求路径: {}", request.getRequestURI());
-            if (PathMatcher.isUrlWhitelisted(request.getRequestURI())) {
-                // log.info("请求路径在白名单中，无需验证");
-                filterChain.doFilter(request, response);
-            } else {
-                String token = request.getHeader("JWT");
-                // log.info("请求令牌: {}", token);
+        String token = request.getHeader("JWT");
+
+        if (StringUtils.hasText(token)) {
+            try {
                 if (isValidToken(token)) {
-                    // log.info("令牌有效");
-                    filterChain.doFilter(request, response);
+                    // Token is valid and context is set in isValidToken
                 } else {
+                    // Token present but invalid
+                    log.error("Token invalid");
+                    // We can choose to throw exception or just clear context.
+                    // Original code threw exception.
                     throw new InvalidTokenException("令牌无效");
                 }
+            } catch (Exception e) {
+                log.error("令牌验证失败: {}", e.getMessage());
+                // Handle exception by forwarding to /error or just clearing context
+                // Forwarding to /error to maintain consistent error response structure if desired
+                request.setAttribute("javax.servlet.error.status_code", HttpServletResponse.SC_UNAUTHORIZED);
+                request.setAttribute("exception", "令牌无效或过期");
+                request.getRequestDispatcher("/error").forward(request, response);
+                return; // Stop filter chain
             }
-        } catch (InvalidTokenException e) {
-            log.error("令牌验证失败: {}", e.getMessage());
-
-            request.setAttribute("javax.servlet.error.status_code", HttpServletResponse.SC_UNAUTHORIZED);
-            request.setAttribute("exception", "令牌无效或过期");
-            // 转发到/error
-            request.getRequestDispatcher("/error").forward(request, response);
         }
 
-
+        filterChain.doFilter(request, response);
     }
 
 
     private boolean isValidToken(String token) {
 
-        if (token == null || token.isEmpty()) {
+        if (!StringUtils.hasText(token)) {
             return false;
         }
         try {
@@ -97,7 +84,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
             if (map == null) {
                 log.error("jwt携带信息为空");
-                throw new IllegalArgumentException("jwt携带信息为空");
+                return false;
             }
 
             String username = convertToString(map.get("username"));
@@ -108,20 +95,17 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
                 return false;
             }
 
+            List<GrantedAuthority> authorities = new ArrayList<>();
+            authorities.add(new SimpleGrantedAuthority(role));
 
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(username, null, authorities);
 
-
-            AuthenticationService authenticationService = new AuthenticationService();
-            authenticationService.setAuthentication(username, role);
-
-
-            List<String> roles = extractUserRoles();
-            // log.info("用户: {} 角色: {}", username, roles);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
             return true;
         } catch (Exception ex) {
             log.error("解析jwt失败: {}", ex.getMessage());
             return false;
-
         }
     }
 
