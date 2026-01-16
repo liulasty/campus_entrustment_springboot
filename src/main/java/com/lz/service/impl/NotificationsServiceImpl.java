@@ -245,10 +245,21 @@ public class NotificationsServiceImpl extends ServiceImpl<NotificationsMapper, N
                 .message(updateDescription)
                 .notificationTime(new Date(System.currentTimeMillis()))
                 .notificationType(NotificationsType.TASK)
-                .userId(ownerId)
+                .userId(ownerId) // 这里记录的是发送者ID，通常应该是系统管理员ID或触发者ID，但在当前逻辑中，sendTaskNotification 的 ownerId 参数被用作接收通知的用户ID。
+                                 // 然而，根据数据库设计，Notifications 表的 UserID 字段含义是 "发送通知的用户ID"。
+                                 // 真正的接收关系是在 NotificationReadStatus 表中建立的。
                 .build();
+        // 获取当前管理员或系统用户作为发送者
+        try {
+            Users admin = getCurrentAdmin();
+            notifications.setUserId(admin != null ? admin.getUserId() : 1L); // 默认管理员ID为1
+        } catch (Exception e) {
+            notifications.setUserId(1L); // 无法获取当前用户时，默认为系统管理员
+        }
+        
         notificationsMapper.insert(notifications);
 
+        // 在 NotificationReadStatus 中建立通知与接收用户(ownerId)的关系
         notificationReadStatusService.addTaskNotification(notifications.getNotificationId(), taskId,
                                                           ownerId);
         

@@ -39,7 +39,12 @@ public enum TaskUpdateType {
     /**
      * 回退草稿
      */
-    FALLBACK_DRAFT("FALLBACK_DRAFT",4, "回退草稿");
+    FALLBACK_DRAFT("FALLBACK_DRAFT",4, "回退草稿"),
+
+    /**
+     * 进度更新
+     */
+    PROGRESS_UPDATE("PROGRESS_UPDATE", 5, "进度更新");
     
 
 

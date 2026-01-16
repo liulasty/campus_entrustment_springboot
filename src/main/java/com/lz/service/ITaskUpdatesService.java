@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lz.Exception.MyException;
 import com.lz.pojo.Enum.TaskUpdateType;
+import com.lz.pojo.dto.TaskUpdateDTO;
 import com.lz.pojo.entity.TaskUpdates;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -74,4 +75,12 @@ public interface ITaskUpdatesService extends IService<TaskUpdates> {
      * @param id 同上
      */
     TaskUpdates cancelPublish(Long id);
+
+    /**
+     * 添加进度更新
+     *
+     * @param taskUpdateDTO
+     * @return TaskUpdates
+     */
+    TaskUpdates addUpdate(TaskUpdateDTO taskUpdateDTO) throws MyException;
 }

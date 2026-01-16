@@ -73,6 +73,13 @@ public class ITaskAcceptRecordsServiceImpl extends ServiceImpl<TaskAcceptRecords
             log.error("任务状态错误");
             throw  new MyException("任务状态错误");
         }
+        
+        // Check if task is expired
+        if (task.getEndTime() != null && task.getEndTime().before(new Date())) {
+            log.error("任务已过期");
+            throw new MyException(MessageConstants.TASK_EXPIRED_CANNOT_ACCEPT);
+        }
+
         Users currentAdmin = getCurrentAdmin();
         log.info("当前操作用户和委托任务{} {}",currentAdmin,task.getOwnerId());
         if (currentAdmin.getUserId().equals(task.getOwnerId())){

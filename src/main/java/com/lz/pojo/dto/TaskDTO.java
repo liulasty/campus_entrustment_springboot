@@ -14,6 +14,7 @@ import io.swagger.models.auth.In;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
+import java.math.BigDecimal;
 
 /**
  * @author lz
@@ -40,6 +41,9 @@ public class TaskDTO {
     @ApiModelProperty(value = "委托类型",required = true)
     @NotBlank(message = "委托类型 不能为空")
     String type;
+
+    @ApiModelProperty(value = "委托金额")
+    BigDecimal money;
     
     
     

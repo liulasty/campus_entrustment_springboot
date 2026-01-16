@@ -332,6 +332,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
                 .status(TaskStatus.DRAFT)
                 .taskType(delegationCategories.getCategoryId())
                 .location(taskDTO.getLocation())
+                .money(taskDTO.getMoney())
                 .build();
 
         taskMapper.insert(task);
@@ -455,6 +456,29 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void auditTask(Long id) throws MyException {
+        Task task = taskMapper.selectById(id);
+        if (task == null) {
+            throw new MyException(MessageConstants.TASK_NOT_EXIST);
+        }
+        if (task.getStatus() != TaskStatus.DRAFT && task.getStatus() != TaskStatus.AUDIT_FAILED) {
+            throw new MyException("当前状态不可提交审核");
+        }
+        task.setStatus(TaskStatus.AUDITING);
+        taskMapper.updateById(task);
+        
+        // Record update
+        TaskUpdates taskUpdates = TaskUpdates.builder()
+                .taskId(task.getTaskId())
+                .userId(getCurrentAdmin().getUserId())
+                .updateDescription("提交审核")
+                .updateType(TaskUpdateType.AUDITING)
+                .updateTime(new Date())
+                .build();
+        taskUpdatesMapper.insert(taskUpdates);
     }
 
     /**
@@ -708,6 +732,13 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
         if (acceptRecords == null) {
             throw new MyException(MessageConstants.TASK_NOT_EXIST);
         }
+        
+        // Double check if task is expired before confirming
+        Task taskCheck = taskMapper.selectById(taskId);
+        if (taskCheck != null && taskCheck.getEndTime() != null && taskCheck.getEndTime().before(new Date())) {
+             throw new MyException(MessageConstants.TASK_EXPIRED_CANNOT_CONFIRM);
+        }
+
         List<TaskAcceptRecords> list = taskAcceptRecordsMapper.selectList(new QueryWrapper<TaskAcceptRecords>().eq("taskId", taskId));
 
         acceptRecords.setStatus(AcceptStatus.CHECKED);

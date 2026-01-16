@@ -5,7 +5,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lz.Exception.MyException;
 import com.lz.mapper.TaskMapper;
 import com.lz.mapper.UsersMapper;
+import com.lz.pojo.dto.TaskUpdateDTO;
 import com.lz.pojo.Enum.TaskUpdateType;
+import com.lz.pojo.entity.Task;
+import com.lz.pojo.Enum.TaskStatus;
+import com.lz.pojo.constants.MessageConstants;
 import com.lz.pojo.entity.TaskUpdates;
 import com.lz.mapper.TaskUpdatesMapper;
 import com.lz.pojo.entity.Users;
@@ -178,5 +182,32 @@ public class TaskUpdatesServiceImpl extends ServiceImpl<TaskUpdatesMapper, TaskU
 
         save(taskUpdates);
         return taskUpdates;
+    }
+
+    @Override
+    public TaskUpdates addUpdate(TaskUpdateDTO taskUpdateDTO) throws MyException {
+        Users user = getCurrentAdmin();
+        Task task = taskMapper.selectById(taskUpdateDTO.getTaskId());
+        if (task == null) {
+            throw new MyException(MessageConstants.TASK_NOT_EXIST);
+        }
+
+        if (task.getReceiverId() == null || !task.getReceiverId().equals(user.getUserId())) {
+            throw new MyException(MessageConstants.PERMISSION_DENIED);
+        }
+
+        if (task.getStatus() != TaskStatus.ACCEPTED) {
+            throw new MyException("任务未在执行中");
+        }
+
+        TaskUpdates updates = TaskUpdates.builder()
+                .taskId(task.getTaskId())
+                .userId(user.getUserId())
+                .updateType(TaskUpdateType.PROGRESS_UPDATE)
+                .updateDescription(taskUpdateDTO.getDescription())
+                .updateTime(new Date())
+                .build();
+        save(updates);
+        return updates;
     }
 }

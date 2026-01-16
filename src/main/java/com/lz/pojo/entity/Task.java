@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 import com.lz.pojo.Enum.TaskStatus;
@@ -71,6 +72,10 @@ public class Task implements Serializable {
     @ApiModelProperty(value = "任务截止时间")
     @TableField("EndTime")
     private Date endTime;
+
+    @ApiModelProperty(value = "任务金额")
+    @TableField("Money")
+    private BigDecimal money;
 
     @ApiModelProperty(value = "任务状态")
     @TableField(value = "STATUS",typeHandler = TaskStatusTypeHandler.class)

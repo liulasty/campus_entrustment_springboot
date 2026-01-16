@@ -158,22 +158,10 @@ public class TaskController {
      * @throws MyException 我的异常
      */
     @PutMapping(value = "/auditTask/{id}")
-    @ApiOperation("去审核")
+    @ApiOperation("提交审核")
     public Result<String> auditTask(@PathVariable("id") Long id) throws MyException {
-        try {
-            Task byId = taskService.getById(id);
-            if (byId == null) {
-                return Result.error(MessageConstants.DATABASE_ERROR);
-            }
-            if (byId.getStatus() != TaskStatus.DRAFT) {
-                return Result.error(MessageConstants.UNEXPECTED_EXCEPTION);
-            }
-            taskService.updateById(Task.builder().taskId(id).status(TaskStatus.AUDITING).build());
-            return Result.success(MessageConstants.DATA_VALIDATION_SUCCESS);
-        } catch (Exception e) {
-            throw new MyException(MessageConstants.UNEXPECTED_EXCEPTION);
-        }
-
+        taskService.auditTask(id);
+        return Result.success(MessageConstants.TASK_UPDATE_SUCCESS);
     }
 
     /**

@@ -148,6 +148,13 @@ public interface ITaskService extends IService<Task> {
     Boolean notAllowed(Long taskId) throws MyException;
 
     /**
+     * 提交审核
+     *
+     * @param id 同上
+     */
+    void auditTask(Long id) throws MyException;
+
+    /**
      * 搜索已发布和已接收委托页面
      *
      * @param pageNum     页码

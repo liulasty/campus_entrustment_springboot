@@ -6,14 +6,17 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.lz.Exception.MyException;
 import com.lz.pojo.Enum.TaskUpdateType;
 import com.lz.pojo.constants.MessageConstants;
+import com.lz.pojo.dto.TaskUpdateDTO;
 import com.lz.pojo.entity.TaskUpdates;
 import com.lz.pojo.result.PageResult;
 import com.lz.pojo.result.Result;
 import com.lz.service.ITaskUpdatesService;
 import com.lz.utils.EnumUtils;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -80,5 +83,12 @@ public class TaskUpdatesController {
         taskUpdateService.removeById(id);
         
         return Result.success(MessageConstants.TASK_RECORDS_DELETE_SUCCESS);
+    }
+
+    @PostMapping("/add")
+    @ApiOperation("添加任务进度更新")
+    public Result<TaskUpdates> addUpdate(@RequestBody TaskUpdateDTO taskUpdateDTO) throws MyException {
+        TaskUpdates taskUpdates = taskUpdateService.addUpdate(taskUpdateDTO);
+        return Result.success(taskUpdates, MessageConstants.TASK_UPDATE_SUCCESS);
     }
 }
