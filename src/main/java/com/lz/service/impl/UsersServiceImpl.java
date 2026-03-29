@@ -1,14 +1,27 @@
 package com.lz.service.impl;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lz.Exception.MyException;
 import com.lz.mapper.UsersInfoMapper;
+import com.lz.mapper.UsersMapper;
 import com.lz.pojo.Enum.AuthenticationStatus;
 import com.lz.pojo.Page.UsersConfig;
 import com.lz.pojo.constants.MessageConstants;
-import com.lz.mapper.UsersMapper;
 import com.lz.pojo.dto.PassWordDTO;
 import com.lz.pojo.dto.UserDTO;
 import com.lz.pojo.dto.UserLoginDTO;
@@ -19,16 +32,8 @@ import com.lz.pojo.vo.UserPageVO;
 import com.lz.service.IUsersService;
 import com.lz.utils.MailUtils;
 import com.lz.utils.PasswordUtils;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * <p>
@@ -44,8 +49,6 @@ import java.util.stream.Collectors;
 public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements IUsersService {
 
     public static final String BASEURL = "http://localhost:80";
-
-
 
     @Autowired
     private UsersMapper usersMapper;
@@ -82,7 +85,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
             return true;
         } else if (!users.getIsActive()) {
             sendActivationEmail(users.getUserId(), users.getEmail(), BASEURL,
-                                "需激活后才能登录");
+                    "需激活后才能登录");
             throw new MyException(MessageConstants.USER_NOT_ACTIVE);
         }
 
@@ -95,7 +98,6 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         QueryWrapper<Users> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("Username", userDTO.getUsername());
         Users users = usersMapper.selectOne(queryWrapper);
-
 
         // 检查输入对象是否为null
         if (users == null) {
@@ -111,7 +113,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
                 usersMapper.insert(user);
 
                 sendActivationEmail(user.getUserId(), user.getEmail(),
-                                    BASEURL, null);
+                        BASEURL, null);
 
                 return true;
             } catch (Exception e) {
@@ -122,15 +124,15 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
     }
 
     public void sendActivationEmail(Long id, String email, String baseUrl,
-                                    String msg) throws MyException {
+            String msg) throws MyException {
         try {
             // 构建激活链接
             String activeUrl = baseUrl + "/campus_entrustment/user/active/" + id;
 
             MailUtils.sendMail(email,
-                               "你好，这是一封激活邮件，无需回复，点击此链接激活" + activeUrl
-                                       + "\n" + msg,
-                               "测试邮件");
+                    "你好，这是一封激活邮件，无需回复，点击此链接激活" + activeUrl
+                            + "\n" + msg,
+                    "测试邮件");
             log.info("发送激活邮件成功");
         } catch (Exception e) {
             throw new MyException(MessageConstants.SEND_EMAIL_FAIL);
@@ -175,20 +177,18 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
             BeanUtils.copyProperties(users, userPageVO);
             UsersInfo byId = usersInfoMapper.selectById(users.getUserId());
 
-            
             // 设置认证状态
             if (byId == null) {
-               userPageVO.setAuthStatus(AuthenticationStatus.UNAUTHORIZED);
-            }else {
+                userPageVO.setAuthStatus(AuthenticationStatus.UNAUTHORIZED);
+            } else {
                 log.info("用户信息 {}", byId);
                 userPageVO.setAuthStatus(byId.getAuthStatus());
             }
             userPageVOS.add(userPageVO);
         }
 
-
-        return new PageResult(usersPage.getTotal(),
-                              userPageVOS);
+        return new PageResult<>(usersPage.getTotal(),
+                userPageVOS);
 
     }
 
@@ -210,13 +210,13 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
     @Override
     public void cancelDisableUser(Long id) throws MyException {
         Users users = getOne(new QueryWrapper<Users>().eq("UserId", id));
-        if (users == null){
+        if (users == null) {
             throw new MyException(MessageConstants.USER_NOT_EXIST);
         }
-        if (!users.getIsEnabled()){
+        if (!users.getIsEnabled()) {
             users.setIsEnabled(true);
             usersMapper.updateById(users);
-        }else {
+        } else {
             throw new MyException(MessageConstants.USER_INFO_ERROR);
         }
     }
@@ -229,13 +229,13 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
     @Override
     public void disableUser(Long id) throws MyException {
         Users users = getOne(new QueryWrapper<Users>().eq("UserId", id));
-        if (users == null){
+        if (users == null) {
             throw new MyException(MessageConstants.USER_NOT_EXIST);
         }
-        if (users.getIsEnabled()){
+        if (users.getIsEnabled()) {
             users.setIsEnabled(false);
             usersMapper.updateById(users);
-        }else {
+        } else {
             throw new MyException(MessageConstants.USER_INFO_ERROR);
         }
     }
@@ -257,7 +257,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
     public boolean adminActivation(Long id) {
         Users users = usersMapper.selectById(id);
         if (users != null) {
-            
+
             if (users.getIsActive()) {
                 return false;
             }
@@ -266,7 +266,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
             usersMapper.updateById(users);
             return true;
         }
-        //发送邮件通知用户已激活成功
+        // 发送邮件通知用户已激活成功
         return false;
     }
 
@@ -277,17 +277,17 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
      */
     @Override
     public void deleteUsers(int[] singleton) throws MyException {
-        
-            List<Integer> collect = Arrays.stream(singleton)
-                    .filter(id -> "user".equals(usersMapper.selectById(id).getRole()) && usersInfoMapper.selectById(id) == null )
-                    .boxed()
-                    .collect(Collectors.toList());
-            if (collect.size() == 0 || collect.size() != singleton.length){
-                throw new MyException(MessageConstants.DELETE_USER_FAIL);
-            }
-            usersMapper.deleteBatchIds(collect);
-            
-        
+
+        List<Integer> collect = Arrays.stream(singleton)
+                .filter(id -> "user".equals(usersMapper.selectById(id).getRole())
+                        && usersInfoMapper.selectById(id) == null)
+                .boxed()
+                .collect(Collectors.toList());
+        if (collect.size() == 0 || collect.size() != singleton.length) {
+            throw new MyException(MessageConstants.DELETE_USER_FAIL);
+        }
+        usersMapper.deleteBatchIds(collect);
+
     }
 
     /**
@@ -295,7 +295,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
      *
      * @return {@code Users}
      */
-    public  Users getCurrentAdmin() {
+    public Users getCurrentAdmin() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String adminName = authentication.getName();
         log.info("管理员: {}", adminName);
@@ -306,22 +306,20 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
     @Override
     public void editPassword(PassWordDTO passWordDTO) throws MyException {
         Users users = getCurrentAdmin();
-        if (passWordDTO.getNewPassword().equals(passWordDTO.getConfirmPassword())){
-           if (users.getPassword().equals(passWordDTO.getOldPassword())){
-               users.setPassword(passWordDTO.getNewPassword());
-               usersMapper.updateById(users);
-               log.info("修改密码成功");
-           }else {
-               log.info("旧密码错误");
-               throw new MyException(MessageConstants.PASSWORD_WRONG);
-           }
-            
-                
-        }else {
+        if (passWordDTO.getNewPassword().equals(passWordDTO.getConfirmPassword())) {
+            if (users.getPassword().equals(passWordDTO.getOldPassword())) {
+                users.setPassword(passWordDTO.getNewPassword());
+                usersMapper.updateById(users);
+                log.info("修改密码成功");
+            } else {
+                log.info("旧密码错误");
+                throw new MyException(MessageConstants.PASSWORD_WRONG);
+            }
+
+        } else {
             log.info("新密码不一致");
             throw new MyException(MessageConstants.PASSWORD_NOT_SAME);
         }
     }
-
 
 }

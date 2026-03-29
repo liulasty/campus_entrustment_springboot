@@ -1,17 +1,13 @@
 package com.lz.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.lz.Exception.MyException;
 import com.lz.pojo.Page.UsersConfig;
 import com.lz.pojo.dto.PassWordDTO;
 import com.lz.pojo.dto.UserDTO;
 import com.lz.pojo.dto.UserLoginDTO;
-import com.lz.pojo.dto.UsersPageDTO;
 import com.lz.pojo.entity.Users;
-import com.baomidou.mybatisplus.extension.service.IService;
 import com.lz.pojo.result.PageResult;
-
-import java.util.List;
-import java.util.Set;
 
 /**
  * <p>
@@ -21,7 +17,7 @@ import java.util.Set;
  * @author lz
  * @since 2024-04-04
  */
-public interface IUsersService extends IService<Users>  {
+public interface IUsersService extends IService<Users> {
 
     /**
      * 登录
@@ -102,7 +98,6 @@ public interface IUsersService extends IService<Users>  {
      * @param singleton 单身 人士
      */
     void deleteUsers(int[] singleton) throws MyException;
-
 
     /**
      * 编辑密码
