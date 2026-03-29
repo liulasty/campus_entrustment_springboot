@@ -1,14 +1,13 @@
 package com.lz.service;
 
+import java.util.List;
+
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.lz.Exception.MyException;
 import com.lz.pojo.entity.DelegationCategories;
-import com.baomidou.mybatisplus.extension.service.IService;
 import com.lz.pojo.result.NameAndDescription;
 import com.lz.pojo.result.PageResult;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * <p>
@@ -30,7 +29,6 @@ public interface IDelegationCategoriesService extends IService<DelegationCategor
     List<NameAndDescription> getTaskCategory() throws MyException;
 
     List<NameAndDescription> getTaskCategoryUser() throws MyException;
-    
 
     /**
      * @return {@code DelegationCategories}
@@ -38,7 +36,7 @@ public interface IDelegationCategoriesService extends IService<DelegationCategor
     DelegationCategories getTaskCategoryByCategoryName(String name);
 
     PageResult list(Page<DelegationCategories> page, String categoryName,
-                    Boolean isEnable, String description);
+            Boolean isEnable, String description);
 
     void enable(Long id) throws MyException;
 }

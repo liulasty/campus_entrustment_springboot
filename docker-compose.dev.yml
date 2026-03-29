@@ -1,0 +1,13 @@
+version: "3.8"
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: docker/backend/Dockerfile
+    ports:
+      - "${BACKEND_PORT:-8080}:${BACKEND_PORT:-8080}"
+    # In dev, we can expose debug ports or mount volumes if we want hot reloading, 
+    # but for a Java fat JAR, we just run the compiled image.
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev

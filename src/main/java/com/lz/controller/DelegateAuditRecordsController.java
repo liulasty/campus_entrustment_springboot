@@ -1,15 +1,15 @@
 package com.lz.controller;
 
-
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.lz.pojo.constants.MessageConstants;
-import com.lz.pojo.result.Result;
-import com.lz.service.IDelegateAuditRecordsService;
-import io.swagger.annotations.Api;
-import lombok.extern.java.Log;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.lz.service.IDelegateAuditRecordsService;
+
+import io.swagger.annotations.Api;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * <p>
@@ -23,7 +23,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/delegateauditrecords")
 @Slf4j
 @Api
-@CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
+@CrossOrigin(origins = "*", allowedHeaders = "*", methods = { RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT,
+        RequestMethod.DELETE })
 public class DelegateAuditRecordsController {
 
     @Autowired
@@ -33,19 +34,20 @@ public class DelegateAuditRecordsController {
      * 查询存储委托信息审核记录列表
      */
     // @GetMapping("/list")
-    // public Result list(Delegateauditrecords delegateauditrecords)
+    // public Result<?>list(Delegateauditrecords delegateauditrecords)
     // {
-    //     // 在查询方法中使用分页
-    //     Page<Delegateauditrecords> page = new Page<>(1, 10); // 查询第一页，每页10条记录
-    //     PageHelper.setPagination(page); // 设置分页对象，自动注入分页数据
+    // // 在查询方法中使用分页
+    // Page<Delegateauditrecords> page = new Page<>(1, 10); // 查询第一页，每页10条记录
+    // PageHelper.setPagination(page); // 设置分页对象，自动注入分页数据
     //
-    //     List<Delegateauditrecords> list = delegateAuditRecordService.selectDelegateauditrecordsList(delegateauditrecords);
-    //     // 获取总记录数
-    //     long total = page.getTotal();
-    //     // 获取查询结果列表
-    //     List<Delegateauditrecords> records = page.getRecords(); 
-    //    
-    //     return getDataTable(list);
+    // List<Delegateauditrecords> list =
+    // delegateAuditRecordService.selectDelegateauditrecordsList(delegateauditrecords);
+    // // 获取总记录数
+    // long total = page.getTotal();
+    // // 获取查询结果列表
+    // List<Delegateauditrecords> records = page.getRecords();
+    //
+    // return getDataTable(list);
     // }
 
     /**
@@ -54,11 +56,14 @@ public class DelegateAuditRecordsController {
 
     // @Log(title = "存储委托信息审核记录", businessType = BusinessType.EXPORT)
     // @PostMapping("/export")
-    // public void export(HttpServletResponse response, Delegateauditrecords delegateauditrecords)
+    // public void export(HttpServletResponse response, Delegateauditrecords
+    // delegateauditrecords)
     // {
-    //     List<Delegateauditrecords> list = delegateauditrecordsService.selectDelegateauditrecordsList(delegateauditrecords);
-    //     ExcelUtil<Delegateauditrecords> util = new ExcelUtil<Delegateauditrecords>(Delegateauditrecords.class);
-    //     util.exportExcel(response, list, "存储委托信息审核记录数据");
+    // List<Delegateauditrecords> list =
+    // delegateauditrecordsService.selectDelegateauditrecordsList(delegateauditrecords);
+    // ExcelUtil<Delegateauditrecords> util = new
+    // ExcelUtil<Delegateauditrecords>(Delegateauditrecords.class);
+    // util.exportExcel(response, list, "存储委托信息审核记录数据");
     // }
 
     /**
@@ -68,7 +73,8 @@ public class DelegateAuditRecordsController {
     // @GetMapping(value = "/{RecordID}")
     // public AjaxResult getInfo(@PathVariable("RecordID") Long RecordID)
     // {
-    //     return success(delegateauditrecordsService.selectDelegateauditrecordsByRecordID(RecordID));
+    // return
+    // success(delegateauditrecordsService.selectDelegateauditrecordsByRecordID(RecordID));
     // }
 
     /**
@@ -79,7 +85,8 @@ public class DelegateAuditRecordsController {
     // @PostMapping
     // public AjaxResult add(@RequestBody Delegateauditrecords delegateauditrecords)
     // {
-    //     return toAjax(delegateauditrecordsService.insertDelegateauditrecords(delegateauditrecords));
+    // return
+    // toAjax(delegateauditrecordsService.insertDelegateauditrecords(delegateauditrecords));
     // }
 
     /**
@@ -88,22 +95,22 @@ public class DelegateAuditRecordsController {
 
     // @Log(title = "存储委托信息审核记录", businessType = BusinessType.UPDATE)
     // @PutMapping
-    // public AjaxResult edit(@RequestBody Delegateauditrecords delegateauditrecords)
+    // public AjaxResult edit(@RequestBody Delegateauditrecords
+    // delegateauditrecords)
     // {
-    //     return toAjax(delegateauditrecordsService.updateDelegateauditrecords(delegateauditrecords));
+    // return
+    // toAjax(delegateauditrecordsService.updateDelegateauditrecords(delegateauditrecords));
     // }
 
     /**
      * 删除存储委托信息审核记录
      */
 
-
     // @DeleteMapping("/{RecordIDs}")
-    // public Result remove(@PathVariable Long[] RecordIDs) {
-    //    
-    //    
-    //     return Result.success(MessageConstants.TASK_RECORDS_DELETE_SUCCESS);
+    // public Result<?>remove(@PathVariable Long[] RecordIDs) {
+    //
+    //
+    // return Result.success(MessageConstants.TASK_RECORDS_DELETE_SUCCESS);
     // }
-
 
 }

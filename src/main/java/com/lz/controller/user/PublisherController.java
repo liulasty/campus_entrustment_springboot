@@ -1,5 +1,17 @@
 package com.lz.controller.user;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 /*
  * Created with IntelliJ IDEA.
  * @Author: lz
@@ -16,7 +28,6 @@ import com.lz.pojo.dto.PublishDTO;
 import com.lz.pojo.dto.UpdateTaskToCompletedDTO;
 import com.lz.pojo.entity.Task;
 import com.lz.pojo.entity.TaskAcceptRecords;
-import com.lz.pojo.entity.Users;
 import com.lz.pojo.entity.UsersInfo;
 import com.lz.pojo.result.PageResult;
 import com.lz.pojo.result.Result;
@@ -24,11 +35,10 @@ import com.lz.pojo.vo.TaskAndUserInfoVO;
 import com.lz.service.ITaskAcceptRecordsService;
 import com.lz.service.ITaskService;
 import com.lz.service.IUsersInfoService;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
 
 /**
  * @author lz
@@ -36,7 +46,8 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/user/publisher")
 @Slf4j
-@CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
+@CrossOrigin(origins = "*", allowedHeaders = "*", methods = { RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT,
+        RequestMethod.DELETE })
 @Api(tags = "发布者控制器", value = "发布者控制器")
 public class PublisherController {
 
@@ -45,21 +56,20 @@ public class PublisherController {
 
     @Autowired
     private ITaskService taskService;
-    
+
     @Autowired
     private ITaskAcceptRecordsService taskAcceptRecordsService;
 
     @GetMapping("/{id}")
-    public Result getPublisher(@PathVariable("id") Long id) throws MyException {
+    public Result<?> getPublisher(@PathVariable("id") Long id) throws MyException {
         UsersInfo usersInfo = usersInfoService.getById(id);
         if (usersInfo == null) {
             throw new MyException(MessageConstants.USER_AUTHENTICATION_INFO_NOT_EXIST);
         }
         if (usersInfo.getAuthStatus() != AuthenticationStatus.AUTHENTICATED) {
-            //正在认证中，请耐心等待
+            // 正在认证中，请耐心等待
             throw new MyException(MessageConstants.USER_AUTHENTICATION_INFO_EXISTING);
         }
-
 
         return Result.success(usersInfo);
     }
@@ -76,7 +86,7 @@ public class PublisherController {
     @PutMapping(value = "/confirmTask/{id}")
     @ApiOperation("发布委托")
     public Result<String> confirmTask(@PathVariable("id") Long id,
-                                      @RequestBody PublishDTO data) throws MyException {
+            @RequestBody PublishDTO data) throws MyException {
         try {
             Task byId = taskService.getById(id);
             if (byId == null) {
@@ -119,27 +129,24 @@ public class PublisherController {
      * @throws MyException 我的异常
      */
     @GetMapping("/page")
-    public Result getTaskPage(
+    public Result<?> getTaskPage(
             @RequestParam(defaultValue = "1") int pageNum, // 默认值为1，如果请求中未提供则使用此默认值
             @RequestParam(defaultValue = "10") int pageSize, // 默认每页大小为10
             @RequestParam(required = false) String location, // 类型阶段参数
             @RequestParam(required = false) String description,
             @RequestParam(required = false) Long taskType,
             @RequestParam(defaultValue = "0") Integer queryRules,
-            @RequestParam(required = false) TaskStatus status
-    ) throws MyException {
+            @RequestParam(required = false) TaskStatus status) throws MyException {
         // 这里处理业务逻辑，比如根据pageNum, pageSize, TypePhase查询数据库等
 
-
         PageResult<Task> taskPageResult = taskService.searchPageByPublisher(pageNum,
-                                                                            pageSize, location, description,
-                                                                            taskType,
-                                                                            queryRules, status);
+                pageSize, location, description,
+                taskType,
+                queryRules, status);
 
         // 返回响应数据，根据实际情况调整
         return Result.success(taskPageResult);
     }
-
 
     /**
      * 确认委托接收者
@@ -151,7 +158,7 @@ public class PublisherController {
      * @throws MyException 我的异常
      */
     @PutMapping("/confirm/{id}")
-    public Result confirm(@PathVariable("id") Long id) throws MyException {
+    public Result<?> confirm(@PathVariable("id") Long id) throws MyException {
 
         TaskAcceptRecords acceptRecords = taskAcceptRecordsService.getById(id);
         if (acceptRecords == null || acceptRecords.getStatus() != AcceptStatus.PENDING) {
@@ -165,7 +172,7 @@ public class PublisherController {
         }
         taskService.confirmTheRecipient(task.getTaskId(), acceptRecords);
         return Result.success(MessageConstants.TASK_UPDATE_SUCCESS);
-        
+
     }
 
     @PutMapping("/cancel/{id}")
@@ -184,22 +191,22 @@ public class PublisherController {
      * @throws MyException 我的异常
      */
     @GetMapping("/getTask/{id}")
-    public Result getTask(@PathVariable("id") Long id) throws MyException {
+    public Result<?> getTask(@PathVariable("id") Long id) throws MyException {
         TaskAndUserInfoVO taskAndUserInfo = taskService.publisherSearchTaskAndPublisherInfo(id);
 
         return Result.success(taskAndUserInfo);
     }
 
     @PutMapping("/completed/{id}")
-    public Result completed(@PathVariable Long id,
-                       @RequestBody UpdateTaskToCompletedDTO DTO) throws MyException {
+    public Result<?> completed(@PathVariable Long id,
+            @RequestBody UpdateTaskToCompletedDTO DTO) throws MyException {
         taskService.updateToCompleted(DTO);
 
         return Result.success(MessageConstants.TASK_UPDATE_SUCCESS);
     }
 
     @DeleteMapping("/{id}")
-        public Result deleteTask(@PathVariable("id") Long id) throws MyException {
+    public Result<?> deleteTask(@PathVariable("id") Long id) throws MyException {
         taskService.deleteCancelTask(id);
         return Result.success(MessageConstants.TASK_DELETE_SUCCESS);
     }

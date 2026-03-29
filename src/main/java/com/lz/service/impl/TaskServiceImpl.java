@@ -1,22 +1,15 @@
 package com.lz.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.lz.Exception.MyException;
-import com.lz.mapper.*;
-import com.lz.pojo.Enum.*;
-import com.lz.pojo.Page.DraftConfig;
-import com.lz.pojo.constants.AuditResult;
-import com.lz.pojo.constants.MessageConstants;
-import com.lz.pojo.dto.*;
-import com.lz.pojo.entity.*;
-import com.lz.pojo.result.PageResult;
-import com.lz.pojo.vo.*;
-import com.lz.service.*;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import lombok.extern.slf4j.Slf4j;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +18,57 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.lz.Exception.MyException;
+import com.lz.mapper.DelegationCategoriesMapper;
+import com.lz.mapper.ReviewsMapper;
+import com.lz.mapper.TaskAcceptRecordsMapper;
+import com.lz.mapper.TaskMapper;
+import com.lz.mapper.TaskUpdatesMapper;
+import com.lz.mapper.UsersInfoMapper;
+import com.lz.mapper.UsersMapper;
+import com.lz.pojo.Enum.AcceptStatus;
+import com.lz.pojo.Enum.AuthenticationStatus;
+import com.lz.pojo.Enum.NotificationsType;
+import com.lz.pojo.Enum.TaskStatus;
+import com.lz.pojo.Enum.TaskUpdateType;
+import com.lz.pojo.Page.DraftConfig;
+import com.lz.pojo.constants.AuditResult;
+import com.lz.pojo.constants.MessageConstants;
+import com.lz.pojo.dto.AuditResultDTO;
+import com.lz.pojo.dto.TaskCountDTO;
+import com.lz.pojo.dto.TaskDTO;
+import com.lz.pojo.dto.TaskPageDTO;
+import com.lz.pojo.dto.UpdateTaskToCompletedDTO;
+import com.lz.pojo.entity.DelegateAuditRecords;
+import com.lz.pojo.entity.DelegationCategories;
+import com.lz.pojo.entity.Reviews;
+import com.lz.pojo.entity.Task;
+import com.lz.pojo.entity.TaskAcceptRecords;
+import com.lz.pojo.entity.TaskUpdates;
+import com.lz.pojo.entity.Users;
+import com.lz.pojo.entity.UsersInfo;
+import com.lz.pojo.result.PageResult;
+import com.lz.pojo.vo.NewestInfoVO;
+import com.lz.pojo.vo.TaskAcceptRecord;
+import com.lz.pojo.vo.TaskAcceptRecordVO;
+import com.lz.pojo.vo.TaskAndUserInfoVO;
+import com.lz.pojo.vo.TaskDetails;
+import com.lz.pojo.vo.TaskDraftVO;
+import com.lz.pojo.vo.UserDelegateDraft;
+import com.lz.service.IDelegateAuditRecordsService;
+import com.lz.service.IDelegationCategoriesService;
+import com.lz.service.INotificationReadStatusService;
+import com.lz.service.INotificationsService;
+import com.lz.service.ISystemAnnouncementsService;
+import com.lz.service.ITaskService;
+import com.lz.service.ITaskUpdatesService;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * <p>
@@ -73,13 +115,12 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
 
     @Autowired
     private ReviewsMapper reviewsMapper;
-    
+
     @Autowired
     private INotificationReadStatusService notificationReadStatusService;
-    
+
     @Autowired
     private INotificationsService notificationsService;
-
 
     /**
      * 获取最新信息
@@ -94,7 +135,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
         newestInfoVO.setHotTaskCategory(getHotTaskCategory());
         newestInfoVO.setTransactionStats(getTransactionStats());
         newestInfoVO.setTasksWithUser(getTasksWithUser(id));
-        newestInfoVO.setTaskAcceptRecordsWithUser( taskAcceptRecordsMapper.getTaskAcceptRecordsWithUser(id));
+        newestInfoVO.setTaskAcceptRecordsWithUser(taskAcceptRecordsMapper.getTaskAcceptRecordsWithUser(id));
         log.info("最新信息：{}", newestInfoVO);
         return newestInfoVO;
     }
@@ -109,13 +150,15 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
     public void updateTask(AuditResultDTO auditResultDTO) throws MyException {
         try {
             if (auditResultDTO.getReviewStatus().equals(AuditResult.APPROVED)) {
-                updateById(Task.builder().taskId(auditResultDTO.getDelegateId()).status(TaskStatus.PENDING_RELEASE).build());
+                updateById(Task.builder().taskId(auditResultDTO.getDelegateId()).status(TaskStatus.PENDING_RELEASE)
+                        .build());
                 notificationsService.addTaskAuditNotificationService(auditResultDTO.getReviewStatus());
             } else if (auditResultDTO.getReviewStatus().equals(AuditResult.REJECTED)) {
-                updateById(Task.builder().taskId(auditResultDTO.getDelegateId()).status(TaskStatus.AUDIT_FAILED).build());
+                updateById(
+                        Task.builder().taskId(auditResultDTO.getDelegateId()).status(TaskStatus.AUDIT_FAILED).build());
                 notificationsService.addTaskAuditNotificationService(auditResultDTO.getReviewStatus());
             }
-            //todo 保存审核记录
+            // todo 保存审核记录
             DelegateAuditRecords delegateAuditRecords = new DelegateAuditRecords();
             BeanUtils.copyProperties(auditResultDTO, delegateAuditRecords);
             delegateAuditRecords.setReviewTime(new Date(System.currentTimeMillis()));
@@ -128,7 +171,6 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
             throw new MyException(MessageConstants.INTERNAL_SERVER_ERROR);
         }
     }
-
 
     @Override
     public TaskDraftVO searchTask(Long id) throws MyException {
@@ -147,7 +189,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
     @Override
     public PageResult<Task> searchPage(TaskPageDTO taskPageDTO) {
         Page<Task> page = new Page<>(taskPageDTO.getPageNum(),
-                                     taskPageDTO.getPageSize());
+                taskPageDTO.getPageSize());
 
         QueryWrapper<Task> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("status", TaskStatus.AUDITING);
@@ -155,7 +197,6 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
         queryWrapper.like("location", taskPageDTO.getLocation());
         log.info("查询条件：{}", queryWrapper);
         Page<Task> taskPage = page(page, queryWrapper);
-
 
         PageResult<Task> pageResult = new PageResult<>();
 
@@ -173,7 +214,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
      */
     @Override
     public List<Task> getNewestTask() {
-        
+
         QueryWrapper<Task> wrapper = new QueryWrapper<>();
 
         long currentTimeMillis = System.currentTimeMillis();
@@ -182,7 +223,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
 
         List<Task> tasks = taskMapper.queryOngoingTasks(date);
         log.info("最新委托：{}", tasks);
-       
+
         return tasks;
     }
 
@@ -194,14 +235,12 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
     @Override
     public Map<String, TaskCountDTO> getHotTaskCategory() {
 
-
         List<TaskCountDTO> tasks = taskMapper.selectTaskTypeCountTop5();
         log.info("热门类别：{}", tasks);
         // 获取热门委托类别
         HashMap<String, TaskCountDTO> hashMap = new LinkedHashMap<>();
         tasks.forEach(taskCountDTO -> hashMap.put(
                 delegationCategoriesService.getById(taskCountDTO.getTaskTypeId()).getCategoryName(), taskCountDTO));
-
 
         return hashMap;
     }
@@ -223,29 +262,22 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
      */
     @Override
     public Map<String, Integer> getTransactionStats() {
-        //查询本月 本周 今天的 委托记录
+        // 查询本月 本周 今天的 委托记录
         Map<String, Integer> map = new LinkedHashMap<String, Integer>();
 
-        Integer tasksTodayCount1 =
-                taskMapper.getTasksTodayCount(TaskStatus.ACCEPTED.getDbValue());
+        Integer tasksTodayCount1 = taskMapper.getTasksTodayCount(TaskStatus.ACCEPTED.getDbValue());
         map.put("今日已接受", tasksTodayCount1);
-        Integer tasksWeeklyCount1 =
-                taskMapper.getTasksWeeklyCount(TaskStatus.ACCEPTED.getDbValue());
+        Integer tasksWeeklyCount1 = taskMapper.getTasksWeeklyCount(TaskStatus.ACCEPTED.getDbValue());
         map.put("本周已接受", tasksWeeklyCount1);
-        Integer tasksMonthlyCount1 =
-                taskMapper.getTasksMonthlyCount(TaskStatus.ACCEPTED.getDbValue());
+        Integer tasksMonthlyCount1 = taskMapper.getTasksMonthlyCount(TaskStatus.ACCEPTED.getDbValue());
         map.put("本月已接受", tasksMonthlyCount1);
 
-        Integer tasksTodayCount =
-                taskMapper.getTasksTodayCount(TaskStatus.ONGOING.getDbValue());
+        Integer tasksTodayCount = taskMapper.getTasksTodayCount(TaskStatus.ONGOING.getDbValue());
         map.put("今日已发布", tasksTodayCount + tasksTodayCount1);
-        Integer tasksWeeklyCount =
-                taskMapper.getTasksWeeklyCount(TaskStatus.ONGOING.getDbValue());
+        Integer tasksWeeklyCount = taskMapper.getTasksWeeklyCount(TaskStatus.ONGOING.getDbValue());
         map.put("本周已发布", tasksWeeklyCount + tasksWeeklyCount1);
-        Integer tasksMonthlyCount =
-                taskMapper.getTasksMonthlyCount(TaskStatus.ONGOING.getDbValue());
+        Integer tasksMonthlyCount = taskMapper.getTasksMonthlyCount(TaskStatus.ONGOING.getDbValue());
         map.put("本月已发布", tasksMonthlyCount + tasksMonthlyCount1);
-
 
         return map;
     }
@@ -263,7 +295,6 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
                 .eq("ReceiverID", userId)
                 .or()
                 .eq("OwnerID", userId);
-
 
         return taskMapper.selectList(wrapper);
     }
@@ -287,10 +318,9 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
                 // 设置查询条件
                 .eq("OwnerID", userId)
                 .in("Status", Arrays.asList(TaskStatus.DRAFT,
-                                            TaskStatus.AUDITING,
-                                            TaskStatus.PENDING_RELEASE,
-                                            TaskStatus.AUDIT_FAILED))
-        ;
+                        TaskStatus.AUDITING,
+                        TaskStatus.PENDING_RELEASE,
+                        TaskStatus.AUDIT_FAILED));
 
         List<Task> tasks = taskMapper.selectList(wrapper);
 
@@ -319,11 +349,11 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
             throw new MyException("用户不存在");
         }
 
-        DelegationCategories delegationCategories = delegationCategoriesService.getTaskCategoryByCategoryName(taskDTO.getType());
+        DelegationCategories delegationCategories = delegationCategoriesService
+                .getTaskCategoryByCategoryName(taskDTO.getType());
         if (delegationCategories == null) {
             throw new MyException("类别不存在");
         }
-
 
         Task task = Task.builder()
                 .createdAt(new Date(System.currentTimeMillis()))
@@ -336,14 +366,13 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
                 .build();
 
         taskMapper.insert(task);
-    
-        TaskUpdates taskUpdates =
-                TaskUpdates.builder()
-                        .taskId(task.getTaskId())
-                        .updateType(TaskUpdateType.CREATED)
-                        .updateDescription("创建委托草稿")
-                        .updateTime(new Date(System.currentTimeMillis()))
-                        .userId(taskDTO.getOwnerId()).build();
+
+        TaskUpdates taskUpdates = TaskUpdates.builder()
+                .taskId(task.getTaskId())
+                .updateType(TaskUpdateType.CREATED)
+                .updateDescription("创建委托草稿")
+                .updateTime(new Date(System.currentTimeMillis()))
+                .userId(taskDTO.getOwnerId()).build();
         taskUpdatesMapper.insert(taskUpdates);
     }
 
@@ -357,7 +386,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
     @Override
     public PageResult<Task> searchPageByAdmin(DraftConfig draftConfig) {
         Page<Task> page = new Page<>(draftConfig.getPageNum(),
-                                     draftConfig.getPageSize());
+                draftConfig.getPageSize());
 
         QueryWrapper<Task> wrapper = new QueryWrapper<>();
         if (draftConfig.getTaskType() != null) {
@@ -425,7 +454,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
             task.setStatus(TaskStatus.PENDING_RELEASE);
             taskMapper.updateById(task);
             delegateAuditRecordsService.createNewRecord(taskId, AuditResult.APPROVED,
-                                                        TaskStatus.PENDING_RELEASE);
+                    TaskStatus.PENDING_RELEASE);
             taskUpdateService.allowPublish(taskId);
             return true;
         }
@@ -450,9 +479,9 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
             taskMapper.updateById(task);
             taskUpdateService.notAllowed(taskId);
             delegateAuditRecordsService.createNewRecord(taskId, AuditResult.REJECTED,
-                                                        TaskStatus.AUDIT_FAILED);
+                    TaskStatus.AUDIT_FAILED);
             taskUpdateService.createNewRecord(taskId, TaskUpdateType.AUDITING,
-                                              MessageConstants.DATA_AUDIT_FAIL);
+                    MessageConstants.DATA_AUDIT_FAIL);
             return true;
         }
         return false;
@@ -469,7 +498,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
         }
         task.setStatus(TaskStatus.AUDITING);
         taskMapper.updateById(task);
-        
+
         // Record update
         TaskUpdates taskUpdates = TaskUpdates.builder()
                 .taskId(task.getTaskId())
@@ -495,16 +524,16 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
      */
     @Override
     public PageResult<Task> searchPage(int pageNum, int pageSize,
-                                       String location, String description,
-                                       Long taskTypeId, Integer queryRules,
-                                       TaskStatus status) {
+            String location, String description,
+            Long taskTypeId, Integer queryRules,
+            TaskStatus status) {
         Page<Task> page = new Page<>(pageNum, pageSize);
         QueryWrapper<Task> wrapper = new QueryWrapper<>();
         if (status != null) {
             wrapper.eq("Status", status);
         } else {
             wrapper.in("Status", TaskStatus.ACCEPTED,
-                       TaskStatus.ONGOING,TaskStatus.COMPLETED);
+                    TaskStatus.ONGOING, TaskStatus.COMPLETED);
         }
         if (taskTypeId != null) {
             wrapper.eq("TaskType", taskTypeId);
@@ -530,7 +559,8 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
      *
      * @param id 委托id
      *
-     * @return <p>
+     * @return
+     *         <p>
      */
     @Override
     public TaskAndUserInfoVO publisherSearchTaskAndPublisherInfo(Long id) throws MyException {
@@ -546,8 +576,8 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
         usersInfo.setRoleImgSrc("");
         usersInfo.setCertifieTime(null);
         usersInfo.setCertifiedTime(null);
-        List<TaskAcceptRecords> records =
-                taskAcceptRecordsMapper.selectList(new QueryWrapper<TaskAcceptRecords>().eq("taskId", id));
+        List<TaskAcceptRecords> records = taskAcceptRecordsMapper
+                .selectList(new QueryWrapper<TaskAcceptRecords>().eq("taskId", id));
 
         if (records.size() == 0) {
             return new TaskAndUserInfoVO(task, usersInfo);
@@ -559,9 +589,8 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
             if (info == null) {
                 throw new MyException(MessageConstants.USER_INFO_ERROR);
             }
-            List<Reviews> reviewsList =
-                    reviewsMapper.selectList(new QueryWrapper<Reviews>().eq(
-                            "AcceptorID", info.getUserId()));
+            List<Reviews> reviewsList = reviewsMapper.selectList(new QueryWrapper<Reviews>().eq(
+                    "AcceptorID", info.getUserId()));
             long sum = 0;
             TaskAcceptRecordVO vo = null;
             if (reviewsList.size() != 0) {
@@ -569,25 +598,22 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
                         .mapToLong(Reviews::getRating)
                         .sum();
                 vo = new TaskAcceptRecordVO(record,
-                                            info.getUserId(),
-                                            info.getName(),
-                                            info.getUserRole()
-                        , sum / reviewsList.size(), sum);
+                        info.getUserId(),
+                        info.getName(),
+                        info.getUserRole(), sum / reviewsList.size(), sum);
 
             } else {
 
                 vo = new TaskAcceptRecordVO(record,
-                                            info.getUserId(),
-                                            info.getName(),
-                                            info.getUserRole()
-                        , 0L, 0L);
+                        info.getUserId(),
+                        info.getName(),
+                        info.getUserRole(), 0L, 0L);
             }
 
             list.add(vo);
         }
-        
 
-        return new TaskAndUserInfoVO(task,usersInfo, list);
+        return new TaskAndUserInfoVO(task, usersInfo, list);
     }
 
     /**
@@ -595,7 +621,8 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
      *
      * @param id 委托id
      *
-     * @return <p>
+     * @return
+     *         <p>
      */
     @Override
     public TaskDetails getTaskAndPublisherInfo(Long id) throws MyException {
@@ -613,18 +640,17 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
         usersInfo.setCertifiedTime(null);
         Long userId = getCurrentAdmin().getUserId();
         TaskAcceptRecords taskAcceptRecords = taskAcceptRecordsMapper.selectOne(new QueryWrapper<TaskAcceptRecords>()
-                                                                                        .eq("taskId", id)
-                                                                                        .eq("accepterId",
-                                                                                            userId));
-        
-        
+                .eq("taskId", id)
+                .eq("accepterId",
+                        userId));
+
         Long publishedTotal = taskMapper.getPublishedTotal(task.getOwnerId());
         Long acceptedTotal = taskMapper.getAcceptedTotal(task.getOwnerId());
         Long overdueTotal = taskMapper.getOverdueTotal(task.getOwnerId());
         Long canceledTotal = taskMapper.getCanceledTotal(task.getOwnerId());
 
         List<Reviews> list = reviewsMapper.selectList(new QueryWrapper<Reviews>()
-                                                              .eq("AcceptorID", userId));
+                .eq("AcceptorID", userId));
         Double Rate = 0.0;
         if (list.size() != 0) {
             Long sum = list.stream()
@@ -634,8 +660,8 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
         }
 
         return new TaskDetails(usersInfo, task, taskAcceptRecords, publishedTotal,
-                                     acceptedTotal, overdueTotal,
-                               canceledTotal,Rate);
+                acceptedTotal, overdueTotal,
+                canceledTotal, Rate);
     }
 
     /**
@@ -652,14 +678,15 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
      * @return 页面结果<任务>
      */
     @Override
-    public PageResult<Task> searchPageByPublisher(int pageNum, int pageSize, String location, String description, Long taskType, Integer queryRules, TaskStatus status) {
+    public PageResult<Task> searchPageByPublisher(int pageNum, int pageSize, String location, String description,
+            Long taskType, Integer queryRules, TaskStatus status) {
         Page<Task> page = new Page<>(pageNum, pageSize);
         QueryWrapper<Task> wrapper = new QueryWrapper<>();
         if (status != null) {
             wrapper.eq("Status", status);
         } else {
             wrapper.in("Status", TaskStatus.ACCEPTED, TaskStatus.ONGOING,
-                       TaskStatus.EXPIRED, TaskStatus.CANCELLED,TaskStatus.COMPLETED);
+                    TaskStatus.EXPIRED, TaskStatus.CANCELLED, TaskStatus.COMPLETED);
         }
         Users currentAdmin = getCurrentAdmin();
         wrapper.eq("OwnerID", currentAdmin.getUserId());
@@ -697,27 +724,25 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
      */
     @Override
     public PageResult<TaskAcceptRecord> searchPageByAcceptor(int pageNum,
-                                                             int pageSize,
-                                                             String location,
-                                                             String description,
-                                                             Long taskType,
-                                                             Integer queryRules,
-                                                             TaskStatus status) {
+            int pageSize,
+            String location,
+            String description,
+            Long taskType,
+            Integer queryRules,
+            TaskStatus status) {
         log.info("接受者搜索任务 {}", queryRules);
         Page<TaskAcceptRecord> page = new Page<>(pageNum, pageSize);
         Long userId = getCurrentAdmin().getUserId();
-        IPage<TaskAcceptRecord> taskAcceptRecord =
-                taskAcceptRecordsMapper.searchTaskAcceptRecord(page,
-                                                               userId,
-                                                               null,
-                                                               status,
-                                                               location,
-                                                               description,
-                                                               taskType,
-                                                               queryRules
-                );
+        IPage<TaskAcceptRecord> taskAcceptRecord = taskAcceptRecordsMapper.searchTaskAcceptRecord(page,
+                userId,
+                null,
+                status,
+                location,
+                description,
+                taskType,
+                queryRules);
 
-        return new PageResult(taskAcceptRecord.getTotal(), taskAcceptRecord.getRecords());
+        return new PageResult<>(taskAcceptRecord.getTotal(), taskAcceptRecord.getRecords());
     }
 
     /**
@@ -732,14 +757,15 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
         if (acceptRecords == null) {
             throw new MyException(MessageConstants.TASK_NOT_EXIST);
         }
-        
+
         // Double check if task is expired before confirming
         Task taskCheck = taskMapper.selectById(taskId);
         if (taskCheck != null && taskCheck.getEndTime() != null && taskCheck.getEndTime().before(new Date())) {
-             throw new MyException(MessageConstants.TASK_EXPIRED_CANNOT_CONFIRM);
+            throw new MyException(MessageConstants.TASK_EXPIRED_CANNOT_CONFIRM);
         }
 
-        List<TaskAcceptRecords> list = taskAcceptRecordsMapper.selectList(new QueryWrapper<TaskAcceptRecords>().eq("taskId", taskId));
+        List<TaskAcceptRecords> list = taskAcceptRecordsMapper
+                .selectList(new QueryWrapper<TaskAcceptRecords>().eq("taskId", taskId));
 
         acceptRecords.setStatus(AcceptStatus.CHECKED);
         acceptRecords.setAdoptTime(new Date(System.currentTimeMillis()));
@@ -750,17 +776,14 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
 
         List<TaskAcceptRecords> NotList = list.stream()
                 .filter(record -> !record.getAccepterId().equals(acceptRecords.getAccepterId()))
-                
-                .collect(Collectors.toList());
 
+                .collect(Collectors.toList());
 
         UpdateWrapper<TaskAcceptRecords> updateWrapper = new UpdateWrapper<>();
         TaskAcceptRecords taskAcceptRecords = TaskAcceptRecords.builder().status(AcceptStatus.UNCHECKED).build();
         taskAcceptRecords.setAdoptTime(new Date(System.currentTimeMillis()));
         updateWrapper.eq("taskId", taskId).eq("status", AcceptStatus.PENDING);
         int update = taskAcceptRecordsMapper.update(taskAcceptRecords, updateWrapper);
-        
-        
 
         TaskUpdates taskupdates = TaskUpdates.builder()
                 .taskId(taskId)
@@ -775,26 +798,28 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
             log.info("更新失败 update {} list.size() {}", update, list.size());
             throw new MyException(MessageConstants.DATABASE_ERROR);
         }
-        Task task = Task.builder().taskId(taskId).receiverId(acceptRecords.getAccepterId()).status(TaskStatus.ACCEPTED).build();
+        Task task = Task.builder().taskId(taskId).receiverId(acceptRecords.getAccepterId()).status(TaskStatus.ACCEPTED)
+                .build();
         updateById(task);
-        //todo 通知接受者
+        // todo 通知接受者
         notificationsService.addTaskConfirmTheRecipient(getCurrentAdmin().getUserId(),
-                                                        MessageConstants.TASK_ACCEPTANCE_PROCESSED_SUCCESS,
-                                                        NotificationsType.TASK,
-                                                        "您的编号为"+acceptRecords+"委托接收记录已被处理，处理的结果是"+MessageConstants.TASK_ACCEPT_SUCCESS,
-                                                        task.getTaskId());
+                MessageConstants.TASK_ACCEPTANCE_PROCESSED_SUCCESS,
+                NotificationsType.TASK,
+                "您的编号为" + acceptRecords + "委托接收记录已被处理，处理的结果是" + MessageConstants.TASK_ACCEPT_SUCCESS,
+                task.getTaskId());
         NotList.forEach(record -> {
             try {
                 notificationsService.addTaskAcceptanceSelected(record.getAccepterId(),
-                                                               MessageConstants.TASK_ACCEPTANCE_PROCESSED_FAILED,
-                                                               NotificationsType.TASK,
-                                                               "您的编号为"+acceptRecords+"委托接收记录已被处理，处理的结果是"+MessageConstants.TASK_ACCEPTANCE_PROCESSED_FAILED,
-                                                               task.getTaskId());
+                        MessageConstants.TASK_ACCEPTANCE_PROCESSED_FAILED,
+                        NotificationsType.TASK,
+                        "您的编号为" + acceptRecords + "委托接收记录已被处理，处理的结果是"
+                                + MessageConstants.TASK_ACCEPTANCE_PROCESSED_FAILED,
+                        task.getTaskId());
             } catch (MyException e) {
                 e.printStackTrace();
             }
         });
-        
+
     }
 
     @Override
@@ -827,7 +852,6 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
             log.error("委托状态异常");
             throw new MyException(MessageConstants.TASK_NOT_EXIST);
         }
-
 
     }
 
@@ -864,34 +888,31 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
                             .eq("taskId", id)
                             .set("status", AcceptStatus.EXPIRED)
                             .set("adoptTime",
-                                 new Date(System.currentTimeMillis())));
+                                    new Date(System.currentTimeMillis())));
         }
 
         throw new MyException(MessageConstants.TASK_NOT_EXIST);
-
 
     }
 
     @Override
     public void updateToCompleted(UpdateTaskToCompletedDTO dto) throws MyException {
         Users users = getCurrentAdmin();
-        
+
         Task task = getById(dto.getTaskId());
-        if (!task.getStatus().equals(TaskStatus.ACCEPTED) || 
+        if (!task.getStatus().equals(TaskStatus.ACCEPTED) ||
                 !task.getOwnerId().equals(users.getUserId()) ||
-        task.getReceiverId()==null) {
+                task.getReceiverId() == null) {
             log.error("任务状态异常{}{}{}", task.getStatus(), task.getOwnerId(), task.getReceiverId());
             throw new MyException(MessageConstants.TASK_NOT_EXIST);
         }
-
-        
 
         Task updateTask = Task.builder()
                 .taskId(dto.getTaskId())
                 .status(TaskStatus.COMPLETED)
                 .build();
         taskMapper.updateById(updateTask);
-        
+
         TaskUpdates taskUpdates = TaskUpdates.builder()
                 .taskId(dto.getTaskId())
                 .userId(users.getUserId())
@@ -899,7 +920,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
                 .updateType(TaskUpdateType.RESULT)
                 .updateTime(new Date(System.currentTimeMillis()))
                 .build();
-        
+
         taskUpdateService.save(taskUpdates);
 
         Reviews reviews = Reviews.builder()
@@ -922,33 +943,32 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
      */
     @Override
     public void withdrawReleaseByTaskID(Long id) throws MyException {
-        Task     task = getById(id);
-        
-        if (task==null||task.getStatus() != TaskStatus.ONGOING) {
+        Task task = getById(id);
+
+        if (task == null || task.getStatus() != TaskStatus.ONGOING) {
             log.error("任务不存在或委托任务状态异常");
-           throw new MyException(MessageConstants.TASK_NOT_EXIST);
+            throw new MyException(MessageConstants.TASK_NOT_EXIST);
         }
-        
+
         task.setStatus(TaskStatus.CANCELLED);
 
-       List<TaskAcceptRecords> taskAcceptRecords = taskAcceptRecordsMapper.getTaskAcceptRecordsByTaskId(id);
-        
-        if (taskAcceptRecords.size() > 0){
+        List<TaskAcceptRecords> taskAcceptRecords = taskAcceptRecordsMapper.getTaskAcceptRecordsByTaskId(id);
+
+        if (taskAcceptRecords.size() > 0) {
             taskAcceptRecords.forEach(taskAcceptRecord -> {
                 taskAcceptRecord.setStatus(AcceptStatus.EXPIRED);
                 taskAcceptRecord.setAdoptTime(new Date(System.currentTimeMillis()));
                 taskAcceptRecordsMapper.updateById(taskAcceptRecord);
             });
         }
-        
+
         taskMapper.updateById(task);
 
         TaskUpdates taskUpdates = taskUpdateService.cancelPublish(id);
-        
+
         notificationsService.sendTaskNotification("您的委托已被管理员撤销发布",
-                                                  taskUpdates.getUpdateDescription(),
-                                                  task.getTaskId(),task.getOwnerId()
-                                                  );
+                taskUpdates.getUpdateDescription(),
+                task.getTaskId(), task.getOwnerId());
 
     }
 
@@ -961,12 +981,12 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
     public void deleteCancelTask(Long id) throws MyException {
         Task task = getById(id);
         if (task.getStatus() != TaskStatus.CANCELLED) {
-           throw new MyException(MessageConstants.TASK_NOT_EXIST);
+            throw new MyException(MessageConstants.TASK_NOT_EXIST);
         }
 
         List<TaskAcceptRecords> taskAcceptRecords = taskAcceptRecordsMapper.getTaskAcceptRecordsByTaskId(id);
-        
-        if (taskAcceptRecords.size() > 0){
+
+        if (taskAcceptRecords.size() > 0) {
             taskAcceptRecords.forEach(taskAcceptRecord -> {
                 taskAcceptRecord.setStatus(AcceptStatus.EXPIRED);
                 taskAcceptRecord.setAdoptTime(new Date(System.currentTimeMillis()));
@@ -985,6 +1005,5 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task> implements IT
         TaskStatus taskStatus = taskMapper.getTaskStatus(id);
         return taskStatus;
     }
-
 
 }

@@ -1,5 +1,20 @@
 package com.lz.controller.admin;
 
+import java.time.LocalDate;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 /*
  * Created with IntelliJ IDEA.
  * @Author: lz
@@ -18,23 +33,24 @@ import com.lz.pojo.entity.TaskUpdates;
 import com.lz.pojo.entity.Users;
 import com.lz.pojo.result.PageResult;
 import com.lz.pojo.result.Result;
-import com.lz.service.*;
+import com.lz.service.IDelegateAuditRecordsService;
+import com.lz.service.INotificationReadStatusService;
+import com.lz.service.INotificationsService;
+import com.lz.service.ITaskService;
+import com.lz.service.ITaskUpdatesService;
+import com.lz.service.IUsersService;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDate;
 
 /**
  * @author lz
  */
 @RestController
 @RequestMapping("/admin/task")
-@CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
+@CrossOrigin(origins = "*", allowedHeaders = "*", methods = { RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT,
+        RequestMethod.DELETE })
 @Api(tags = "管理员管理委托相关接口")
 @Slf4j
 public class TaskAdminController {
@@ -45,7 +61,6 @@ public class TaskAdminController {
     private final ITaskUpdatesService taskUpdatesService;
     private final INotificationReadStatusService notificationReadStatusService;
     private final INotificationsService notificationsService;
-
 
     /**
      * 获取当前登录管理员的信息。
@@ -60,11 +75,11 @@ public class TaskAdminController {
      */
     @Autowired
     public TaskAdminController(ITaskService taskService,
-                               IDelegateAuditRecordsService delegateAuditRecordsService,
-                               IUsersService usersService,
-                               ITaskUpdatesService taskUpdatesService,
-                               INotificationReadStatusService notificationReadStatusService,
-                               INotificationsService notificationsService) {
+            IDelegateAuditRecordsService delegateAuditRecordsService,
+            IUsersService usersService,
+            ITaskUpdatesService taskUpdatesService,
+            INotificationReadStatusService notificationReadStatusService,
+            INotificationsService notificationsService) {
         this.taskService = taskService;
         this.delegateAuditRecordsService = delegateAuditRecordsService;
         this.usersService = usersService;
@@ -78,7 +93,7 @@ public class TaskAdminController {
      *
      * @return {@code Users}
      */
-    
+
     public Users getCurrentAdmin() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String adminName = authentication.getName();
@@ -95,38 +110,32 @@ public class TaskAdminController {
      */
     @GetMapping("/list")
     @ApiOperation("分页查询")
-    public Result searchPage(@RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
-                             @RequestParam(value = "pageSize",
-                                     defaultValue = "5") int pageSize,
-                             @RequestParam(value = "Description", required = false) String description,
-                             @RequestParam(value = "taskType", required =
-                                     false) Integer taskType,
-                             @RequestParam(value = "Location", required = false) String location,
-                             @RequestParam(value = "CreatedAt", required = false) LocalDate createdAt,
-                             @RequestParam(value = "TypePhase", required =
-                                     false) String typePhase) {
+    public Result<?> searchPage(@RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
+            @RequestParam(value = "pageSize", defaultValue = "5") int pageSize,
+            @RequestParam(value = "Description", required = false) String description,
+            @RequestParam(value = "taskType", required = false) Integer taskType,
+            @RequestParam(value = "Location", required = false) String location,
+            @RequestParam(value = "CreatedAt", required = false) LocalDate createdAt,
+            @RequestParam(value = "TypePhase", required = false) String typePhase) {
         log.info("搜索页面{}，{}，{},{},{}", taskType, createdAt, location, typePhase, description);
         DraftConfig draftConfig = new DraftConfig(createdAt, description, location, pageNum, pageSize,
-                                                  taskType,
-                                                  TaskPhase.fromValue(typePhase));
-        PageResult<Task> taskPageResult =
-                taskService.searchPageByAdmin(draftConfig);
+                taskType,
+                TaskPhase.fromValue(typePhase));
+        PageResult<Task> taskPageResult = taskService.searchPageByAdmin(draftConfig);
         return Result.success(taskPageResult);
     }
 
-
     @GetMapping("/{TaskID}")
     @ApiOperation("根据id查询")
-    public Result searchTask(@PathVariable("TaskID") Long taskID) throws MyException {
+    public Result<?> searchTask(@PathVariable("TaskID") Long taskID) throws MyException {
         log.info("根据id查询{}", taskID);
 
         return Result.success(taskService.searchTask(taskID));
     }
 
-
     @DeleteMapping("/{TaskID}")
     @ApiOperation("管理员删除委托")
-    public Result deleteTask(@PathVariable("TaskID") Long taskID) {
+    public Result<?> deleteTask(@PathVariable("TaskID") Long taskID) {
         Task task = taskService.getById(taskID);
         if (task == null || task.getStatus() == TaskStatus.ONGOING) {
             return Result.error(MessageConstants.TASK_NOT_EXIST);
@@ -141,18 +150,16 @@ public class TaskAdminController {
                 .updateType(TaskUpdateType.RESULT)
                 .updateDescription(MessageConstants.TASK_DRAFT_DELETE_SUCCESS).build();
         taskUpdatesService.save(taskupdates);
-        //todo 通知用户
-         Long id =
-                 notificationsService.addTaskDeleteNotification(users.getUserId(), 
-                                                       "您的委托已被删除");
-         // log.info("管理员删除委托成功{}", acceptRecordId);
+        // todo 通知用户
+        Long id = notificationsService.addTaskDeleteNotification(users.getUserId(),
+                "您的委托已被删除");
+        // log.info("管理员删除委托成功{}", acceptRecordId);
         notificationReadStatusService.addTaskNotification(id,
-                                                          task.getOwnerId(),
-                                                          users.getUserId());
+                task.getOwnerId(),
+                users.getUserId());
         log.info("管理员删除委托成功{}", taskID);
         return Result.success(MessageConstants.TASK_DELETE_SUCCESS);
     }
-
 
     /**
      * 回退草稿
@@ -165,7 +172,7 @@ public class TaskAdminController {
      */
     @PutMapping("/getFallbackDraft/{TaskID}")
     @ApiOperation("管理员回退草稿")
-    public Result fallbackDraft(@PathVariable("TaskID") Long taskId) throws MyException {
+    public Result<?> fallbackDraft(@PathVariable("TaskID") Long taskId) throws MyException {
         log.info("管理员获取回退草稿{}", taskId);
         Task task = taskService.getById(taskId);
         if (task == null || task.getStatus() == TaskStatus.ONGOING) {
@@ -181,7 +188,6 @@ public class TaskAdminController {
         return Result.success(MessageConstants.TASK_UPDATE_SUCCESS);
     }
 
-
     /**
      * 允许发布
      *
@@ -193,7 +199,7 @@ public class TaskAdminController {
      */
     @PutMapping("/allowPublish/{TaskID}")
     @ApiOperation("管理员允许发布")
-    public Result allowPublish(@PathVariable("TaskID") Long taskId) throws MyException {
+    public Result<?> allowPublish(@PathVariable("TaskID") Long taskId) throws MyException {
         log.info("管理员允许发布{}", taskId);
         Task task = taskService.getById(taskId);
         if (task == null || task.getStatus() == TaskStatus.ONGOING) {
@@ -205,11 +211,10 @@ public class TaskAdminController {
             log.error("委托审核失败{}", taskId);
             return Result.error(MessageConstants.DATABASE_ERROR);
         }
-        
+
         return Result.success(MessageConstants.TASK_UPDATE_SUCCESS);
 
     }
-
 
     /**
      * 不允许
@@ -222,7 +227,7 @@ public class TaskAdminController {
      */
     @PutMapping("/notAllowed/{TaskID}")
     @ApiOperation("管理员不允许发布")
-    public Result notAllowed(@PathVariable("TaskID") Long taskId) throws MyException {
+    public Result<?> notAllowed(@PathVariable("TaskID") Long taskId) throws MyException {
         log.info("管理员不允许发布{}", taskId);
         Task task = taskService.getById(taskId);
         if (task == null || task.getStatus() == TaskStatus.ONGOING) {
@@ -234,38 +239,32 @@ public class TaskAdminController {
             log.error("委托审核失败{}", taskId);
             return Result.error(MessageConstants.DATABASE_ERROR);
         }
-        
+
         return Result.success(MessageConstants.TASK_UPDATE_SUCCESS);
     }
-    
-    
-    
+
     @PutMapping("/handleEnableAdmin/{id}")
     @ApiOperation("管理员启用")
-    public Result handleEnableAdmin(@PathVariable("id") Long id) throws MyException {
+    public Result<?> handleEnableAdmin(@PathVariable("id") Long id) throws MyException {
         log.info("管理员启用{}", id);
         usersService.cancelDisableUser(id);
         return Result.success(MessageConstants.USER_ABLE_SUCCESS);
     }
-    
+
     @PutMapping("/handleDisableAdmin/{id}")
     @ApiOperation("管理员禁用")
-    public Result handleDisableAdmin(@PathVariable("id") Long id) throws MyException {
+    public Result<?> handleDisableAdmin(@PathVariable("id") Long id) throws MyException {
         log.info("管理员禁用{}", id);
         usersService.disableUser(id);
         return Result.success(MessageConstants.USER_DISABLE_SUCCESS);
     }
-    
+
     @PutMapping("/withdrawReleaseByTaskID/{id}")
     @ApiOperation("管理员撤回发布")
-    public Result withdrawReleaseByTaskID(@PathVariable("id") Long id) throws MyException {
+    public Result<?> withdrawReleaseByTaskID(@PathVariable("id") Long id) throws MyException {
         log.info("管理员撤回发布{}", id);
         taskService.withdrawReleaseByTaskID(id);
         return Result.success(MessageConstants.TASK_WITHDRAW_SUCCESS);
     }
-    
-    
-    
-    
-    
+
 }

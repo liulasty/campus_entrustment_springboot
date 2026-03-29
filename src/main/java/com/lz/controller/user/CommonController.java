@@ -1,5 +1,16 @@
 package com.lz.controller.user;
 
+import java.util.Date;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
 /*
  * Created with IntelliJ IDEA.
  * @Author: lz
@@ -12,14 +23,9 @@ import com.lz.pojo.entity.IpLogs;
 import com.lz.pojo.result.Result;
 import com.lz.service.IpLogsService;
 import com.lz.utils.IpUtil;
+
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.ServletRequest;
-import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
 
 /**
  * @author lz
@@ -28,18 +34,20 @@ import java.util.Date;
 @RequestMapping("/common")
 @Api(tags = "公共控制器")
 @Slf4j
-@CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
+@CrossOrigin(origins = "*", allowedHeaders = "*", methods = { RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT,
+        RequestMethod.DELETE })
 public class CommonController {
-    
+
     @Autowired
     private IpLogsService ipLogsService;
+
     /**
      * 获取当前登录用户的IP地址
      *
      * @return
      */
     @GetMapping("/getUserIp")
-    public Result getIp( HttpServletRequest request) {
+    public Result<?> getIp(HttpServletRequest request) {
         String ipAdrress = IpUtil.getIpAdrress(request);
         Long currentId = BaseContext.getCurrentId();
         log.info("当前登录用户ID：{}", currentId);

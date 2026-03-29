@@ -1,24 +1,18 @@
 package com.lz.pojo.entity;
 
-import com.alibaba.fastjson.annotation.JSONField;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.Date;
-import java.util.List;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 /**
  * 用户
@@ -32,7 +26,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 @EqualsAndHashCode(callSuper = false)
 @TableName("users")
 @Builder
-@ApiModel(value="Users对象", description="存储系统用户信息")
+@ApiModel(value = "Users对象", description = "存储系统用户信息")
 public class Users implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -49,8 +43,6 @@ public class Users implements Serializable {
 
     @ApiModelProperty(value = "电子邮件地址")
     private String email;
-
-
 
     @ApiModelProperty(value = "用户是否激活")
     @TableField("IsActive")
@@ -70,5 +62,4 @@ public class Users implements Serializable {
     @TableField("IsEnabled")
     private Boolean isEnabled;
 
-    
 }

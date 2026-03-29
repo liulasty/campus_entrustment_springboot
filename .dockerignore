@@ -1,0 +1,26 @@
+# Git
+.git
+.gitignore
+
+# Maven
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!target/*.jar
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+
+# Environment files
+config/.env.dev
+config/.env.prod
+
+# Logs
+logs/
+*.log
+
+# Docker
+docker-compose*.yml
+docker/
+scripts/

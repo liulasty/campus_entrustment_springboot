@@ -1,8 +1,19 @@
 package com.lz.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lz.Exception.MyException;
+import com.lz.mapper.NotificationsMapper;
 import com.lz.mapper.SystemAnnouncementsMapper;
 import com.lz.mapper.UsersMapper;
 import com.lz.pojo.Enum.NotificationsType;
@@ -12,24 +23,13 @@ import com.lz.pojo.dto.NotificationDTO;
 import com.lz.pojo.dto.SendDataDTO;
 import com.lz.pojo.entity.NotificationReadStatus;
 import com.lz.pojo.entity.Notifications;
-import com.lz.mapper.NotificationsMapper;
-import com.lz.pojo.entity.SystemAnnouncements;
 import com.lz.pojo.entity.Users;
 import com.lz.pojo.vo.NoticeItemVO;
 import com.lz.pojo.vo.NoticeVO;
 import com.lz.service.INotificationReadStatusService;
 import com.lz.service.INotificationsService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * <p>
@@ -41,7 +41,8 @@ import java.util.List;
  */
 @Service
 @Slf4j
-public class NotificationsServiceImpl extends ServiceImpl<NotificationsMapper, Notifications> implements INotificationsService {
+public class NotificationsServiceImpl extends ServiceImpl<NotificationsMapper, Notifications>
+        implements INotificationsService {
 
     @Autowired
     private SystemAnnouncementsMapper systemAnnouncementsMapper;
@@ -63,7 +64,6 @@ public class NotificationsServiceImpl extends ServiceImpl<NotificationsMapper, N
 
     }
 
-
     @Override
     public void getNewestNotifications() {
 
@@ -80,10 +80,11 @@ public class NotificationsServiceImpl extends ServiceImpl<NotificationsMapper, N
      * @return 页面<通知>
      */
     @Override
-    public Page<Notifications> selectList(Page<Notifications> page, Date createAt, String messageType, String description) {
+    public Page<Notifications> selectList(Page<Notifications> page, Date createAt, String messageType,
+            String description) {
         Page<Notifications> notificationsPage = notificationsMapper.selectPageAdmin(page,
-                                                                                    createAt, messageType,
-                                                                                    description);
+                createAt, messageType,
+                description);
 
         return notificationsPage;
     }
@@ -172,9 +173,8 @@ public class NotificationsServiceImpl extends ServiceImpl<NotificationsMapper, N
         log.info("通知类型: {}", NotificationsType.fromDbValue(str).getWebValue());
 
         Users users = getCurrentAdmin();
-        list =
-                notificationsMapper.selectListByType(users.getUserId(),
-                                                     NotificationsType.fromDbValue(str).getDbValue());
+        list = notificationsMapper.selectListByType(users.getUserId(),
+                NotificationsType.fromDbValue(str).getDbValue());
         return list;
     }
 
@@ -182,14 +182,14 @@ public class NotificationsServiceImpl extends ServiceImpl<NotificationsMapper, N
     public NoticeVO getInfoById(Long id) {
         if (id != null) {
             NoticeVO noticeVO = notificationsMapper.getInfoById(id);
-            if (!noticeVO.getIsRead()){
+            if (!noticeVO.getIsRead()) {
                 NotificationReadStatus notificationReadStatus = new NotificationReadStatus();
                 notificationReadStatus.setId(id);
                 notificationReadStatus.setIsRead(true);
                 notificationReadStatus.setReadTime(new Date(System.currentTimeMillis()));
                 notificationReadStatusService.updateById(notificationReadStatus);
             }
-            
+
             return noticeVO;
         }
         return null;
@@ -197,7 +197,7 @@ public class NotificationsServiceImpl extends ServiceImpl<NotificationsMapper, N
 
     @Override
     public void addTaskConfirmTheRecipient(Long userId,
-                                           String taskAcceptanceProcessedSuccess, NotificationsType task, String s, Long taskId) throws MyException {
+            String taskAcceptanceProcessedSuccess, NotificationsType task, String s, Long taskId) throws MyException {
         Notifications notifications = Notifications.builder()
                 .userId(userId)
                 .notificationTime(new Date(System.currentTimeMillis()))
@@ -210,13 +210,14 @@ public class NotificationsServiceImpl extends ServiceImpl<NotificationsMapper, N
             throw new MyException(MessageConstants.ADD_MESSAGE_FAILURE);
         }
         notificationReadStatusService.addTaskConfirmTheRecipient(insert,
-                                                                 taskId,
-                                                                 userId,
-                                                                 new Date(System.currentTimeMillis()));
+                taskId,
+                userId,
+                new Date(System.currentTimeMillis()));
     }
 
     @Override
-    public void addTaskAcceptanceSelected(Long userId, String taskAcceptanceProcessedFailed, NotificationsType task, String s, Long taskId) throws MyException {
+    public void addTaskAcceptanceSelected(Long userId, String taskAcceptanceProcessedFailed, NotificationsType task,
+            String s, Long taskId) throws MyException {
         Notifications notifications = Notifications.builder()
                 .userId(userId)
                 .notificationTime(new Date(System.currentTimeMillis()))
@@ -229,14 +230,14 @@ public class NotificationsServiceImpl extends ServiceImpl<NotificationsMapper, N
             throw new MyException(MessageConstants.ADD_MESSAGE_FAILURE);
         }
         notificationReadStatusService.addTaskConfirmTheRecipient(insert,
-                                                                 taskId,
-                                                                 userId,
-                                                                 new Date(System.currentTimeMillis()));
+                taskId,
+                userId,
+                new Date(System.currentTimeMillis()));
     }
 
     @Override
     public void addTaskAuditNotificationService(String reviewStatus) {
-        
+
     }
 
     @Override
@@ -245,7 +246,8 @@ public class NotificationsServiceImpl extends ServiceImpl<NotificationsMapper, N
                 .message(updateDescription)
                 .notificationTime(new Date(System.currentTimeMillis()))
                 .notificationType(NotificationsType.TASK)
-                .userId(ownerId) // 这里记录的是发送者ID，通常应该是系统管理员ID或触发者ID，但在当前逻辑中，sendTaskNotification 的 ownerId 参数被用作接收通知的用户ID。
+                .userId(ownerId) // 这里记录的是发送者ID，通常应该是系统管理员ID或触发者ID，但在当前逻辑中，sendTaskNotification 的 ownerId
+                                 // 参数被用作接收通知的用户ID。
                                  // 然而，根据数据库设计，Notifications 表的 UserID 字段含义是 "发送通知的用户ID"。
                                  // 真正的接收关系是在 NotificationReadStatus 表中建立的。
                 .build();
@@ -256,15 +258,15 @@ public class NotificationsServiceImpl extends ServiceImpl<NotificationsMapper, N
         } catch (Exception e) {
             notifications.setUserId(1L); // 无法获取当前用户时，默认为系统管理员
         }
-        
+
         notificationsMapper.insert(notifications);
 
         // 在 NotificationReadStatus 中建立通知与接收用户(ownerId)的关系
         notificationReadStatusService.addTaskNotification(notifications.getNotificationId(), taskId,
-                                                          ownerId);
-        
-        
+                ownerId);
+
     }
+
     public Users getCurrentAdmin() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String adminName = authentication.getName();
@@ -272,6 +274,5 @@ public class NotificationsServiceImpl extends ServiceImpl<NotificationsMapper, N
 
         return usersMapper.getByUsername(adminName);
     }
-
 
 }

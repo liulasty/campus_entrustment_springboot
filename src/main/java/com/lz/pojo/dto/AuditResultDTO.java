@@ -10,7 +10,6 @@ package com.lz.pojo.dto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * 审核结果结果 DTO

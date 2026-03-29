@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+  backend:
+    image: ${REGISTRY:-docker.io}/${APP_NAME}-backend:${IMAGE_TAG:-latest}
+    container_name: ${APP_NAME}-backend
+    environment:
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-dev}
+      - JAVA_OPTS=${JAVA_OPTS:--Xmx512m}
+      - SERVER_PORT=${BACKEND_PORT:-8080}
+      # Database and Redis variables mapped from .env
+      - SPRING_DATASOURCE_URL=jdbc:mysql://${DB_HOST:-host.docker.internal}:${DB_PORT:-3306}/${DB_NAME:-campus_entrustment}?serverTimezone=GMT%2B8&characterEncoding=utf-8&useSSL=false
+      - SPRING_DATASOURCE_USERNAME=${DB_USER:-root}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD:-root}
+      - SPRING_REDIS_HOST=${REDIS_HOST:-host.docker.internal}
+      - SPRING_REDIS_PORT=${REDIS_PORT:-6379}
+      - SPRING_REDIS_PASSWORD=${REDIS_PASSWORD:-}
+    # Important: Maps host.docker.internal to the host gateway on Linux. 
+    # Works natively on Docker Desktop (Windows/Mac).
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - appnet
+
+networks:
+  appnet:
+    driver: bridge
+    name: ${APP_NAME}-network

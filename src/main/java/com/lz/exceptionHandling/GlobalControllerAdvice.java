@@ -1,13 +1,14 @@
 package com.lz.exceptionHandling;
 
-import com.lz.Exception.InvalidTokenException;
-import com.lz.Exception.MyException;
-import com.lz.Exception.NoAthleteException;
-import com.lz.Exception.UsernameNotFoundException;
-import com.lz.pojo.constants.MessageConstants;
-import com.lz.pojo.result.ErrorCode;
-import com.lz.pojo.result.Result;
-import lombok.extern.slf4j.Slf4j;
+import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
@@ -18,18 +19,20 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import com.lz.Exception.InvalidTokenException;
+import com.lz.Exception.MyException;
+import com.lz.Exception.NoAthleteException;
+import com.lz.Exception.UsernameNotFoundException;
+import com.lz.pojo.constants.MessageConstants;
+import com.lz.pojo.result.ErrorCode;
+import com.lz.pojo.result.Result;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author lz
- * <p>
- * 通过全局异常处理的方式统一处理异常。
+ *         <p>
+ *         通过全局异常处理的方式统一处理异常。
  */
 @RestControllerAdvice
 @RestController
@@ -40,7 +43,7 @@ public class GlobalControllerAdvice {
      * 处理 form data方式调用接口校验失败抛出的异常
      */
     @ExceptionHandler(BindException.class)
-    public Result<String> bindExceptionHandler(BindException e) {
+    public Result<?> bindExceptionHandler(BindException e) {
         log.error("form data方式调用接口校验失败: {}", e.getMessage());
         List<FieldError> fieldErrors = e.getBindingResult().getFieldErrors();
         String msg = fieldErrors.stream()
@@ -53,7 +56,7 @@ public class GlobalControllerAdvice {
      * 处理 json 请求体调用接口校验失败抛出的异常
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Result<String> methodArgumentNotValidExceptionHandler(MethodArgumentNotValidException e) {
+    public Result<?> methodArgumentNotValidExceptionHandler(MethodArgumentNotValidException e) {
         log.error("json 请求体调用接口校验失败: {}", e.getMessage());
         List<FieldError> fieldErrors = e.getBindingResult().getFieldErrors();
         String msg = fieldErrors.stream()
@@ -66,7 +69,7 @@ public class GlobalControllerAdvice {
      * 处理单个参数校验失败抛出的异常
      */
     @ExceptionHandler(ConstraintViolationException.class)
-    public Result<String> constraintViolationExceptionHandler(ConstraintViolationException e) {
+    public Result<?> constraintViolationExceptionHandler(ConstraintViolationException e) {
         log.error("单个参数校验失败: {}", e.getMessage());
         Set<ConstraintViolation<?>> constraintViolations = e.getConstraintViolations();
         String msg = constraintViolations.stream()
@@ -76,7 +79,7 @@ public class GlobalControllerAdvice {
     }
 
     @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
-    public Result<String> sqlIntegrityConstraintViolationException(SQLIntegrityConstraintViolationException e) {
+    public Result<?> sqlIntegrityConstraintViolationException(SQLIntegrityConstraintViolationException e) {
         log.error("数据完整性违规异常: {}", e.getMessage());
         return Result.error(ErrorCode.DUPLICATE_KEY);
     }
@@ -85,37 +88,37 @@ public class GlobalControllerAdvice {
      * 处理SQL异常
      */
     @ExceptionHandler(SQLException.class)
-    public Result<String> exceptionHandler(SQLException e) {
+    public Result<?> exceptionHandler(SQLException e) {
         log.error("发生SQL异常: {}", e.getMessage());
         return Result.error(ErrorCode.DATABASE_ERROR);
     }
 
     @ExceptionHandler(NullPointerException.class)
-    public Result<String> exceptionHandler(NullPointerException e) {
+    public Result<?> exceptionHandler(NullPointerException e) {
         log.error("发生空指针异常:", e);
         return Result.error(ErrorCode.SYSTEM_ERROR, "系统内部错误(NPE)");
     }
 
     @ExceptionHandler(MyException.class)
-    public Result<String> myException(MyException e) {
+    public Result<?> myException(MyException e) {
         log.error("发生业务异常: {}", e.getMessage());
         return Result.error(ErrorCode.BUSINESS_ERROR, e.getMessage());
     }
 
     @ExceptionHandler(NoAthleteException.class)
-    public Result<String> noAthleteException(NoAthleteException e) {
+    public Result<?> noAthleteException(NoAthleteException e) {
         log.error("未找到相关人员异常: {}", e.getMessage());
         return Result.error(ErrorCode.USER_NOT_FOUND, e.getMessage());
     }
 
     @ExceptionHandler(UsernameNotFoundException.class)
-    public Result<String> usernameNotFoundException(UsernameNotFoundException e) {
+    public Result<?> usernameNotFoundException(UsernameNotFoundException e) {
         log.error("用户名不存在异常: {}", e.getMessage());
         return Result.error(ErrorCode.USER_NOT_FOUND, e.getMessage());
     }
 
     @ExceptionHandler(AuthenticationException.class)
-    public Result<String> authenticationExceptionResult(AuthenticationException e) {
+    public Result<?> authenticationExceptionResult(AuthenticationException e) {
         log.error("认证失败异常: {}", e.getMessage());
         if (MessageConstants.BAD_PASSWORD_ERROR.equals(e.getMessage())) {
             return Result.error(ErrorCode.PASSWORD_ERROR, MessageConstants.DATABASE_PASSWORD_ERROR);
@@ -125,21 +128,21 @@ public class GlobalControllerAdvice {
 
     // 拦截AccessDeniedException
     @ExceptionHandler(AccessDeniedException.class)
-    public Result<String> accessDeniedExceptionResult(AccessDeniedException e) {
+    public Result<?> accessDeniedExceptionResult(AccessDeniedException e) {
         log.error("权限不足异常: {}", e.getMessage());
         return Result.error(ErrorCode.FORBIDDEN);
     }
 
     // 拦截InvalidTokenException
     @ExceptionHandler(InvalidTokenException.class)
-    public Result<String> invalidTokenExceptionResult(InvalidTokenException e) {
+    public Result<?> invalidTokenExceptionResult(InvalidTokenException e) {
         log.error("无效令牌异常: {}", e.getMessage());
         return Result.error(ErrorCode.TOKEN_INVALID, e.getMessage());
     }
 
     // 兜底异常处理
     @ExceptionHandler(Exception.class)
-    public Result<String> globalExceptionHandler(Exception e) {
+    public Result<?> globalExceptionHandler(Exception e) {
         log.error("发生未知系统异常:", e);
         return Result.error(ErrorCode.SYSTEM_ERROR, "系统繁忙，请稍后重试");
     }

@@ -8,12 +8,12 @@ src/main/resources/application-dev.yml
 src/main/resources/application-devDB.yml
 src/main/resources/application-devMVC.yml
 
-
-
-
-
 # IDE-specific file
 .idea
 
 *.log
 *.iml
+
+# Environment variables
+config/.env.dev
+config/.env.prod

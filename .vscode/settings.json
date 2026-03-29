@@ -1,3 +1,42 @@
 {
-    "java.compile.nullAnalysis.mode": "disabled"
+    // ==================== JDK 8 核心配置 ====================
+    "java.configuration.runtimes": [
+        {
+            "name": "JavaSE-1.8",
+            "path": "D:\\CODE\\.jdks\\jdk1.8.0_111",
+            "default": true
+        }
+    ],
+    "java.jdt.ls.java.home": "D:\\CODE\\.jdks\\jdk1.8.0_111",
+    // ==================== Maven 配置 ====================
+    "maven.executable.path": "D:\\CODE\\apache-maven-3.6.3\\bin\\mvn.cmd",
+    "maven.terminal.useJavaHome": true,
+    "maven.terminal.customEnv": [
+        {
+            "environmentVariable": "JAVA_HOME",
+            "value": "D:\\CODE\\.jdks\\jdk1.8.0_111"
+        }
+    ],
+    "java.maven.downloadSources": true,
+    "java.maven.downloadJavadoc": true,
+    // ==================== 【已修复】保存时自动操作（最新标准写法） ====================
+    // 旧配置已废弃，替换为这个
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": "explicit", // 自动整理导入包
+        "source.fixAll": "explicit" // 自动修复代码问题
+    },
+    "editor.formatOnSave": true, // 保存自动格式化
+    // ==================== 项目编译 ====================
+    "java.compile.nullAnalysis.mode": "automatic",
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "java.errors.incompleteClasspath.severity": "ignore",
+    "java.import.exclusions": [
+        "**/bin",
+        "**/target",
+        "**/.mvn"
+    ],
+    // ==================== 编码与调试 ====================
+    "files.encoding": "utf8",
+    "java.debug.settings.vmArgs": "-Dfile.encoding=UTF-8",
+    "debug.console.showVariableTypes": true
 }

@@ -9,7 +9,6 @@ import com.lz.pojo.constants.MessageConstants;
 import com.lz.pojo.dto.PassWordDTO;
 import com.lz.pojo.dto.UserDTO;
 import com.lz.pojo.dto.UserLoginDTO;
-import com.lz.pojo.dto.UsersPageDTO;
 import com.lz.pojo.entity.Users;
 import com.lz.pojo.entity.UsersInfo;
 import com.lz.pojo.result.PageResult;
@@ -21,15 +20,12 @@ import com.lz.utils.JwtUtil;
 import com.lz.utils.ValidateUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.validation.BindingResult;
@@ -46,7 +42,8 @@ import java.util.*;
  * @since 2024-04-04
  */
 @RestController
-@CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
+@CrossOrigin(origins = "*", allowedHeaders = "*",
+        methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
 @RequestMapping("/user")
 @Api(tags = "用户相关接口")
 @Slf4j
@@ -57,7 +54,7 @@ public class UsersController {
 
     @Autowired
     private IUsersService usersService;
-    
+
     @Autowired
     private IUsersInfoService userInfoService;
 
@@ -79,22 +76,19 @@ public class UsersController {
     @PostMapping(value = "/login")
     @ApiOperation("登录")
     @NoReturnHandle
-    public Result<UserLoginVO> login(@Validated @RequestBody UserLoginDTO userLoginDTO, BindingResult result) throws MyException {
-        log.info("用户登录:{},用户密码 {}", userLoginDTO.getUsername(),
-                 userLoginDTO.getPassword());
-        //校验结果
+    public Result<UserLoginVO> login(@Validated @RequestBody UserLoginDTO userLoginDTO,
+            BindingResult result) throws MyException {
+        log.info("用户登录:{},用户密码 {}", userLoginDTO.getUsername(), userLoginDTO.getPassword());
+        // 校验结果
         if (ValidateUtil.validate(result) != null) {
             log.info("用户登录校验失败:{}", ValidateUtil.validate(result));
             return Result.error(ValidateUtil.validate(result));
         }
         {
             // 使用Spring Security进行身份验证
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            userLoginDTO.getUsername(),
-                            userLoginDTO.getPassword()
-                    )
-            );
+            Authentication authentication =
+                    authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                            userLoginDTO.getUsername(), userLoginDTO.getPassword()));
             log.info("用户登录成功:{}", authentication);
 
 
@@ -110,20 +104,19 @@ public class UsersController {
             claims.put("role", user.getRole());
             String token = JwtUtil.genToken(claims, appConfig.getJwtKey());
             UsersInfo usersInfo = null;
-            if (user.getRole() != ROLE_ADMIN){
+            if (user.getRole() != ROLE_ADMIN) {
                 usersInfo = userInfoService.getById(user.getUserId());
             }
 
-            
-            UserLoginVO loginVO = UserLoginVO.builder()
-                    .userId(user.getUserId())
+
+            UserLoginVO loginVO = UserLoginVO.builder().userId(user.getUserId())
                     .userType(user.getRole())
-                    .Authorization(usersInfo == null ? null : usersInfo.getAuthStatus().getDescription())
-                    .token(token)
-                    .build();
+                    .Authorization(
+                            usersInfo == null ? null : usersInfo.getAuthStatus().getDescription())
+                    .token(token).build();
             // boolean login = usersService.login(userLoginDTO);
             // if (!login) {
-            //     return Result.error(MessageConstants.USER_LOGIN_FAIL);
+            // return Result.error(MessageConstants.USER_LOGIN_FAIL);
             // }
             // 登录成功，生成JWT并添加到响应中
             // Spring Security验证成功，无需再执行usersService.login()
@@ -142,7 +135,7 @@ public class UsersController {
     @ApiOperation("注册")
     public Result<String> register(@Validated @RequestBody UserDTO userDTO, BindingResult result) {
         log.info("用户注册:{}", userDTO);
-        //校验结果
+        // 校验结果
         if (ValidateUtil.validate(result) != null) {
             return Result.error(ValidateUtil.validate(result));
         }
@@ -239,17 +232,16 @@ public class UsersController {
      * 按页面获取用户信息
      *
      * @param username 用户名
-     * @param email    电子邮件
+     * @param email 电子邮件
      * @param isActive 处于活动状态
-     * @param page     页
-     * @param size     大小
+     * @param page 页
+     * @param size 大小
      *
      * @return {@code Result<PageResult>}
      */
     @GetMapping(value = "/page")
     @ApiOperation("分页查询用户信息")
-    public Result<PageResult> getUserInfoByPage(
-            @RequestParam(required = false) String username,
+    public Result<PageResult> getUserInfoByPage(@RequestParam(required = false) String username,
             @RequestParam(required = false) String email,
             @RequestParam(required = false) String isActive,
             @RequestParam(defaultValue = "1") int page,
@@ -259,13 +251,8 @@ public class UsersController {
         if (isActive != null && !"".equals(isActive)) {
             is = "TRUE".equals(isActive);
         }
-        UsersConfig config = UsersConfig.builder()
-                .username(username)
-                .email(email)
-                .isActive(is)
-                .page(page)
-                .size(size)
-                .build();
+        UsersConfig config = UsersConfig.builder().username(username).email(email).isActive(is)
+                .page(page).size(size).build();
         log.info("分页查询用户信息:{}", config);
         return Result.success(usersService.getUserByPage(config));
     }
@@ -409,8 +396,9 @@ public class UsersController {
 
     @ApiOperation("修改密码")
     @PutMapping("/editPassword")
-    public Result<String> editPassword(@Validated @RequestBody PassWordDTO passWordDTO, BindingResult result) throws MyException {
-        //校验结果
+    public Result<String> editPassword(@Validated @RequestBody PassWordDTO passWordDTO,
+            BindingResult result) throws MyException {
+        // 校验结果
         if (ValidateUtil.validate(result) != null) {
             log.info("用户修改密码校验失败:{}", ValidateUtil.validate(result));
             return Result.error(ValidateUtil.validate(result));
